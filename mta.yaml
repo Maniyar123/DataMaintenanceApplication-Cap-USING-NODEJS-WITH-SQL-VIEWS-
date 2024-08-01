@@ -65,6 +65,14 @@ modules:
       - comproductdetailsapplicationproductdetailsapplication.zip
       name: comproductdetailsapplicationproductdetailsapplication
       target-path: resources/
+    - artifacts:
+      - commaintaninceapplicationmaintenanceapplication.zip
+      name: commaintaninceapplicationmaintenanceapplication
+      target-path: resources/
+    - artifacts:
+      - commaintenanceapplicationmaintenanceapplication.zip
+      name: commaintenanceapplicationmaintenanceapplication
+      target-path: resources/
 - name: comcarproductapplicationproductsapplication
   type: html5
   path: app/productsapplication
@@ -78,6 +86,26 @@ modules:
 - name: comproductdetailsapplicationproductdetailsapplication
   type: html5
   path: app/productdetailsapplication
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: commaintaninceapplicationmaintenanceapplication
+  type: html5
+  path: app/maintenanceapplication
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: commaintenanceapplicationmaintenanceapplication
+  type: html5
+  path: app/maintenanceapplication
   build-parameters:
     build-result: dist
     builder: custom

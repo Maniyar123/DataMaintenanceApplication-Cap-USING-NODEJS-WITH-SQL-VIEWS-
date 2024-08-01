@@ -1,0 +1,58 @@
+<mvc:View controllerName="com.maintenanceapplication.maintenanceapplication.controller.ProductView"
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+    xmlns="sap.m"
+    xmlns:f="sap.f">
+   <f:DynamicPage id="dynamicPage" >
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="Maintenance Application" />
+                </f:heading>
+            </f:DynamicPageTitle>
+        </f:title>
+        <f:header>
+            <f:DynamicPageHeader>
+                <Toolbar class="productToolbar">
+                    <!-- <Title text="Product Selection" /> -->
+                    
+                    <Input
+                        id="productInput"
+                        placeholder="Select a Product"
+                        showValueHelp="true"
+                        valueHelpRequest="onValueHelpRequest"
+                        width="50%"
+                    />
+                </Toolbar>
+            </f:DynamicPageHeader>
+        </f:header>
+        <f:content>
+            <Table id="productTable" items="{/Products}" >
+                <headerToolbar>
+                    <Toolbar>
+                        <Title text="Products" />
+                    </Toolbar>
+                </headerToolbar>
+                <columns>
+                    <Column>
+                        <Text text="Product ID" />
+                    </Column>
+                    <Column>
+                        <Text text="Product Name" />
+                    </Column>
+                    <Column>
+                        <Text text="Master Data Number" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <ObjectIdentifier title="{productId}" />
+                            <Text text="{productName}" />
+                            <Text text="{masterClass/masterDataNumber}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>

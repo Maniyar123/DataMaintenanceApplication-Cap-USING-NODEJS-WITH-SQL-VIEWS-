@@ -1,0 +1,42 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:table="sap.ui.table">
+    <Dialog
+        id="hierarchicalDataDialog"
+        title="Hierarchical Data"
+        class="sapUiResponsivePadding--header sapUiResponsivePadding--content sapUiResponsivePadding--footer"
+        stretch="true">
+        <VBox>
+            <table:TreeTable
+                id="hierarchicalDataTreeTable"
+                rows="{hierarchicalDataModel>/}"
+                selectionMode="Single"
+                enableSelectAll="false">
+                <table:columns>
+                    <table:Column>
+                        <Text text="Characteristic" />
+                        <table:template>
+                            <Text text="{hierarchicalDataModel>characteristicName}" />
+                        </table:template>
+                    </table:Column>
+                    <table:Column>
+                        <Text text="Sub-Characteristic" />
+                        <table:template>
+                            <Text text="{hierarchicalDataModel>subCharacteristicName}" />
+                        </table:template>
+                    </table:Column>
+                    <table:Column>
+                        <Text text="Value" />
+                        <table:template>
+                            <Text text="{hierarchicalDataModel>value}" />
+                        </table:template>
+                    </table:Column>
+                </table:columns>
+            </table:TreeTable>
+        </VBox>
+        <endButton>
+            <Button text="Close" press="onCloseDialog" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

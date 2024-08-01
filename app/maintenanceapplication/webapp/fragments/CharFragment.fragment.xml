@@ -1,0 +1,38 @@
+<!-- CharacteristicFragment.fragment.xml -->
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Dialog title="Characteristics" id="characteristicsDetailDialog" draggable="true" >
+   
+       <beginButton>
+            <Button icon="sap-icon://add" press="onActionButtonPress" />
+        </beginButton>
+        
+       
+        <content>
+            <Table id="characteristicsDetailTable" items="{/Characteristics}" >
+                <columns>
+                    <Column>
+                        <Text text="Characteristic Number" />
+                    </Column>
+                    <Column>
+                        <Text text="Characteristic Name" />
+                    </Column>
+                    <Column>
+                        <Text text="Sub Category Number" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <cells>
+                            <Text text="{characteristicNumber}" />
+                            <Text text="{characteristicName}" />
+                            <Text text="{subCategorieNumber_subCategorieNumber}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <endButton>
+            <Button text="Close" press="onCloseCharacteristicsDetailDialog" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

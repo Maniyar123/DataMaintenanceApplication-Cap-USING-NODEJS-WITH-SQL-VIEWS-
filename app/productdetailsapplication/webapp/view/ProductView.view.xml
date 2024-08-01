@@ -7,15 +7,17 @@
                 <ToolbarSpacer />
                 <Button text="Create" press="onCreateProduct" />
                 <Button text="Update" press="onUpdateProduct" />
-                <Button text="Delete" press="onDeleteProduct" />
+                <Button text="Delete" press="onDeleteProduct"  id="deleteButton"/>
+                <!-- <Button id="saveButton" text="Save" type="Transparent" press="onSave" visible="false" />
+				<Button id="cancelButton" text="Cancel" type="Transparent" press="onCancel" visible="false" /> -->
             </Toolbar>
         </headerContent>
         
         <content>
-            <IconTabBar>
+            <IconTabBar select="onSelectTab">
                 <items>
-                    <IconTabFilter key="Products" text="PRODUCTS" icon="sap-icon://hint">
-                        <Table id="table" items="{/Products}">
+                    <IconTabFilter key="Products" text="PRODUCTS" icon="sap-icon://inventory">
+                        <Table id="table" items="{/Products}" mode="MultiSelect" alternateRowColors="true">
                             <columns>
                                 <Column>
                                     <Text text="ID" />
@@ -29,13 +31,14 @@
                                     <cells>
                                         <Text text="{ID}" />
                                         <Text text="{productName}" />
+                                        
                                     </cells>
                                 </ColumnListItem>
                             </items>
                         </Table>
                     </IconTabFilter>
-                    <IconTabFilter key="Characteristics" text="CHARACTERISTICS" icon="sap-icon://hint">
-                        <Table id="charTable" items="{/Characteristics}">
+                    <IconTabFilter key="Characteristics" text="CHARACTERISTICS" icon="sap-icon://compare">
+                        <Table id="charTable" items="{/Characteristics}" alternateRowColors="true">
                             <columns>
                                 <Column>
                                     <Text text="ID" />

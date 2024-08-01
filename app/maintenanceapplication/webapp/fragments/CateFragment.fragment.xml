@@ -1,0 +1,31 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Dialog title="Categories" id="characteristicsDialog" draggable="true">
+        <content>
+            <Table id="characteristicsTable" items="{/SubCategories}">
+                <columns>
+                    <Column>
+                        <Text text="Sub Categorie Number" />
+                    </Column>
+                    <Column>
+                        <Text text="Sub Categories Name" />
+                    </Column>
+                    <Column>
+                        <Text text="Master Data Number" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem type="Navigation" press="onNavigate">
+                        <cells>
+                            <Text text="{subCategorieNumber}" />
+                            <Text text="{subCategoriesName}" />
+                            <Text text="{masterDataNumber_masterDataNumber}" />
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <endButton>
+            <Button text="Close" press="onCloseCatDialog" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

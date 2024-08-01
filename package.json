@@ -28,7 +28,8 @@
     "undeploy": "cf undeploy productdetails --delete-services --delete-service-keys --delete-service-brokers",
     "build": "rimraf resources mta_archives && mbt build --mtar archive",
     "deploy": "cf deploy mta_archives/archive.mtar --retries 1",
-    "watch-productdetailsapplication": "cds watch --open productdetailsapplication/webapp/index.html?sap-ui-xx-viewCache=false"
+    "watch-productdetailsapplication": "cds watch --open productdetailsapplication/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-maintenanceapplication": "cds watch --open maintenanceapplication/webapp/index.html?sap-ui-xx-viewCache=false"
   },
   "cds": {
     "requires": {
@@ -39,6 +40,7 @@
     }
   },
   "sapux": [
-    "app/productdetailsapplication"
+    "app/productdetailsapplication",
+    "app/maintenanceapplication"
   ]
 }

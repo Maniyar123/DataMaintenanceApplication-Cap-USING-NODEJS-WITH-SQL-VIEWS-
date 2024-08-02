@@ -9,4 +9,8 @@ service CatalogService1 {
     entity CharacteristicValues as projection on pdb.CharacteristicValue;
     
     entity HierarchicalData as projection on pdb.HierarchicalData;
+    
+     
 }              
+
+

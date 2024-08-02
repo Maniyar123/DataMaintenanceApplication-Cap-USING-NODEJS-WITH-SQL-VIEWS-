@@ -1,68 +1,69 @@
 const cds = require('@sap/cds');
+ 
 module.exports = cds.service.impl(async function () {
-    console.log("Inside cds.service.impl...");
-
     this.on('READ', 'HierarchicalData', async (req) => {
-        console.log("Handling READ request for HierarchicalData");
-
         const db = await cds.connect.to('db');
-        // cds.server.listen(4004); // Start the server on port 4004
-
-        console.log("connected to database");
-        
+ 
+        // Define the SQL query
         const query = `
-        SELECT 
-        MYAPP_CHARACTERISTIC.CHARACTERISTICNAME,
-        MYAPP_SUBCHARACTERISTIC.SUBCHARACTERISTICNAME,
-        MYAPP_CHARACTERISTICVALUE.VALUE
-    FROM 
-        MYAPP_CHARACTERISTIC
-        INNER JOIN
-        MYAPP_SUBCHARACTERISTIC
-        ON MYAPP_CHARACTERISTIC.CHARACTERISTICNUMBER = MYAPP_SUBCHARACTERISTIC.CHARACTERISTICNUMBER_CHARACTERISTICNUMBER
-        INNER JOIN
-        MYAPP_CHARACTERISTICVALUE
-        ON MYAPP_SUBCHARACTERISTIC.SUBCHARACTERISTICNUMBER = MYAPP_CHARACTERISTICVALUE.SUBCHARACTERISTICNUMBER_SUBCHARACTERISTICNUMBER;
-    
+            SELECT
+                MYAPP_CHARACTERISTIC.CHARACTERISTICNAME,
+                MYAPP_CHARACTERISTIC.CHARACTERISTICNUMBER,
+                MYAPP_SUBCHARACTERISTIC.SUBCHARACTERISTICNAME,
+                MYAPP_SUBCHARACTERISTIC.SUBCHARACTERISTICNUMBER,
+                MYAPP_CHARACTERISTICVALUE.VALUE
+            FROM
+                MYAPP_CHARACTERISTIC
+                INNER JOIN MYAPP_SUBCHARACTERISTIC
+                ON MYAPP_CHARACTERISTIC.CHARACTERISTICNUMBER = MYAPP_SUBCHARACTERISTIC.CHARACTERISTICNUMBER_CHARACTERISTICNUMBER
+                LEFT JOIN MYAPP_CHARACTERISTICVALUE
+                ON MYAPP_SUBCHARACTERISTIC.SUBCHARACTERISTICNUMBER = MYAPP_CHARACTERISTICVALUE.SUBCHARACTERISTICNUMBER_SUBCHARACTERISTICNUMBER
         `;
-        
-        console.log("Executing query:", query);
-
+ 
         try {
+            // Execute the SQL query
             const result = await db.run(query);
-            console.log("Query result:", result);
-
-            // Transform the flat data into hierarchical structure
+ 
             const hierarchicalData = [];
             const characteristicMap = {};
-
+ 
+            // Process the result set
             result.forEach(row => {
-                if (!characteristicMap[row.CHARACTERISTICNAME]) {
-                    characteristicMap[row.CHARACTERISTICNAME] = {
+                // Create or find the characteristic in the map
+                if (!characteristicMap[row.CHARACTERISTICNUMBER]) {
+                    characteristicMap[row.CHARACTERISTICNUMBER] = {
                         characteristicName: row.CHARACTERISTICNAME,
+                        characteristicNumber: row.CHARACTERISTICNUMBER,
                         subCharacteristics: []
                     };
-                    hierarchicalData.push(characteristicMap[row.CHARACTERISTICNAME]);
+                    hierarchicalData.push(characteristicMap[row.CHARACTERISTICNUMBER]);
                 }
-
-                const characteristic = characteristicMap[row.CHARACTERISTICNAME];
-                const subCharacteristic = characteristic.subCharacteristics.find(sc => sc.subCharacteristicName === row.SUBCHARACTERISTICNAME);
-
+ 
+                const characteristic = characteristicMap[row.CHARACTERISTICNUMBER];
+               
+                // Find or create the sub-characteristic in the characteristic
+                let subCharacteristic = characteristic.subCharacteristics.find(sc => sc.subCharacteristicNumber === row.SUBCHARACTERISTICNUMBER);
+ 
                 if (!subCharacteristic) {
-                    characteristic.subCharacteristics.push({
+                    subCharacteristic = {
                         subCharacteristicName: row.SUBCHARACTERISTICNAME,
-                        values: [row.VALUE]
-                    });
-                } else {
+                        subCharacteristicNumber: row.SUBCHARACTERISTICNUMBER,
+                        values: row.VALUE ? [row.VALUE] : []
+                    };
+                    characteristic.subCharacteristics.push(subCharacteristic);
+                } else if (row.VALUE) {
                     subCharacteristic.values.push(row.VALUE);
                 }
             });
-
-            return hierarchicalData;
+ 
+            // Log hierarchical data for debugging
+            console.log("Hierarchical Data:", JSON.stringify(hierarchicalData, null, 2));
+ 
+            // Return hierarchical data
+            return { value: hierarchicalData };
         } catch (error) {
             console.error("Error executing query:", error);
             throw error;
         }
     });
 });
-

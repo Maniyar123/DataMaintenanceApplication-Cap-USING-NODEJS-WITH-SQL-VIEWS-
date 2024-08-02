@@ -1,42 +1,51 @@
 <core:FragmentDefinition
-    xmlns="sap.m"
     xmlns:core="sap.ui.core"
+    xmlns:m="sap.m"
     xmlns:table="sap.ui.table">
-    <Dialog
-        id="hierarchicalDataDialog"
+    <m:Dialog
+        id="checkboxDialog"
         title="Hierarchical Data"
-        class="sapUiResponsivePadding--header sapUiResponsivePadding--content sapUiResponsivePadding--footer"
+        class="sapUiResponsivePadding"
+        draggable="true"
+        resizable="true"
         stretch="true">
-        <VBox>
+        <m:content>
             <table:TreeTable
                 id="hierarchicalDataTreeTable"
                 rows="{hierarchicalDataModel>/}"
-                selectionMode="Single"
-                enableSelectAll="false">
+                selectionMode="Single">
                 <table:columns>
-                    <table:Column>
-                        <Text text="Characteristic" />
+                    <table:Column
+                        label="Characteristic Name">
                         <table:template>
-                            <Text text="{hierarchicalDataModel>characteristicName}" />
+                            <m:Text text="{hierarchicalDataModel>characteristicName}" />
                         </table:template>
                     </table:Column>
-                    <table:Column>
-                        <Text text="Sub-Characteristic" />
+                    <table:Column
+                        label="Characteristic Number">
                         <table:template>
-                            <Text text="{hierarchicalDataModel>subCharacteristicName}" />
+                            <m:Text text="{hierarchicalDataModel>characteristicNumber}" />
                         </table:template>
                     </table:Column>
-                    <table:Column>
-                        <Text text="Value" />
+                    <table:Column
+                        label="Sub Characteristics">
                         <table:template>
-                            <Text text="{hierarchicalDataModel>value}" />
+                            <m:Text text="{hierarchicalDataModel>subCharacteristicName}" />
+                        </table:template>
+                    </table:Column>
+                    <table:Column
+                        label="Values">
+                        <table:template>
+                            <m:Text text="{hierarchicalDataModel>values}" />
                         </table:template>
                     </table:Column>
                 </table:columns>
             </table:TreeTable>
-        </VBox>
-        <endButton>
-            <Button text="Close" press="onCloseDialog" />
-        </endButton>
-    </Dialog>
+        </m:content>
+        <m:buttons>
+            <m:Button
+                text="Close"
+                press="onCloseCheckBoxDialog" />
+        </m:buttons>
+    </m:Dialog>
 </core:FragmentDefinition>

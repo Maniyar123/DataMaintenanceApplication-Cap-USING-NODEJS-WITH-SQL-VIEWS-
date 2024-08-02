@@ -39,11 +39,19 @@ entity CharacteristicValue {
     subCharacteristicNumber       : Association to SubCharacteristic; // Foreign key to SubCharacteristic.subCharacteristicNumber
 }
 
+
+
+
+
+
 // Virtual entity for hierarchical data
- entity HierarchicalData {
-    characteristicName: String;
-    characteristicNumber: Integer;
-    subCharacteristicName: String;
-    subCharacteristicNumber:Integer;
-    value: String;
+
+
+
+entity HierarchicalData {
+    key characteristicNumber : Integer;
+    characteristicName : String;
+    key subCharacteristicNumber : Integer;
+    subCharacteristicName : String;
+    value : String;
 }

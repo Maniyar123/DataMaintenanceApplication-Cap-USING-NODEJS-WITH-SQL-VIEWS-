@@ -111,6 +111,11 @@
 
 
 
+
+
+
+
+
             
 
             // onNavigate: function (oEvent) {
@@ -174,7 +179,7 @@
             //     this._checkboxDialog.then(function (oDialog) {
             //         var oTreeTable = this.byId("hierarchicalDataTreeTable");
             //         oTreeTable.setModel(this._filteredCharacteristicsData);
-            //         // this.fetchHierarchicalData();
+            //         this.fetchHierarchicalData();
             //         oDialog.open();
             //     }.bind(this)).catch(function (oError) {
             //         console.error("Error loading fragment: ", oError);
@@ -252,8 +257,128 @@
             // },
             
 
-             onActionButtonPress: function () {
-                // Load the checkbox fragment
+            // onActionButtonPress: async function () {
+            //     try {
+            //         // Load the checkbox fragment
+            //         if (!this._checkboxDialog) {
+            //             this._checkboxDialog = await Fragment.load({
+            //                 id: this.getView().getId(),
+            //                 name: "com.maintenanceapplication.maintenanceapplication.fragments.CheckBox",
+            //                 controller: this
+            //             });
+            //             this.getView().addDependent(this._checkboxDialog);
+            //         }
+            
+            //         var oDialog = this._checkboxDialog;
+            //         var oModel = this.getView().getModel("oNewModel");
+            
+            //         // Fetch hierarchical data
+            //         const data = await new Promise(function (resolve, reject) {
+            //             oModel.read("/HierarchicalData", {
+            //                 success: function (data) {
+            //                     resolve(data.results);
+            //                 },
+            //                 error: function (error) {
+            //                     reject(error);
+            //                 }
+            //             });
+            //         });
+            
+            //         var oHierarchicalDataModel = new JSONModel(data);
+            
+            //         // Filter hierarchical data based on characteristics
+            //         var aFilteredCharacteristics = this._filteredCharacteristicsData.getProperty("/Characteristics");
+            //         var aHierarchicalData = oHierarchicalDataModel.getData();
+            //         var aFilteredHierarchicalData = aHierarchicalData.filter(function (item) {
+            //             return aFilteredCharacteristics.some(function (char) {
+            //                 return item.characteristicNumber === char.characteristicNumber;
+            //             });
+            //         });
+            
+            //         var oFilteredHierarchicalDataModel = new JSONModel(aFilteredHierarchicalData);
+            //         var oTreeTable = this.byId("hierarchicalDataTreeTable");
+            //         oTreeTable.setModel(oFilteredHierarchicalDataModel, "hierarchicalDataModel");
+            
+            //         oDialog.open();
+            //     } catch (error) {
+            //         sap.m.MessageToast.show("Error fetching hierarchical data");
+            //         console.error("Error:", error);
+            //     }
+            // },
+           
+            
+        
+            // onActionButtonPress: function () {
+            //     // Load the dialog fragment if not already loaded
+            //     if (!this._checkboxDialog) {
+            //         this._checkboxDialog = Fragment.load({
+            //             id: this.getView().getId(),
+            //             name: "com.maintenanceapplication.maintenanceapplication.fragments.CheckBox",
+            //             controller: this
+            //         }).then(function (oDialog) {
+            //             this.getView().addDependent(oDialog);
+            //             return oDialog;
+            //         }.bind(this));
+            //     }
+    
+            //     // Open the dialog and fetch hierarchical data
+            //     this._checkboxDialog.then(function (oDialog) {
+            //         var oModel = this.getView().getModel("oNewModel");
+    
+            //         // Fetch hierarchical data from OData service
+            //         oModel.read("/HierarchicalData", {
+            //             success: function (data) {
+            //                 var oHierarchicalDataModel = new JSONModel(data.value);
+    
+            //                 // Get filtered characteristics data
+            //                 var aFilteredCharacteristics = this.getView().getModel("filteredCharacteristicsModel").getProperty("/Characteristics");
+    
+            //                 // Filter hierarchical data based on filtered characteristics
+            //                 var aHierarchicalData = oHierarchicalDataModel.getData();
+            //                 var aFilteredHierarchicalData = aHierarchicalData.filter(function (item) {
+            //                     return aFilteredCharacteristics.some(function (char) {
+            //                         // Match based on characteristic criteria
+            //                         return item.characteristicName === char.characteristicName;
+            //                     });
+            //                 });
+    
+            //                 // Set filtered hierarchical data model to the tree table in the dialog
+            //                 var oFilteredHierarchicalDataModel = new JSONModel(aFilteredHierarchicalData);
+            //                 var oTreeTable = this.byId("hierarchicalDataTreeTable");
+            //                 oTreeTable.setModel(oFilteredHierarchicalDataModel, "hierarchicalDataModel");
+    
+            //                 // Open the dialog
+            //                 oDialog.open();
+            //             }.bind(this),
+            //             error: function (error) {
+            //                 MessageToast.show("Error fetching hierarchical data");
+            //                 console.error("Error fetching hierarchical data:", error);
+            //             }
+            //         });
+            //     }.bind(this)).catch(function (oError) {
+            //         console.error("Error loading fragment: ", oError);
+            //     });
+            // },
+    
+            onCloseCheckBoxDialog: function () {
+                // Close the dialog
+                if (this._checkboxDialog) {
+                    this._checkboxDialog.then(function (oDialog) {
+                        oDialog.close();
+                    });
+                }
+            },
+     
+          
+            // onCloseDialog: function () {
+            //     this._checkboxDialog.then(function (oDialog) {
+            //         oDialog.close();
+            //     });
+            // },
+             
+           
+            onActionButtonPress: function () {
+                // Load the CheckBox fragment if not already loaded
                 if (!this._checkboxDialog) {
                     this._checkboxDialog = Fragment.load({
                         id: this.getView().getId(),
@@ -265,34 +390,48 @@
                     }.bind(this));
                 }
             
-                // Open the dialog and fetch hierarchical data
+                // Open the CheckBox dialog and fetch hierarchical data
                 this._checkboxDialog.then(function (oDialog) {
                     var oModel = this.getView().getModel("oNewModel");
             
-                    // Get filtered characteristics data
+                    // Get the filtered characteristics data
                     var aFilteredCharacteristics = this._filteredCharacteristicsData.getProperty("/Characteristics");
+                    // console.log("Filtered Characteristics Data: ", aFilteredCharacteristics);
             
                     // Fetch all hierarchical data
-                    oModel.callFunction("/HierarchicalData", {
-                        method:"GET",
-                        success: function (data) {
-                            var oHierarchicalDataModel = new JSONModel(data.results);
+                    oModel.read("/HierarchicalData", {
+                        success: function (oData) {
+                            var aHierarchicalData = oData.results[0].value; // Accessing the correct data structure
+                            // console.log("Hierarchical Data: ", aHierarchicalData);
+            
+                            // Flatten the hierarchical data
+                            var aFlattenedHierarchicalData = aHierarchicalData.flat();
+                            // console.log("Flattened Hierarchical Data: ", aFlattenedHierarchicalData);
             
                             // Filter hierarchical data based on filtered characteristics
-                            var aHierarchicalData = oHierarchicalDataModel.getData();
-                            var aFilteredHierarchicalData = aHierarchicalData.filter(function (item) {
-                                return aFilteredCharacteristics.some(function (char) {
-                                    // Match based on characteristic criteria
-                                    return item.characteristicName === char.characteristicName; 
+                            var aFilteredHierarchicalData = aFlattenedHierarchicalData.filter(function (item) {
+                                return aFilteredCharacteristics.some(function (filteredChar) {
+                                    // console.log("Comparing: ", item.characteristicNumber, filteredChar.characteristicNumber);
+                                    return item.characteristicNumber === filteredChar.characteristicNumber;
                                 });
                             });
             
-                            // Set filtered hierarchical data model to the tree table in the dialog
-                            var oFilteredHierarchicalDataModel = new JSONModel(aFilteredHierarchicalData);
+                            // console.log("Filtered Hierarchical Data: ", aFilteredHierarchicalData);
+            
+                            // Set filtered hierarchical data model to the TreeTable in the dialog
+                            var oFilteredHierarchicalDataModel = new sap.ui.model.json.JSONModel(aFilteredHierarchicalData);
                             var oTreeTable = this.byId("hierarchicalDataTreeTable");
                             oTreeTable.setModel(oFilteredHierarchicalDataModel, "hierarchicalDataModel");
-                                
-                              
+            
+                            // // Bind rows to the TreeTable
+                            // oTreeTable.bindRows({
+                            //     path: "hierarchicalDataModel>/",
+                            //     parameters: {
+                            //         arrayNames: ['subCharacteristics', 'values'] // Define the array structure for tree binding
+                            //     }
+                            // });
+            
+                            // Open the dialog
                             oDialog.open();
                         }.bind(this),
                         error: function (error) {
@@ -303,19 +442,7 @@
                 }.bind(this)).catch(function (oError) {
                     console.error("Error loading fragment: ", oError);
                 });
-            },
-            
-        
-            
-          
-            onCloseDialog: function () {
-                this._checkboxDialog.then(function (oDialog) {
-                    oDialog.close();
-                });
-            },
-             
-           
-            
+            }
             
             
 

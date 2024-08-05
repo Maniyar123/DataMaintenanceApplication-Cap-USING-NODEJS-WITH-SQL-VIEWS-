@@ -4,11 +4,11 @@
     xmlns:table="sap.ui.table">
     <m:Dialog
         id="checkboxDialog"
-        title="Hierarchical Data"
+        title="CHARACTERISTIC'S"
         class="sapUiResponsivePadding"
         draggable="true"
         resizable="true"
-        stretch="true">
+        >
         <m:content>
             <table:TreeTable
                 id="hierarchicalDataTreeTable"
@@ -21,12 +21,12 @@
                             <m:Text text="{hierarchicalDataModel>characteristicName}" />
                         </table:template>
                     </table:Column>
-                    <table:Column
+                    <!-- <table:Column
                         label="Characteristic Number">
                         <table:template>
                             <m:Text text="{hierarchicalDataModel>characteristicNumber}" />
                         </table:template>
-                    </table:Column>
+                    </table:Column> -->
                     <table:Column
                         label="Sub Characteristics">
                         <table:template>

@@ -18,6 +18,8 @@
                
             },
 
+
+                //   -------value helper request----------
             onValueHelpRequest: function() {
             
                 // Load the fragment
@@ -43,9 +45,25 @@
                 });
             },
               
+                //   -------------Product Search field-------------
+            onProductInputLiveChange: function (oEvent) {
+                var sQuery = oEvent.getParameter("newValue");
+                var oTable = this.byId("productTable");
+                var oBinding = oTable.getBinding("items");
+    
+                var aFilters = [];
+                if (sQuery) {
+                    if (!isNaN(sQuery)) {
+                        aFilters.push(new Filter("productId", FilterOperator.EQ, parseInt(sQuery, 10)));
+                    } else {
+                        aFilters.push(new Filter("productName", FilterOperator.Contains, sQuery));
+                    }
+                }
+                oBinding.filter(aFilters);
+            },
 
 
-            // ------------characteristicsDetailDialog-------------------------
+            // ------------characteristicsDetailDialog open-------------------------
             onNavigate: function (oEvent) {
                 var oItem = oEvent.getSource();
                 var oContext = oItem.getBindingContext();
@@ -107,276 +125,9 @@
                     oDialog.close();
                 });
             },
+              
 
-
-
-
-
-
-
-
-
-            
-
-            // onNavigate: function (oEvent) {
-            //     var oItem = oEvent.getSource();
-            //     var oContext = oItem.getBindingContext();
-            //     var subCategorieNumber = oContext.getProperty("subCategorieNumber");
-
-            //     // Load the characteristic fragment
-            //     if (!this._characteristicsDetailDialog) {
-            //         this._characteristicsDetailDialog = Fragment.load({
-            //             id: this.getView().getId(),
-            //             name: "com.maintenanceapplication.maintenanceapplication.fragments.CharFragment",
-            //             controller: this
-            //         }).then(function (oDialog) {
-            //             this.getView().addDependent(oDialog);
-            //             return oDialog;
-            //         }.bind(this));
-            //     }
-
-            //     // Open the dialog and bind the context
-            //     this._characteristicsDetailDialog.then(function (oDialog) {
-            //         var oModelData = that.getView().getModel("oNewModel");
-            //         var oCharFragment = sap.ui.getCore().byId("characteristicsDetailTable");
-            //         // Filter characteristics based on subCategorieNumber
-            //     var filteredCharacteristics = oModelData.getProperty("/Characteristics").filter(function (item) {
-            //     return item.subCategorieNumber === subCategorieNumber;
-            // });
-            //     // Create a new model for the filtered data
-            //     var oFilteredModel = new sap.ui.model.json.JSONModel({
-            //     Characteristics: filteredCharacteristics
-            // });
-            //     oCharFragment.setModel(oFilteredModel);
-            //         oDialog.open();
-            //     });
-            // },
-  
-          
-
-            CloseCheckDialog: function() {
-                this._simpleDialog.then(function(oDialog) {
-                    oDialog.close();
-                });
-            },
-            
-           
-            
-            // onActionButtonPress: function () {
-            //     // Load the checkbox fragment
-            //     if (!this._checkboxDialog) {
-            //         this._checkboxDialog = Fragment.load({
-            //             id: this.getView().getId(),
-            //             name: "com.maintenanceapplication.maintenanceapplication.fragments.CheckBox",
-            //             controller: this
-            //         }).then(function (oDialog) {
-            //             this.getView().addDependent(oDialog);
-            //             return oDialog;
-            //         }.bind(this));
-            //     }
-                
-            //     // Open the dialog and set the same model data
-            //     this._checkboxDialog.then(function (oDialog) {
-            //         var oTreeTable = this.byId("hierarchicalDataTreeTable");
-            //         oTreeTable.setModel(this._filteredCharacteristicsData);
-            //         this.fetchHierarchicalData();
-            //         oDialog.open();
-            //     }.bind(this)).catch(function (oError) {
-            //         console.error("Error loading fragment: ", oError);
-            //     });
-            // },
-            // fetchHierarchicalData: function () {
-            //     var oModel =  this.getView().getModel("oNewModel");
-            //     var _checkboxDialog = this;
-    
-            //     // Fetch the hierarchical data from the OData service
-            //     oModel.read("/HierarchicalData", {
-            //         success: function (data) {
-            //             var oHierarchicalDataModel = new JSONModel(data.results);
-            //             // var hierarchicalFrag=that.getId("hierarchicalDataTree");
-            //             // hierarchicalFrag.setModel(oHierarchicalDataModel);
-            //             _checkboxDialog.getView().setModel(oHierarchicalDataModel, "hierarchicalDataModel");
-            //         },
-            //         error: function (error) {
-            //             sap.m.MessageToast.show("Error fetching data");
-            //             console.error("Error fetching data:", error);
-            //         }
-            //     });
-            // },
-
-            // onActionButtonPress: function () {
-            //     // Load the checkbox fragment
-            //     if (!this._checkboxDialog) {
-            //         this._checkboxDialog = Fragment.load({
-            //             id: this.getView().getId(),
-            //             name: "com.maintenanceapplication.maintenanceapplication.fragments.CheckBox",
-            //             controller: this
-            //         }).then(function (oDialog) {
-            //             this.getView().addDependent(oDialog);
-            //             return oDialog;
-            //         }.bind(this));
-            //     }
-            
-            //     // Open the dialog and fetch hierarchical data
-            //     this._checkboxDialog.then(function (oDialog) {
-            //         var oModel = this.getView().getModel("oNewModel");
-            
-            //         // Get filtered characteristics data
-            //         var aFilteredCharacteristics = this._filteredCharacteristicsData.getProperty("/Characteristics");
-            
-            //         // Fetch all hierarchical data
-            //         oModel.read("/HierarchicalData", {
-            //             success: function (data) {
-            //                 var oHierarchicalDataModel = new JSONModel(data.results);
-            
-            //                 // Filter hierarchical data based on filtered characteristics
-            //                 var aHierarchicalData = oHierarchicalDataModel.getData();
-            //                 var aFilteredHierarchicalData = aHierarchicalData.filter(function (item) {
-            //                     return aFilteredCharacteristics.some(function (char) {
-            //                         // Match based on characteristic criteria
-            //                         return item.characteristicName === char.characteristicName; 
-            //                     });
-            //                 });
-            
-            //                 // Set filtered hierarchical data model to the tree table in the dialog
-            //                 var oFilteredHierarchicalDataModel = new JSONModel(aFilteredHierarchicalData);
-            //                 var oTreeTable = this.byId("hierarchicalDataTreeTable");
-            //                 oTreeTable.setModel(oFilteredHierarchicalDataModel, "hierarchicalDataModel");
-                                
-                              
-            //                 oDialog.open();
-            //             }.bind(this),
-            //             error: function (error) {
-            //                 sap.m.MessageToast.show("Error fetching hierarchical data");
-            //                 console.error("Error fetching hierarchical data:", error);
-            //             }
-            //         });
-            //     }.bind(this)).catch(function (oError) {
-            //         console.error("Error loading fragment: ", oError);
-            //     });
-            // },
-            
-
-            // onActionButtonPress: async function () {
-            //     try {
-            //         // Load the checkbox fragment
-            //         if (!this._checkboxDialog) {
-            //             this._checkboxDialog = await Fragment.load({
-            //                 id: this.getView().getId(),
-            //                 name: "com.maintenanceapplication.maintenanceapplication.fragments.CheckBox",
-            //                 controller: this
-            //             });
-            //             this.getView().addDependent(this._checkboxDialog);
-            //         }
-            
-            //         var oDialog = this._checkboxDialog;
-            //         var oModel = this.getView().getModel("oNewModel");
-            
-            //         // Fetch hierarchical data
-            //         const data = await new Promise(function (resolve, reject) {
-            //             oModel.read("/HierarchicalData", {
-            //                 success: function (data) {
-            //                     resolve(data.results);
-            //                 },
-            //                 error: function (error) {
-            //                     reject(error);
-            //                 }
-            //             });
-            //         });
-            
-            //         var oHierarchicalDataModel = new JSONModel(data);
-            
-            //         // Filter hierarchical data based on characteristics
-            //         var aFilteredCharacteristics = this._filteredCharacteristicsData.getProperty("/Characteristics");
-            //         var aHierarchicalData = oHierarchicalDataModel.getData();
-            //         var aFilteredHierarchicalData = aHierarchicalData.filter(function (item) {
-            //             return aFilteredCharacteristics.some(function (char) {
-            //                 return item.characteristicNumber === char.characteristicNumber;
-            //             });
-            //         });
-            
-            //         var oFilteredHierarchicalDataModel = new JSONModel(aFilteredHierarchicalData);
-            //         var oTreeTable = this.byId("hierarchicalDataTreeTable");
-            //         oTreeTable.setModel(oFilteredHierarchicalDataModel, "hierarchicalDataModel");
-            
-            //         oDialog.open();
-            //     } catch (error) {
-            //         sap.m.MessageToast.show("Error fetching hierarchical data");
-            //         console.error("Error:", error);
-            //     }
-            // },
-           
-            
-        
-            // onActionButtonPress: function () {
-            //     // Load the dialog fragment if not already loaded
-            //     if (!this._checkboxDialog) {
-            //         this._checkboxDialog = Fragment.load({
-            //             id: this.getView().getId(),
-            //             name: "com.maintenanceapplication.maintenanceapplication.fragments.CheckBox",
-            //             controller: this
-            //         }).then(function (oDialog) {
-            //             this.getView().addDependent(oDialog);
-            //             return oDialog;
-            //         }.bind(this));
-            //     }
-    
-            //     // Open the dialog and fetch hierarchical data
-            //     this._checkboxDialog.then(function (oDialog) {
-            //         var oModel = this.getView().getModel("oNewModel");
-    
-            //         // Fetch hierarchical data from OData service
-            //         oModel.read("/HierarchicalData", {
-            //             success: function (data) {
-            //                 var oHierarchicalDataModel = new JSONModel(data.value);
-    
-            //                 // Get filtered characteristics data
-            //                 var aFilteredCharacteristics = this.getView().getModel("filteredCharacteristicsModel").getProperty("/Characteristics");
-    
-            //                 // Filter hierarchical data based on filtered characteristics
-            //                 var aHierarchicalData = oHierarchicalDataModel.getData();
-            //                 var aFilteredHierarchicalData = aHierarchicalData.filter(function (item) {
-            //                     return aFilteredCharacteristics.some(function (char) {
-            //                         // Match based on characteristic criteria
-            //                         return item.characteristicName === char.characteristicName;
-            //                     });
-            //                 });
-    
-            //                 // Set filtered hierarchical data model to the tree table in the dialog
-            //                 var oFilteredHierarchicalDataModel = new JSONModel(aFilteredHierarchicalData);
-            //                 var oTreeTable = this.byId("hierarchicalDataTreeTable");
-            //                 oTreeTable.setModel(oFilteredHierarchicalDataModel, "hierarchicalDataModel");
-    
-            //                 // Open the dialog
-            //                 oDialog.open();
-            //             }.bind(this),
-            //             error: function (error) {
-            //                 MessageToast.show("Error fetching hierarchical data");
-            //                 console.error("Error fetching hierarchical data:", error);
-            //             }
-            //         });
-            //     }.bind(this)).catch(function (oError) {
-            //         console.error("Error loading fragment: ", oError);
-            //     });
-            // },
-    
-            onCloseCheckBoxDialog: function () {
-                // Close the dialog
-                if (this._checkboxDialog) {
-                    this._checkboxDialog.then(function (oDialog) {
-                        oDialog.close();
-                    });
-                }
-            },
-     
-          
-            // onCloseDialog: function () {
-            //     this._checkboxDialog.then(function (oDialog) {
-            //         oDialog.close();
-            //     });
-            // },
-             
-           
+            // ---------------checkbox fragmnet functionality-----------------
             onActionButtonPress: function () {
                 // Load the CheckBox fragment if not already loaded
                 if (!this._checkboxDialog) {
@@ -442,8 +193,22 @@
                 }.bind(this)).catch(function (oError) {
                     console.error("Error loading fragment: ", oError);
                 });
-            }
+            },
             
+
+            onCloseCheckBoxDialog: function () {
+                // Close the dialog
+                if (this._checkboxDialog) {
+                    this._checkboxDialog.then(function (oDialog) {
+                        oDialog.close();
+                    });
+                }
+            },
+     
+          
+           
+             
+           
             
 
 

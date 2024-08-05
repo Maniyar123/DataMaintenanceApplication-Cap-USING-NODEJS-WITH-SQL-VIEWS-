@@ -21,7 +21,10 @@
                         showValueHelp="true"
                         valueHelpRequest="onValueHelpRequest"
                         width="50%"
+                        liveChange="onProductInputLiveChange"
                     />
+
+                    
                 </Toolbar>
             </f:DynamicPageHeader>
         </f:header>

@@ -57,9 +57,9 @@ module.exports = cds.service.impl(async function () {
             });
  
             // Log hierarchical data for debugging
-            console.log("Hierarchical Data:", JSON.stringify(hierarchicalData, null, 2));
+            // console.log("Hierarchical Data:", JSON.stringify(hierarchicalData, null, 2));
  
-            // Return hierarchical data
+            // Return hierarchical data 
             return { value: hierarchicalData };
         } catch (error) {
             console.error("Error executing query:", error);

@@ -216,7 +216,7 @@
                     var aFilteredCharacteristics = this._filteredCharacteristicsData.getProperty("/Characteristics");
             
                     // Fetch all hierarchical data
-                    oModel.read("/HIERARICALDATA", {
+                    oModel.read("/HierarchicalData", {
                         success: function (oData) {
                             var aHierarchicalData = oData.results; // Accessing the correct data structure
                             

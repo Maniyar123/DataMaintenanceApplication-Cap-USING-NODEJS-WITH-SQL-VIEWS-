@@ -1,16 +1,14 @@
-using { myapp as pdb } from '../db/productdata-model';
+using { myapp } from '../db/productdata-model';
+using {HIERARICALDATASET} from '../db/productdata-model';
 
 service CatalogService1 {
-    entity Products as projection on pdb.Product;
-    entity MasterData as projection on pdb.MasterData;
-     entity SubCategories as projection on pdb.subCategoriesData;
-    entity Characteristics as projection on pdb.Characteristic;
-    entity SubCharacteristics as projection on pdb.SubCharacteristic;
-    entity CharacteristicValues as projection on pdb.CharacteristicValue;
-    
-    entity HierarchicalData as projection on pdb.HierarchicalData;
-    
-     
-}              
+ 
+ entity Product as projection on myapp.Product;
+ entity MasterData as projection on myapp.MasterData;
+ entity subCategoriesData as projection on myapp.subCategoriesData;
+ entity Characteristic as projection on myapp.Characteristic;
+ entity SubCharacteristic as projection on myapp.SubCharacteristic;
+ entity CharacteristicValue as projection on myapp.CharacteristicValue;
+ entity HIERARICALDATA as projection on HIERARICALDATASET;
 
-
+}

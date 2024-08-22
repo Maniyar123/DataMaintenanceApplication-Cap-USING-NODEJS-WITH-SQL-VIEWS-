@@ -17,7 +17,7 @@
                     
                     <Input
                         id="productInput"
-                        placeholder="Select a Product"
+                        placeholder="Select and Search a Product"
                         showValueHelp="true"
                         valueHelpRequest="onValueHelpRequest"
                         width="50%"

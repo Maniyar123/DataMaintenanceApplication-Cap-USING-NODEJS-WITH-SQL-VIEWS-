@@ -128,6 +128,73 @@
               
 
             // ---------------checkbox fragmnet functionality-----------------
+            // onActionButtonPress: function () {
+            //     // Load the CheckBox fragment if not already loaded
+            //     if (!this._checkboxDialog) {
+            //         this._checkboxDialog = Fragment.load({
+            //             id: this.getView().getId(),
+            //             name: "com.maintenanceapplication.maintenanceapplication.fragments.CheckBox",
+            //             controller: this
+            //         }).then(function (oDialog) {
+            //             this.getView().addDependent(oDialog);
+            //             return oDialog;
+            //         }.bind(this));
+            //     }
+            
+            //     // Open the CheckBox dialog and fetch hierarchical data
+            //     this._checkboxDialog.then(function (oDialog) {
+            //         var oModel = this.getView().getModel("oNewModel");
+            
+            //         // Get the filtered characteristics data
+            //         var aFilteredCharacteristics = this._filteredCharacteristicsData.getProperty("/Characteristics");
+            //         // console.log("Filtered Characteristics Data: ", aFilteredCharacteristics);
+            
+            //         // Fetch all hierarchical data
+            //         oModel.read("/HIERARICALDATA", {
+            //             success: function (oData) {
+            //                 var aHierarchicalData = oData.results[0].value; // Accessing the correct data structure
+            //                 // console.log("Hierarchical Data: ", aHierarchicalData);
+            
+            //                 // Flatten the hierarchical data
+            //                 var aFlattenedHierarchicalData = aHierarchicalData.flat();
+            //                 // console.log("Flattened Hierarchical Data: ", aFlattenedHierarchicalData);
+            
+            //                 // Filter hierarchical data based on filtered characteristics
+            //                 var aFilteredHierarchicalData = aFlattenedHierarchicalData.filter(function (item) {
+            //                     return aFilteredCharacteristics.some(function (filteredChar) {
+            //                         // console.log("Comparing: ", item.characteristicNumber, filteredChar.characteristicNumber);
+            //                         return item.characteristicNumber === filteredChar.characteristicNumber;
+            //                     });
+            //                 });
+            
+            //                 // console.log("Filtered Hierarchical Data: ", aFilteredHierarchicalData);
+            
+            //                 // Set filtered hierarchical data model to the TreeTable in the dialog
+            //                 var oFilteredHierarchicalDataModel = new sap.ui.model.json.JSONModel(aFilteredHierarchicalData);
+            //                 var oTreeTable = this.byId("hierarchicalDataTreeTable");
+            //                 oTreeTable.setModel(oFilteredHierarchicalDataModel, "hierarchicalDataModel");
+            
+            //                 // // Bind rows to the TreeTable
+            //                 // oTreeTable.bindRows({
+            //                 //     path: "hierarchicalDataModel>/",
+            //                 //     parameters: {
+            //                 //         arrayNames: ['subCharacteristics', 'values'] // Define the array structure for tree binding
+            //                 //     }
+            //                 // });
+            
+            //                 // Open the dialog
+            //                 oDialog.open();
+            //             }.bind(this),
+            //             error: function (error) {
+            //                 sap.m.MessageToast.show("Error fetching hierarchical data");
+            //                 console.error("Error fetching hierarchical data:", error);
+            //             }
+            //         });
+            //     }.bind(this)).catch(function (oError) {
+            //         console.error("Error loading fragment: ", oError);
+            //     });
+            // },
+
             onActionButtonPress: function () {
                 // Load the CheckBox fragment if not already loaded
                 if (!this._checkboxDialog) {
@@ -147,34 +214,58 @@
             
                     // Get the filtered characteristics data
                     var aFilteredCharacteristics = this._filteredCharacteristicsData.getProperty("/Characteristics");
-                    // console.log("Filtered Characteristics Data: ", aFilteredCharacteristics);
             
                     // Fetch all hierarchical data
-                    oModel.read("/HierarchicalData", {
+                    oModel.read("/HIERARICALDATA", {
                         success: function (oData) {
-                            var aHierarchicalData = oData.results[0].value; // Accessing the correct data structure
-                            // console.log("Hierarchical Data: ", aHierarchicalData);
+                            var aHierarchicalData = oData.results; // Accessing the correct data structure
+                            
+                            // Transform data into hierarchical format
+                            var hierarchicalData = [];
+                            var characteristicMap = {};
             
-                            // Flatten the hierarchical data
-                            var aFlattenedHierarchicalData = aHierarchicalData.flat();
-                            // console.log("Flattened Hierarchical Data: ", aFlattenedHierarchicalData);
+                            // Process the result set
+                            aHierarchicalData.forEach(row => {
+                                // Create or find the characteristic in the map
+                                if (!characteristicMap[row.CHARACTERISTICNUMBER]) {
+                                    characteristicMap[row.CHARACTERISTICNUMBER] = {
+                                        characteristicName: row.CHARACTERISTICNAME,
+                                        characteristicNumber: row.CHARACTERISTICNUMBER,
+                                        subCharacteristics: []
+                                    };
+                                    hierarchicalData.push(characteristicMap[row.CHARACTERISTICNUMBER]);
+                                }
+            
+                                const characteristic = characteristicMap[row.CHARACTERISTICNUMBER];
+                               
+                                // Find or create the sub-characteristic in the characteristic
+                                let subCharacteristic = characteristic.subCharacteristics.find(sc => sc.subCharacteristicNumber === row.SUBCHARACTERISTICNUMBER);
+            
+                                if (!subCharacteristic) {
+                                    subCharacteristic = {
+                                        subCharacteristicName: row.SUBCHARACTERISTICNAME,
+                                        subCharacteristicNumber: row.SUBCHARACTERISTICNUMBER,
+                                        values: row.VALUE ? [row.VALUE] : []
+                                    };
+                                    characteristic.subCharacteristics.push(subCharacteristic);
+                                } else if (row.VALUE) {
+                                    subCharacteristic.values.push(row.VALUE);
+                                }
+                            });
             
                             // Filter hierarchical data based on filtered characteristics
-                            var aFilteredHierarchicalData = aFlattenedHierarchicalData.filter(function (item) {
+                            var aFilteredHierarchicalData = hierarchicalData.filter(function (item) {
                                 return aFilteredCharacteristics.some(function (filteredChar) {
-                                    // console.log("Comparing: ", item.characteristicNumber, filteredChar.characteristicNumber);
                                     return item.characteristicNumber === filteredChar.characteristicNumber;
                                 });
                             });
-            
-                            // console.log("Filtered Hierarchical Data: ", aFilteredHierarchicalData);
             
                             // Set filtered hierarchical data model to the TreeTable in the dialog
                             var oFilteredHierarchicalDataModel = new sap.ui.model.json.JSONModel(aFilteredHierarchicalData);
                             var oTreeTable = this.byId("hierarchicalDataTreeTable");
                             oTreeTable.setModel(oFilteredHierarchicalDataModel, "hierarchicalDataModel");
             
-                            // // Bind rows to the TreeTable
+                            // Bind rows to the TreeTable
                             // oTreeTable.bindRows({
                             //     path: "hierarchicalDataModel>/",
                             //     parameters: {
@@ -194,6 +285,64 @@
                     console.error("Error loading fragment: ", oError);
                 });
             },
+            
+            // onActionButtonPress: function () {
+            //     // Load the CheckBox fragment if not already loaded
+            //     if (!this._checkboxDialog) {
+            //         this._checkboxDialog = Fragment.load({
+            //             id: this.getView().getId(),
+            //             name: "com.maintenanceapplication.maintenanceapplication.fragments.CheckBox",
+            //             controller: this
+            //         }).then(function (oDialog) {
+            //             this.getView().addDependent(oDialog);
+            //             return oDialog;
+            //         }.bind(this));
+            //     }
+            
+            //     // Open the CheckBox dialog and fetch hierarchical data
+            //     this._checkboxDialog.then(function (oDialog) {
+            //         var oModel = this.getView().getModel("oNewModel");
+            
+            //         // Get the filtered characteristics data
+            //         var aFilteredCharacteristics = this._filteredCharacteristicsData.getProperty("/Characteristics");
+            
+            //         // Fetch all hierarchical data
+            //         oModel.read("/HIERARICALDATA", {
+            //             success: function (oData) {
+            //                 var aHierarchicalData = oData.results; // Hierarchical data already in required format
+            
+            //                 // Filter hierarchical data based on filtered characteristics
+            //                 var aFilteredHierarchicalData = aHierarchicalData.filter(function (item) {
+            //                     return aFilteredCharacteristics.some(function (filteredChar) {
+            //                         return item.characteristicNumber === filteredChar.characteristicNumber;
+            //                     });
+            //                 });
+            
+            //                 // Set filtered hierarchical data model to the TreeTable in the dialog
+            //                 var oFilteredHierarchicalDataModel = new sap.ui.model.json.JSONModel(aFilteredHierarchicalData);
+            //                 var oTreeTable = this.byId("hierarchicalDataTreeTable");
+            //                 oTreeTable.setModel(oFilteredHierarchicalDataModel, "hierarchicalDataModel");
+            
+            //                 // Bind rows to the TreeTable
+            //                 // oTreeTable.bindRows({
+            //                 //     path: "hierarchicalDataModel>/",
+            //                 //     parameters: {
+            //                 //         arrayNames: ['subCharacteristics', 'values'] // Define the array structure for tree binding
+            //                 //     }
+            //                 // });
+            
+            //                 // Open the dialog
+            //                 oDialog.open();
+            //             }.bind(this),
+            //             error: function (error) {
+            //                 sap.m.MessageToast.show("Error fetching hierarchical data");
+            //                 console.error("Error fetching hierarchical data:", error);
+            //             }
+            //         });
+            //     }.bind(this)).catch(function (oError) {
+            //         console.error("Error loading fragment: ", oError);
+            //     });
+            // },
             
 
             onCloseCheckBoxDialog: function () {

@@ -1,6 +1,11 @@
-namespace myapp;
+//    namespace myapp;
 
-entity Product {
+ 
+    
+  context myapp {
+    
+  
+    entity Product {
     key productId         : Integer;  // Auto-generated numerical ID
     productName           : String(50);  // Product name
     masterClass           : Composition of MasterData on masterClass.productId = $self; // Single MasterClass
@@ -38,20 +43,17 @@ entity CharacteristicValue {
     value                         : String(255);  // Value associated with the sub-characteristic
     subCharacteristicNumber       : Association to SubCharacteristic; // Foreign key to SubCharacteristic.subCharacteristicNumber
 }
-
-
-
-
-
+  }
 
 // Virtual entity for hierarchical data
 
-
-
-entity HierarchicalData {
-    key characteristicNumber : Integer;
-    characteristicName : String;
-    key subCharacteristicNumber : Integer;
-    subCharacteristicName : String;
-    value : String;
-}
+@cds.persistence.exists
+@cds.persistence.table
+ 
+entity HIERARICALDATASET {
+     CHARACTERISTICNAME:String;
+     key CHARACTERISTICNUMBER:Integer;
+     SUBCHARACTERISTICNAME:String;
+     key SUBCHARACTERISTICNUMBER:Integer;
+     VALUE:String;
+};

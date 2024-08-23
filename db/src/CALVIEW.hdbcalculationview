@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="CALVIEW" applyPrivilegeType="NONE" dataCategory="DIMENSION" dimensionType="STANDARD" schemaVersion="3.0" hierarchyGeneration="SQL" outputViewType="Projection" cacheInvalidationPeriod="NONE" enforceSqlExecution="true" application="BAS">
+<descriptions defaultDescription="CAL-VIEW"/>
+<localVariables/>
+<variableMappings/>
+<dataSources>
+  <DataSource id="MYAPP_SUBCHARACTERISTIC">
+    <resourceUri>MYAPP_SUBCHARACTERISTIC</resourceUri>
+  </DataSource>
+  <DataSource id="MYAPP_CHARACTERISTICVALUE">
+    <resourceUri>MYAPP_CHARACTERISTICVALUE</resourceUri>
+  </DataSource>
+  <DataSource id="MYAPP_CHARACTERISTIC">
+    <resourceUri>MYAPP_CHARACTERISTIC</resourceUri>
+  </DataSource>
+</dataSources>
+<snapshotProcedures/>
+<calculationViews>
+  <calculationView xsi:type="Calculation:JoinView" id="Join_1_1" cardinality="C1_N" joinType="inner" multiJoinNode="Join_1" multiJoinCentralTable="MYAPP_CHARACTERISTIC" multiJoinOrder="Outside In">
+    <viewAttributes>
+      <viewAttribute id="SUBCHARACTERISTICNUMBER"/>
+      <viewAttribute id="SUBCHARACTERISTICNAME"/>
+      <viewAttribute id="VALUE"/>
+      <viewAttribute id="CHARACTERISTICNUMBER_CHARACTERISTICNUMBER"/>
+      <viewAttribute hidden="true" id="JOIN$SUBCHARACTERISTICNUMBER$SUBCHARACTERISTICNUMBER_SUBCHARACTERISTICNUMBER"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="MYAPP_SUBCHARACTERISTIC">
+      <mapping xsi:type="Calculation:AttributeMapping" target="SUBCHARACTERISTICNUMBER" source="SUBCHARACTERISTICNUMBER"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="SUBCHARACTERISTICNAME" source="SUBCHARACTERISTICNAME"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="CHARACTERISTICNUMBER_CHARACTERISTICNUMBER" source="CHARACTERISTICNUMBER_CHARACTERISTICNUMBER"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$SUBCHARACTERISTICNUMBER$SUBCHARACTERISTICNUMBER_SUBCHARACTERISTICNUMBER" source="SUBCHARACTERISTICNUMBER"/>
+    </input>
+    <input node="MYAPP_CHARACTERISTICVALUE">
+      <mapping xsi:type="Calculation:AttributeMapping" target="VALUE" source="VALUE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$SUBCHARACTERISTICNUMBER$SUBCHARACTERISTICNUMBER_SUBCHARACTERISTICNUMBER" source="SUBCHARACTERISTICNUMBER_SUBCHARACTERISTICNUMBER"/>
+    </input>
+    <joinAttribute name="JOIN$SUBCHARACTERISTICNUMBER$SUBCHARACTERISTICNUMBER_SUBCHARACTERISTICNUMBER"/>
+  </calculationView>
+  <calculationView xsi:type="Calculation:JoinView" id="Join_1_2" cardinality="C1_N" joinType="inner" multiJoinNode="Join_1" multiJoinCentralTable="MYAPP_CHARACTERISTIC" multiJoinOrder="Outside In">
+    <viewAttributes>
+      <viewAttribute id="SUBCHARACTERISTICNUMBER"/>
+      <viewAttribute id="SUBCHARACTERISTICNAME"/>
+      <viewAttribute id="VALUE"/>
+      <viewAttribute id="CHARACTERISTICNUMBER_CHARACTERISTICNUMBER"/>
+      <viewAttribute id="CHARACTERISTICNUMBER"/>
+      <viewAttribute id="CHARACTERISTICNAME"/>
+      <viewAttribute hidden="true" id="JOIN$CHARACTERISTICNUMBER$CHARACTERISTICNUMBER_CHARACTERISTICNUMBER"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="MYAPP_CHARACTERISTIC">
+      <mapping xsi:type="Calculation:AttributeMapping" target="CHARACTERISTICNUMBER" source="CHARACTERISTICNUMBER"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="CHARACTERISTICNAME" source="CHARACTERISTICNAME"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$CHARACTERISTICNUMBER$CHARACTERISTICNUMBER_CHARACTERISTICNUMBER" source="CHARACTERISTICNUMBER"/>
+    </input>
+    <input node="Join_1_1">
+      <mapping xsi:type="Calculation:AttributeMapping" target="SUBCHARACTERISTICNUMBER" source="SUBCHARACTERISTICNUMBER"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="SUBCHARACTERISTICNAME" source="SUBCHARACTERISTICNAME"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="VALUE" source="VALUE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="CHARACTERISTICNUMBER_CHARACTERISTICNUMBER" source="CHARACTERISTICNUMBER_CHARACTERISTICNUMBER"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$CHARACTERISTICNUMBER$CHARACTERISTICNUMBER_CHARACTERISTICNUMBER" source="CHARACTERISTICNUMBER_CHARACTERISTICNUMBER"/>
+    </input>
+    <joinAttribute name="JOIN$CHARACTERISTICNUMBER$CHARACTERISTICNUMBER_CHARACTERISTICNUMBER"/>
+  </calculationView>
+</calculationViews>
+
+<logicalModel id="Join_1_2">
+  <attributes>
+    <attribute id="CHARACTERISTICNUMBER" order="1" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="CHARACTERISTICNUMBER"/>
+      <keyMapping columnObjectName="Join_1_2" columnName="CHARACTERISTICNUMBER"/>
+    </attribute>
+    <attribute id="CHARACTERISTICNAME" order="2" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="CHARACTERISTICNAME"/>
+      <keyMapping columnObjectName="Join_1_2" columnName="CHARACTERISTICNAME"/>
+    </attribute>
+    <attribute id="SUBCHARACTERISTICNUMBER" order="3" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="SUBCHARACTERISTICNUMBER"/>
+      <keyMapping columnObjectName="Join_1_2" columnName="SUBCHARACTERISTICNUMBER"/>
+    </attribute>
+    <attribute id="SUBCHARACTERISTICNAME" order="4" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="SUBCHARACTERISTICNAME"/>
+      <keyMapping columnObjectName="Join_1_2" columnName="SUBCHARACTERISTICNAME"/>
+    </attribute>
+    <attribute id="VALUE" order="5" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="VALUE"/>
+      <keyMapping columnObjectName="Join_1_2" columnName="VALUE"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures/>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="92" y="112"/>
+    
+      <rectangleSize width="160"/>
+    </shape>
+    
+  
+    <shape expanded="true" modelObjectName="Join_1" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="92" y="217"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape modelObjectName="MYAPP_CHARACTERISTIC" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput" multiJoinViewNodeName="Join_1">
+      <upperLeftCorner x="-67" y="30"/>
+      <rectangleSize width="360"/>
+    </shape>
+    <shape modelObjectName="MYAPP_SUBCHARACTERISTIC" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput" multiJoinViewNodeName="Join_1">
+      <upperLeftCorner x="349" y="30"/>
+      <rectangleSize width="380"/>
+    </shape>
+    <shape modelObjectName="MYAPP_CHARACTERISTICVALUE" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput" multiJoinViewNodeName="Join_1">
+      <upperLeftCorner x="787" y="30"/>
+      <rectangleSize width="425"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>

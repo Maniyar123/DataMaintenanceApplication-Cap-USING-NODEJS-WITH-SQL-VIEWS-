@@ -43,13 +43,22 @@ entity CharacteristicValue {
     value                         : String(255);  // Value associated with the sub-characteristic
     subCharacteristicNumber       : Association to SubCharacteristic; // Foreign key to SubCharacteristic.subCharacteristicNumber
 }
-  }
+}
+   // Virtual entity for Calculation View
+    @cds.persistence.exists
+    @cds.persistence.table
+    entity CALVIEW {
+        key CHARACTERISTICNUMBER: Integer;
+        CHARACTERISTICNAME: String;
+        key SUBCHARACTERISTICNUMBER: Integer;
+        SUBCHARACTERISTICNAME: String;
+        VALUE: String;
+    }
 
 // Virtual entity for hierarchical data
 
 @cds.persistence.exists
 @cds.persistence.table
- 
 entity HIERARICALDATASET {
      CHARACTERISTICNAME:String;
      key CHARACTERISTICNUMBER:Integer;
@@ -57,3 +66,4 @@ entity HIERARICALDATASET {
      key SUBCHARACTERISTICNUMBER:Integer;
      VALUE:String;
 };
+

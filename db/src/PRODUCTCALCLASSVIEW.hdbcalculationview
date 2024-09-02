@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="PRODUCTCALCLASSVIEW" applyPrivilegeType="NONE" dataCategory="DIMENSION" dimensionType="STANDARD" schemaVersion="3.0" hierarchyGeneration="SQL" outputViewType="Projection" cacheInvalidationPeriod="NONE" enforceSqlExecution="true" application="BAS">
+<descriptions defaultDescription="PRODUCTCALCLASSVIEW"/>
+<localVariables/>
+<variableMappings/>
+<dataSources>
+  <DataSource id="CATALOGSERVICE2_CHARACTERISTICS">
+    <resourceUri>CATALOGSERVICE2_CHARACTERISTICS</resourceUri>
+  </DataSource>
+  <DataSource id="CATALOGSERVICE2_CHARACTERISTICSVALUE">
+    <resourceUri>CATALOGSERVICE2_CHARACTERISTICSVALUE</resourceUri>
+  </DataSource>
+  <DataSource id="CATALOGSERVICE2_PRODUCTCLASS">
+    <resourceUri>CATALOGSERVICE2_PRODUCTCLASS</resourceUri>
+  </DataSource>
+  <DataSource id="CATALOGSERVICE2_PRODUCT">
+    <resourceUri>CATALOGSERVICE2_PRODUCT</resourceUri>
+  </DataSource>
+</dataSources>
+<snapshotProcedures/>
+<calculationViews>
+  <calculationView xsi:type="Calculation:JoinView" id="Join_1_1" cardinality="C1_N" joinType="inner" multiJoinNode="Join_1" multiJoinCentralTable="CATALOGSERVICE2_PRODUCT" multiJoinOrder="Outside In">
+    <viewAttributes>
+      <viewAttribute id="CHARACTERISTICNAME"/>
+      <viewAttribute id="VALUE"/>
+      <viewAttribute id="VALUEDESCRIPTION"/>
+      <viewAttribute id="CLASSID_CLASSID"/>
+      <viewAttribute hidden="true" id="JOIN$CHARACTERISTICID$CHARACTERISTICID_CHARACTERISTICID"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="CATALOGSERVICE2_CHARACTERISTICS">
+      <mapping xsi:type="Calculation:AttributeMapping" target="CHARACTERISTICNAME" source="CHARACTERISTICNAME"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="CLASSID_CLASSID" source="CLASSID_CLASSID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$CHARACTERISTICID$CHARACTERISTICID_CHARACTERISTICID" source="CHARACTERISTICID"/>
+    </input>
+    <input node="CATALOGSERVICE2_CHARACTERISTICSVALUE">
+      <mapping xsi:type="Calculation:AttributeMapping" target="VALUE" source="VALUE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="VALUEDESCRIPTION" source="VALUEDESCRIPTION"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$CHARACTERISTICID$CHARACTERISTICID_CHARACTERISTICID" source="CHARACTERISTICID_CHARACTERISTICID"/>
+    </input>
+    <joinAttribute name="JOIN$CHARACTERISTICID$CHARACTERISTICID_CHARACTERISTICID"/>
+  </calculationView>
+  <calculationView xsi:type="Calculation:JoinView" id="Join_1_2" cardinality="C1_N" joinType="inner" multiJoinNode="Join_1" multiJoinCentralTable="CATALOGSERVICE2_PRODUCT" multiJoinOrder="Outside In">
+    <viewAttributes>
+      <viewAttribute id="CHARACTERISTICNAME"/>
+      <viewAttribute id="VALUE"/>
+      <viewAttribute id="VALUEDESCRIPTION"/>
+      <viewAttribute id="CLASSID_CLASSID"/>
+      <viewAttribute id="PRODUCTID_PRODUCTID"/>
+      <viewAttribute hidden="true" id="JOIN$CLASSID_CLASSID$CLASSID_CLASSID"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="CATALOGSERVICE2_PRODUCTCLASS">
+      <mapping xsi:type="Calculation:AttributeMapping" target="PRODUCTID_PRODUCTID" source="PRODUCTID_PRODUCTID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$CLASSID_CLASSID$CLASSID_CLASSID" source="CLASSID_CLASSID"/>
+    </input>
+    <input node="Join_1_1">
+      <mapping xsi:type="Calculation:AttributeMapping" target="CHARACTERISTICNAME" source="CHARACTERISTICNAME"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="VALUE" source="VALUE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="VALUEDESCRIPTION" source="VALUEDESCRIPTION"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="CLASSID_CLASSID" source="CLASSID_CLASSID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$CLASSID_CLASSID$CLASSID_CLASSID" source="CLASSID_CLASSID"/>
+    </input>
+    <joinAttribute name="JOIN$CLASSID_CLASSID$CLASSID_CLASSID"/>
+  </calculationView>
+  <calculationView xsi:type="Calculation:JoinView" id="Join_1_3" cardinality="C1_N" joinType="inner" multiJoinNode="Join_1" multiJoinCentralTable="CATALOGSERVICE2_PRODUCT" multiJoinOrder="Outside In">
+    <viewAttributes>
+      <viewAttribute id="CHARACTERISTICNAME"/>
+      <viewAttribute id="VALUE"/>
+      <viewAttribute id="VALUEDESCRIPTION"/>
+      <viewAttribute id="CLASSID_CLASSID"/>
+      <viewAttribute id="PRODUCTID_PRODUCTID"/>
+      <viewAttribute id="PRODUCTID"/>
+      <viewAttribute id="PRODUCTNAME"/>
+      <viewAttribute id="TYPE"/>
+      <viewAttribute hidden="true" id="JOIN$PRODUCTID$PRODUCTID_PRODUCTID"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="CATALOGSERVICE2_PRODUCT">
+      <mapping xsi:type="Calculation:AttributeMapping" target="PRODUCTID" source="PRODUCTID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="PRODUCTNAME" source="PRODUCTNAME"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TYPE" source="TYPE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$PRODUCTID$PRODUCTID_PRODUCTID" source="PRODUCTID"/>
+    </input>
+    <input node="Join_1_2">
+      <mapping xsi:type="Calculation:AttributeMapping" target="CHARACTERISTICNAME" source="CHARACTERISTICNAME"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="VALUE" source="VALUE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="VALUEDESCRIPTION" source="VALUEDESCRIPTION"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="CLASSID_CLASSID" source="CLASSID_CLASSID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="PRODUCTID_PRODUCTID" source="PRODUCTID_PRODUCTID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$PRODUCTID$PRODUCTID_PRODUCTID" source="PRODUCTID_PRODUCTID"/>
+    </input>
+    <joinAttribute name="JOIN$PRODUCTID$PRODUCTID_PRODUCTID"/>
+  </calculationView>
+</calculationViews>
+
+<logicalModel id="Join_1_3">
+  <attributes>
+    <attribute id="PRODUCTID" order="1" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="PRODUCTID"/>
+      <keyMapping columnObjectName="Join_1_3" columnName="PRODUCTID"/>
+    </attribute>
+    <attribute id="PRODUCTNAME" order="2" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="PRODUCTNAME"/>
+      <keyMapping columnObjectName="Join_1_3" columnName="PRODUCTNAME"/>
+    </attribute>
+    <attribute id="TYPE" order="3" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="TYPE"/>
+      <keyMapping columnObjectName="Join_1_3" columnName="TYPE"/>
+    </attribute>
+    <attribute id="CHARACTERISTICNAME" order="4" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="CHARACTERISTICNAME"/>
+      <keyMapping columnObjectName="Join_1_3" columnName="CHARACTERISTICNAME"/>
+    </attribute>
+    <attribute id="VALUE" order="5" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="VALUE"/>
+      <keyMapping columnObjectName="Join_1_3" columnName="VALUE"/>
+    </attribute>
+    <attribute id="VALUEDESCRIPTION" order="6" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="VALUEDESCRIPTION"/>
+      <keyMapping columnObjectName="Join_1_3" columnName="VALUEDESCRIPTION"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures/>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="92" y="112"/>
+    
+      <rectangleSize width="160"/>
+    </shape>
+    
+  
+    <shape expanded="true" modelObjectName="Join_1" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="92" y="217"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape modelObjectName="CATALOGSERVICE2_PRODUCT" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput" multiJoinViewNodeName="Join_1">
+      <upperLeftCorner x="-172" y="14"/>
+      <rectangleSize width="246"/>
+    </shape>
+    <shape modelObjectName="CATALOGSERVICE2_PRODUCTCLASS" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput" multiJoinViewNodeName="Join_1">
+      <upperLeftCorner x="187" y="14"/>
+      <rectangleSize width="287"/>
+    </shape>
+    <shape modelObjectName="CATALOGSERVICE2_CHARACTERISTICS" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput" multiJoinViewNodeName="Join_1">
+      <upperLeftCorner x="547" y="14"/>
+      <rectangleSize width="302"/>
+    </shape>
+    <shape modelObjectName="CATALOGSERVICE2_CHARACTERISTICSVALUE" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput" multiJoinViewNodeName="Join_1">
+      <upperLeftCorner x="920" y="30"/>
+      <rectangleSize width="341"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>

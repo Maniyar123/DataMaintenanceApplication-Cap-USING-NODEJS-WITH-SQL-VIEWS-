@@ -42,16 +42,16 @@
                     <Column>
                         <Text text="Product Name" />
                     </Column>
-                    <Column>
+                    <!-- <Column>
                         <Text text="Master Data Number" />
-                    </Column>
+                    </Column> -->
                 </columns>
                 <items>
                     <ColumnListItem>
                         <cells>
                             <ObjectIdentifier title="{productId}" />
                             <Text text="{productName}" />
-                            <Text text="{masterClass/masterDataNumber}" />
+                            <!-- <Text text="{masterClass/masterDataNumber}" /> -->
                         </cells>
                     </ColumnListItem>
                 </items>

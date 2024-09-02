@@ -1,7 +1,5 @@
 //    namespace myapp;
 
- 
-    
   context myapp {
     
   

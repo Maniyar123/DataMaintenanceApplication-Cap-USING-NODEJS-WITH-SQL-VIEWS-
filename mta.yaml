@@ -73,6 +73,10 @@ modules:
       - commaintenanceapplicationmaintenanceapplication.zip
       name: commaintenanceapplicationmaintenanceapplication
       target-path: resources/
+    - artifacts:
+      - comproductclassdatamaintenanceapplication.zip
+      name: comproductclassdatamaintenanceapplication
+      target-path: resources/
 - name: comcarproductapplicationproductsapplication
   type: html5
   path: app/productsapplication
@@ -106,6 +110,16 @@ modules:
 - name: commaintenanceapplicationmaintenanceapplication
   type: html5
   path: app/maintenanceapplication
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: comproductclassdatamaintenanceapplication
+  type: html5
+  path: app/productclassdatamaintenanceapplication
   build-parameters:
     build-result: dist
     builder: custom

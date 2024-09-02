@@ -1,0 +1,79 @@
+<mvc:View
+    controllerName="com.productclassdatamaintenanceapplication.controller.ProductCharacteristicsView"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core"
+>
+    <VBox class="sapUiSmallMargin">
+    
+      <!-- Back Button -->
+        <Button  icon="sap-icon://nav-back" press="onNavBack" tooltip="Click to go back" />
+        <f:Form id="characteristicsForm">
+            <f:title>
+                <core:Title text="Product Characteristics" />
+            </f:title>
+            <f:layout>
+                <f:ResponsiveGridLayout
+                    labelSpanXL="3"
+                    labelSpanL="3"
+                    labelSpanM="3"
+                    labelSpanS="12"
+                    adjustLabelSpan="false"
+                    emptySpanXL="4"
+                    emptySpanL="4"
+                    emptySpanM="4"
+                    emptySpanS="0"
+                    columnsXL="1"
+                    columnsL="1"
+                    columnsM="1"
+                    singleContainerFullSize="false"
+                />
+            </f:layout>
+            <f:formContainers>
+                <f:FormContainer>
+                    <f:formElements>
+                        <!-- Bind product characteristics data to text fields -->
+
+                         <f:FormElement id="_IDGenLabel2" label="Product ID" >
+                            <f:fields>
+                                <Text id="_IDGenText2" text="{characteristicData>/items/0/PRODUCTID}" />
+                            </f:fields>
+                        </f:FormElement>
+
+                        <f:FormElement id="_IDGenLabel4" label="Type">
+                            <f:fields>
+                                <Text  id="_IDGenText4"  text="{characteristicData>/items/0/TYPE}" />
+                            </f:fields>
+                        </f:FormElement>
+
+                         <f:FormElement    id="_IDGenLabel3"  label="Product Name">
+                            <f:fields>
+                                <Text  id="_IDGenText3" text="{characteristicData>/items/0/PRODUCTNAME}"  />
+                            </f:fields>
+                        </f:FormElement>
+                         
+                          <f:FormElement id="_IDGenLabel1" label="Characteristic Name" >
+                            <f:fields>
+                                <Text id="_IDGenText1" text="{characteristicData>/items/0/CHARACTERISTICNAME}"/>
+                            </f:fields>
+                        </f:FormElement>
+
+                        <f:FormElement id="_IDGenLabel5" label="Value" >
+                       
+                            <f:fields>
+                                <Text id="_IDGenText5"  text="{characteristicData>/items/0/VALUE}"  />
+                            </f:fields>
+                        </f:FormElement>
+
+                        <f:FormElement  id="_IDGenLabel6" label="Value Description">
+                            <f:fields>
+                                <Text  id="_IDGenText6"  text="{characteristicData>/items/0/VALUEDESCRIPTION}" />
+                            </f:fields>
+                        </f:FormElement>
+                    </f:formElements>
+                </f:FormContainer>
+            </f:formContainers>
+        </f:Form>
+    </VBox>
+</mvc:View>

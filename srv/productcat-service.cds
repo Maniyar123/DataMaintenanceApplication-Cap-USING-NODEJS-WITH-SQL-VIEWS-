@@ -12,5 +12,5 @@ service CatalogService1 {
     // entity calview as projection on myapp.CALVIEW;
     entity HierarchicalData as projection on HIERARICALDATASET;
     entity calculationview as projection on CALVIEW;
-     
+   
 }    

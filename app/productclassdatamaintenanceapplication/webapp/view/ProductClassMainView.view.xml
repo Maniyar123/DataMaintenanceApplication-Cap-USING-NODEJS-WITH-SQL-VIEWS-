@@ -1,0 +1,45 @@
+<mvc:View controllerName="com.productclassdatamaintenanceapplication.controller.ProductClassMainView"
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+    xmlns="sap.m"
+    xmlns:f="sap.f">
+
+<f:DynamicPage id="dynamicPage" >
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="Product Maintenance Table" />
+                </f:heading>
+            </f:DynamicPageTitle>
+        </f:title>
+
+    <f:content>
+            <Table id="productTable" items="{/PRODUCT}" >
+                <!-- <headerToolbar>
+                    <Toolbar>
+                        <Title text="Products" />
+                    </Toolbar>
+                </headerToolbar> -->
+                <columns>
+                    <Column>
+                        <Text text="PRODUCTS"  />
+                    </Column>
+                    <Column>
+                        <Text text="PRODUCTS ID"  />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem type="Navigation" press="onProductPress">
+                        <cells>
+                            <Text text="{productName}" />
+                             <Text text="{productID}" />
+                            <!-- <Text text="{masterClass/masterDataNumber}" /> -->
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </f:content>
+  
+
+ </f:DynamicPage>
+
+</mvc:View>

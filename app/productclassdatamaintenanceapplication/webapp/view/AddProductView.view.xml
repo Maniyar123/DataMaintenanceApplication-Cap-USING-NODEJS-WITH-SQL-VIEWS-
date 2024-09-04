@@ -1,0 +1,241 @@
+<mvc:View 
+    controllerName="com.productclassdatamaintenanceapplication.controller.AddProductView"
+    xmlns:mvc="sap.ui.core.mvc" 
+    xmlns="sap.m">
+    
+    <Page title="Add New Product" >
+        <content>
+         <Button  icon="sap-icon://nav-back" press="addProductOnNavBack" tooltip="Click to go back" />
+            <IconTabBar id="iconTabBar">
+                <items>
+                 
+                    <!-- Class Tab -->
+                    <IconTabFilter text="Class" key="class" >
+                        <VBox>
+                            <!-- Class input fields with labels -->
+                            <Label text="Class ID:" labelFor="classIdInput" />
+                            <Input id="classIdInput" />
+                            
+                            <Label text="Class Name:" labelFor="classNameInput" />
+                            <Input id="classNameInput" />
+                            
+                            <Button text="Save Class" press="onSaveClass" />
+
+                            <!-- Table for Classes -->
+                            <Table id="classTable" items="{/CLASS}">
+                                <columns>
+                                    <Column>
+                                        <Text text="Class ID" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="Class Name" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="Actions" />
+                                    </Column>
+                                </columns>
+                                <items>
+                                    <ColumnListItem>
+                                        <cells>
+                                            <Text text="{classID}" />
+                                            <Text text="{className}" />
+                                            <HBox>
+                                                <Button icon="sap-icon://edit" press="onEditClass"  class="sapUiSmallMarginEnd" type="Success"/>
+                                                <Button icon="sap-icon://delete" press="onDeleteClass" type="Reject" />
+                                            </HBox>
+                                        </cells>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
+                        </VBox>
+                    </IconTabFilter>
+
+                    <!-- Product Tab -->
+                    <IconTabFilter text="Product" key="product">
+                        <VBox>
+                            <!-- Product input fields with labels -->
+                            <Label text="Product Id:" labelFor="productIdInput" />
+                            <Input id="productIdInput" />
+                            
+                            <Label text="Product Name:" labelFor="productNameInput" />
+                            <Input id="productNameInput" />
+                            
+                            <Label text="Type:" labelFor="productTypeInput" />
+                            <Input id="productTypeInput" />
+                            
+                            <Button text="Save Product" press="onSaveProduct" />
+
+                            <!-- Table for Products -->
+                            <Table id="productsTable" items="{/PRODUCT}">
+                                <columns>
+                                    <Column>
+                                        <Text text="Product ID" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="Product Name" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="Type" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="Actions" />
+                                    </Column>
+                                </columns>
+                                <items>
+                                    <ColumnListItem>
+                                        <cells>
+                                            <Text text="{productID}" />
+                                            <Text text="{productName}" />
+                                            <Text text="{type}" />
+                                            <HBox>
+                                                <Button icon="sap-icon://edit" press="onEditProduct" type="Success"  class="sapUiSmallMarginEnd" />
+                                                <Button icon="sap-icon://delete" press="onDeleteProduct" type="Reject"/>
+                                            </HBox>
+                                        </cells>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
+                        </VBox>
+                    </IconTabFilter>
+                    
+                    <!-- Characteristics Tab -->
+                    <IconTabFilter text="Characteristics" key="characteristics">
+                        <VBox>
+                            <!-- Characteristics input fields with labels -->
+                            <Label text="Characteristic Id:" labelFor="characteristicIdInput" />
+                            <Input id="characteristicIdInput" />
+                            
+                            <Label text="Class Id:" labelFor="characteristicClassIdInput" />
+                            <Input id="characteristicClassIdInput" />
+                            
+                            <Label text="Characteristic Name:" labelFor="characteristicNameInput" />
+                            <Input id="characteristicNameInput" />
+                            
+                            <Button text="Save Characteristic" press="onSaveCharacteristic" />
+
+                            <!-- Table for Characteristics -->
+                            <Table id="characteristicsTable" items="{/CHARACTERISTICS}">
+                                <columns>
+                                    <Column>
+                                        <Text text="Characteristic ID" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="Class ID" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="Characteristic Name" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="Actions" />
+                                    </Column>
+                                </columns>
+                                <items>
+                                    <ColumnListItem>
+                                        <cells>
+                                            <Text text="{characteristicID}" />
+                                            <Text text="{classID_classID}" />
+                                            <Text text="{characteristicName}" />
+                                            <HBox>
+                                                <Button icon="sap-icon://edit" press="onEditCharacteristic"   class="sapUiSmallMarginEnd" type="Success" />
+                                                <Button icon="sap-icon://delete" press="onDeleteCharacteristic" type="Reject"/>
+                                            </HBox>
+                                        </cells>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
+                        </VBox>
+                    </IconTabFilter>
+
+                    <!-- Characteristics Value Tab -->
+                    <IconTabFilter text="Characteristics Value" key="characteristicsValue">
+                        <VBox>
+                            <!-- Characteristics Value input fields with labels -->
+                            <Label text="Characteristic Id:" labelFor="characteristicValueIdInput" />
+                            <Input id="characteristicValueIdInput" />
+                            
+                            <Label text="Value:" labelFor="characteristicValueInput" />
+                            <Input id="characteristicValueInput" />
+                            
+                            <Label text="Value Description:" labelFor="characteristicValueDesInput" />
+                            <Input id="characteristicValueDesInput" />
+                            
+                            <Button text="Save Characteristic Value" press="onSaveCharacteristicValue" />
+
+                            <!-- Table for Characteristics Value -->
+                            <Table id="characteristicsValueTable" items="{CHARACTERISTICSVALUE>/value}">
+                                <columns>
+                                    <Column>
+                                        <Text text="Characteristic ID" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="Value" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="Value Description" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="Actions" />
+                                    </Column>
+                                </columns>
+                                <items>
+                                    <ColumnListItem>
+                                        <cells>
+                                            <Text text="{CHARACTERISTICSVALUE>characteristicID_characteristicID}" />
+                                            <Text text="{CHARACTERISTICSVALUE>value}" />
+                                            <Text text="{CHARACTERISTICSVALUE>valueDescription}" />
+                                            <HBox>
+                                                <Button icon="sap-icon://edit" press="onEditCharacteristicValue"  class="sapUiSmallMarginEnd" type="Success"/>
+                                                <Button icon="sap-icon://delete" press="onDeleteCharacteristicValue" type="Reject"/>
+                                            </HBox>
+                                        </cells>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
+                        </VBox>
+                    </IconTabFilter>
+
+                    <!-- Product Class Tab -->
+                    <IconTabFilter text="Product Class" key="productClass">
+                        <VBox>
+                            <!-- Product Class input fields with labels -->
+                            <Label text="Product Id:" labelFor="productClassIdInput" />
+                            <Input id="productClassIdInput" />
+                            
+                            <Label text="Class Id:" labelFor="classProductIdInput" />
+                            <Input id="classProductIdInput" />
+                            
+                            <Button text="Save Product Class" press="onSaveProductClassIds" />
+
+                            <!-- Table for Product Classes -->
+                            <Table id="productClassTable" items="{PRODUCTCLASS>/value}">
+                                <columns>
+                                    <Column>
+                                        <Text text="Product ID" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="Class ID" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="Actions" />
+                                    </Column>
+                                </columns>
+                                <items>
+                                    <ColumnListItem>
+                                        <cells>
+                                            <Text text="{PRODUCTCLASS>productID_productID}" />
+                                            <Text text="{PRODUCTCLASS>classID_classID}" />
+                                            <HBox>
+                                                <Button icon="sap-icon://edit" press="onEditProductClass" class="sapUiSmallMarginEnd" type="Success"/>
+                                                <Button icon="sap-icon://delete" press="onDeleteProductClass" type="Reject"/>
+                                            </HBox>
+                                        </cells>
+                                    </ColumnListItem>
+                                </items>
+                            </Table>
+                        </VBox>
+                    </IconTabFilter>
+                </items>
+            </IconTabBar>
+        </content>
+    </Page>
+</mvc:View>

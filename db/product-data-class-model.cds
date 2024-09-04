@@ -26,7 +26,7 @@ entity Product {
 }
 
 entity ProductClass {
-    productID : Association to Product;
+     productID : Association to Product;
     classID   : Association to Class;
 }
 }
@@ -40,6 +40,13 @@ entity PRODUCTCALCLASSVIEW{
    CHARACTERISTICNAME:String(100);
    VALUE:String(100);
    VALUEDESCRIPTION:String(255);
+   CLASSID_CLASSID:Integer;
 
-    
+}
+@cds.persistence.exists
+@cds.persistence.table
+entity PRODUCTIDCLASSIDCALVIEW  {
+    PRODUCTID:Integer;
+    PRODUCTNAME:String(100);
+    CLASSID_CLASSID:Integer;
 }

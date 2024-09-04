@@ -3,7 +3,7 @@
     xmlns="sap.m"
     xmlns:f="sap.f">
 
-<f:DynamicPage id="dynamicPage" >
+    <f:DynamicPage id="dynamicPage">
         <f:title>
             <f:DynamicPageTitle>
                 <f:heading>
@@ -12,34 +12,33 @@
             </f:DynamicPageTitle>
         </f:title>
 
-    <f:content>
-            <Table id="productTable" items="{/PRODUCT}" >
-                <!-- <headerToolbar>
+        <f:content>
+            <Table id="productTable" items="{/PRODUCT}">
+                <headerToolbar>
                     <Toolbar>
                         <Title text="Products" />
+                        <ToolbarSpacer />
+                        <Button text="Add" icon="sap-icon://add" press="onAddProduct" />
                     </Toolbar>
-                </headerToolbar> -->
+                </headerToolbar>
                 <columns>
                     <Column>
-                        <Text text="PRODUCTS"  />
+                        <Text text="PRODUCTS" />
                     </Column>
                     <Column>
-                        <Text text="PRODUCTS ID"  />
+                        <Text text="PRODUCTS ID" />
                     </Column>
                 </columns>
                 <items>
                     <ColumnListItem type="Navigation" press="onProductPress">
                         <cells>
                             <Text text="{productName}" />
-                             <Text text="{productID}" />
-                            <!-- <Text text="{masterClass/masterDataNumber}" /> -->
+                            <Text text="{productID}" />
                         </cells>
                     </ColumnListItem>
                 </items>
             </Table>
         </f:content>
-  
-
- </f:DynamicPage>
+    </f:DynamicPage>
 
 </mvc:View>

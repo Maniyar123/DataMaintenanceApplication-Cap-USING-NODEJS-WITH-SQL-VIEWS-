@@ -68,7 +68,7 @@ function (Controller,History,MessageToast,Filter) {
                     // Store filtered data for later use
                     this._filteredCharacteristicsData = oFilteredModel;
 
-                }.bind(this), // Make sure 'this' refers to the controller
+                }.bind(this), 
                 error: function () {
                     MessageToast.show("Failed to fetch characteristics.");
                 }

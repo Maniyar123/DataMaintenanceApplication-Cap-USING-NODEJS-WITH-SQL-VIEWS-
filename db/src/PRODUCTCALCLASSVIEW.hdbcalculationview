@@ -96,29 +96,37 @@
 
 <logicalModel id="Join_1_3">
   <attributes>
-    <attribute id="PRODUCTID" order="1" displayAttribute="false" attributeHierarchyActive="false">
-      <descriptions defaultDescription="PRODUCTID"/>
-      <keyMapping columnObjectName="Join_1_3" columnName="PRODUCTID"/>
-    </attribute>
-    <attribute id="PRODUCTNAME" order="2" displayAttribute="false" attributeHierarchyActive="false">
-      <descriptions defaultDescription="PRODUCTNAME"/>
-      <keyMapping columnObjectName="Join_1_3" columnName="PRODUCTNAME"/>
-    </attribute>
-    <attribute id="TYPE" order="3" displayAttribute="false" attributeHierarchyActive="false">
-      <descriptions defaultDescription="TYPE"/>
-      <keyMapping columnObjectName="Join_1_3" columnName="TYPE"/>
-    </attribute>
-    <attribute id="CHARACTERISTICNAME" order="4" displayAttribute="false" attributeHierarchyActive="false">
+    <attribute id="CHARACTERISTICNAME" order="1" displayAttribute="false" attributeHierarchyActive="false">
       <descriptions defaultDescription="CHARACTERISTICNAME"/>
       <keyMapping columnObjectName="Join_1_3" columnName="CHARACTERISTICNAME"/>
     </attribute>
-    <attribute id="VALUE" order="5" displayAttribute="false" attributeHierarchyActive="false">
+    <attribute id="VALUE" order="2" displayAttribute="false" attributeHierarchyActive="false">
       <descriptions defaultDescription="VALUE"/>
       <keyMapping columnObjectName="Join_1_3" columnName="VALUE"/>
     </attribute>
-    <attribute id="VALUEDESCRIPTION" order="6" displayAttribute="false" attributeHierarchyActive="false">
+    <attribute id="VALUEDESCRIPTION" order="3" displayAttribute="false" attributeHierarchyActive="false">
       <descriptions defaultDescription="VALUEDESCRIPTION"/>
       <keyMapping columnObjectName="Join_1_3" columnName="VALUEDESCRIPTION"/>
+    </attribute>
+    <attribute id="CLASSID_CLASSID" order="4" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="CLASSID_CLASSID"/>
+      <keyMapping columnObjectName="Join_1_3" columnName="CLASSID_CLASSID"/>
+    </attribute>
+    <attribute id="PRODUCTID_PRODUCTID" order="5" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="PRODUCTID_PRODUCTID"/>
+      <keyMapping columnObjectName="Join_1_3" columnName="PRODUCTID_PRODUCTID"/>
+    </attribute>
+    <attribute id="PRODUCTID" order="6" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="PRODUCTID"/>
+      <keyMapping columnObjectName="Join_1_3" columnName="PRODUCTID"/>
+    </attribute>
+    <attribute id="PRODUCTNAME" order="7" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="PRODUCTNAME"/>
+      <keyMapping columnObjectName="Join_1_3" columnName="PRODUCTNAME"/>
+    </attribute>
+    <attribute id="TYPE" order="8" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="TYPE"/>
+      <keyMapping columnObjectName="Join_1_3" columnName="TYPE"/>
     </attribute>
   </attributes>
   <calculatedAttributes/>

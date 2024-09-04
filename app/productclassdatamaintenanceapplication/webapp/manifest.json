@@ -109,7 +109,14 @@
           "target": [
               "TargetCharacteristicsView"
           ]
-      }
+      },
+      {
+        "name": "AddProductView",
+        "pattern": "AddProductView",
+        "target": [
+            "TargetAddProductView"
+        ]
+    }
        
       ],
       "targets": {
@@ -126,6 +133,13 @@
             "clearControlAggregation": false,
             "viewId": "ProductCharacteristicsView",
             "viewName": "ProductCharacteristicsView"
+        },
+        "TargetAddProductView": {
+            "viewType": "XML",
+            "transition": "slide",
+            "clearControlAggregation": false,
+            "viewId": "AddProductView",
+            "viewName": "AddProductView"
         }
       }
     },

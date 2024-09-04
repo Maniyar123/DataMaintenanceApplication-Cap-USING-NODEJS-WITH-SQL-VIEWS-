@@ -11,6 +11,12 @@ function (Controller) {
             var oModel = this.getOwnerComponent().getModel("productclassmodel");
                 this.getView().setModel(oModel);
         },
+
+        onAddProduct: function () {
+            var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
+            oRouter.navTo("AddProductView");
+        },
+        
         onProductPress: function (oEvent) {
             var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
             var oContext = oEvent.getSource().getBindingContext();

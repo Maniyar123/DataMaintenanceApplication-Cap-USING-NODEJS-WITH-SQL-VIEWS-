@@ -71,6 +71,13 @@
                                 <Text  id="_IDGenText6"  text="{characteristicData>/items/0/VALUEDESCRIPTION}" />
                             </f:fields>
                         </f:FormElement>
+
+                        <f:FormElement  id="_IDGenLabel7" label="Class Id">
+                            <f:fields>
+                                <Text  id="_IDGenText7"  text="{characteristicData>/items/0/CLASSID_CLASSID}" />
+                            </f:fields>
+                        </f:FormElement>
+                        
                     </f:formElements>
                 </f:FormContainer>
             </f:formContainers>

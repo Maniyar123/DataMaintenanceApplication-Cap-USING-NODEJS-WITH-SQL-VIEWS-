@@ -1,5 +1,6 @@
 using { productdetailsdataclass } from '../db/product-data-class-model';
 using {PRODUCTCALCLASSVIEW} from '../db/product-data-class-model';
+using {PRODUCTIDCLASSIDCALVIEW} from '../db/product-data-class-model';
 
 service CatalogService2{
 entity CLASS as projection on productdetailsdataclass.Class;
@@ -8,4 +9,5 @@ entity CHARACTERISTICSVALUE as projection on productdetailsdataclass.Characteris
 entity PRODUCT as projection on productdetailsdataclass.Product;
 entity PRODUCTCLASS as projection on productdetailsdataclass.ProductClass;
 entity productclasscalview as projection on PRODUCTCALCLASSVIEW;
+entity productidclassidcalview as projection on PRODUCTIDCLASSIDCALVIEW;
 }

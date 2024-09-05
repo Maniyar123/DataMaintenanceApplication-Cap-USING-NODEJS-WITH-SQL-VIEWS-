@@ -19,10 +19,10 @@
                             <Label text="Class Name:" labelFor="classNameInput" />
                             <Input id="classNameInput" />
                             
-                            <Button text="Save Class" press="onSaveClass" />
+                            <Button text="Save Class" press="onSaveClasses" />
 
                             <!-- Table for Classes -->
-                            <Table id="classTable" items="{/CLASS}">
+                            <Table id="classTable" items="{/CLASS}" >
                                 <columns>
                                     <Column>
                                         <Text text="Class ID" />
@@ -47,6 +47,17 @@
                                     </ColumnListItem>
                                 </items>
                             </Table>
+                                     
+                                <VBox id="editClassContainer" visible="false">
+                                <Label text="Class ID:" labelFor="editClassIdInput" />
+                                <Input id="editClassIdInput" />
+                                
+                                <Label text="Class Name:" labelFor="editClassNameInput" />
+                                <Input id="editClassNameInput" />
+                                
+                                <Button text="Save" press="onSaveClass" id="saveClassButton"/>
+                                <Button text="Cancel" press="onCancelEdit" />
+                            </VBox>
                         </VBox>
                     </IconTabFilter>
 
@@ -63,7 +74,7 @@
                             <Label text="Type:" labelFor="productTypeInput" />
                             <Input id="productTypeInput" />
                             
-                            <Button text="Save Product" press="onSaveProduct" />
+                            <Button text="Save Product" press="onSaveProducts" />
 
                             <!-- Table for Products -->
                             <Table id="productsTable" items="{/PRODUCT}">
@@ -95,7 +106,23 @@
                                     </ColumnListItem>
                                 </items>
                             </Table>
+
+                             <!-- Editable Mode for Product -->
+                            <VBox id="editProductContainer" visible="false">
+                                <Label text="Product ID:" labelFor="editProductIdInput" />
+                                <Text id="editProductIdInput" /> <!-- ID is not editable -->
+                                
+                                <Label text="Product Name:" labelFor="editProductNameInput" />
+                                <Input id="editProductNameInput" />
+                                
+                                <Label text="Type:" labelFor="editTypeInput" />
+                                <Input id="editTypeInput" />
+                                
+                                <Button text="Save" press="onSaveProduct" id="saveProductButton"/>
+                                <Button text="Cancel" press="onCancelEditProduct" />
+                            </VBox>
                         </VBox>
+
                     </IconTabFilter>
                     
                     <!-- Characteristics Tab -->
@@ -111,7 +138,7 @@
                             <Label text="Characteristic Name:" labelFor="characteristicNameInput" />
                             <Input id="characteristicNameInput" />
                             
-                            <Button text="Save Characteristic" press="onSaveCharacteristic" />
+                            <Button text="Save Characteristic" press="onSaveCharacteristics" />
 
                             <!-- Table for Characteristics -->
                             <Table id="characteristicsTable" items="{/CHARACTERISTICS}">
@@ -143,6 +170,17 @@
                                     </ColumnListItem>
                                 </items>
                             </Table>
+                             <!-- Editable Mode for Characteristic -->
+                                <VBox id="editCharacteristicContainer" visible="false">
+                                    <Label text="Characteristic ID:" labelFor="editCharacteristicIdInput" />
+                                    <Text id="editCharacteristicIdInput" /> <!-- ID is not editable -->
+                                    
+                                    <Label text="Characteristic Name:" labelFor="editCharacteristicNameInput" />
+                                    <Input id="editCharacteristicNameInput" />
+                                    
+                                    <Button text="Save" press="onSaveCharacteristic" id="saveCharacteristicButton"/>
+                                    <Button text="Cancel" press="onCancelEditCharacteristic" />
+                                </VBox>
                         </VBox>
                     </IconTabFilter>
 
@@ -150,7 +188,7 @@
                     <IconTabFilter text="Characteristics Value" key="characteristicsValue">
                         <VBox>
                             <!-- Characteristics Value input fields with labels -->
-                            <Label text="Characteristic Id:" labelFor="characteristicValueIdInput" />
+                            <Label text="CharacteristicValue Id:" labelFor="characteristicValueIdInput" />
                             <Input id="characteristicValueIdInput" />
                             
                             <Label text="Value:" labelFor="characteristicValueInput" />
@@ -158,31 +196,45 @@
                             
                             <Label text="Value Description:" labelFor="characteristicValueDesInput" />
                             <Input id="characteristicValueDesInput" />
+
+                            <Label text="Characteristic Id:" labelFor="characteristicsIdInput" />
+                            <Input id="characteristicsIdInput" />
                             
-                            <Button text="Save Characteristic Value" press="onSaveCharacteristicValue" />
+                            <Button text="Save Characteristic Value" press="onSaveCharacteristicValues" />
 
                             <!-- Table for Characteristics Value -->
-                            <Table id="characteristicsValueTable" items="{CHARACTERISTICSVALUE>/value}">
+                            <Table id="characteristicsValueTable" items="{/CHARACTERISTICSVALUE}">
                                 <columns>
-                                    <Column>
-                                        <Text text="Characteristic ID" />
+                                   <Column>
+                                        <Text text="CharacteristicValue ID" />
                                     </Column>
+                                    <!-- <Column>
+                                        <Text text="Characteristic ID" />
+                                    </Column> -->
                                     <Column>
                                         <Text text="Value" />
                                     </Column>
                                     <Column>
                                         <Text text="Value Description" />
                                     </Column>
+                                   
+
                                     <Column>
+                                        <Text text="Characteristic ID" />
+                                    </Column>
+                                     <Column>
                                         <Text text="Actions" />
                                     </Column>
                                 </columns>
                                 <items>
                                     <ColumnListItem>
                                         <cells>
-                                            <Text text="{CHARACTERISTICSVALUE>characteristicID_characteristicID}" />
-                                            <Text text="{CHARACTERISTICSVALUE>value}" />
-                                            <Text text="{CHARACTERISTICSVALUE>valueDescription}" />
+                                            <!-- <Text text="{characteristicID_characteristicID}" /> -->
+                                            <Text text="{characteristicValueID}" />
+                                            <Text text="{value}" />
+                                            <Text text="{valueDescription}" />
+                                            <Text text="{characteristicID_characteristicID}" />
+
                                             <HBox>
                                                 <Button icon="sap-icon://edit" press="onEditCharacteristicValue"  class="sapUiSmallMarginEnd" type="Success"/>
                                                 <Button icon="sap-icon://delete" press="onDeleteCharacteristicValue" type="Reject"/>
@@ -191,6 +243,20 @@
                                     </ColumnListItem>
                                 </items>
                             </Table>
+                                <!-- Editable Mode for Characteristic Value -->
+                                    <VBox id="editCharacteristicValueContainer" visible="false">
+                                        <Label text="CharacteristicValue ID:" labelFor="editCharacteristicValueIdInput" />
+                                        <Text id="editCharacteristicValueIdInput" /> <!-- ID is not editable -->
+                                        
+                                        <Label text="Value:" labelFor="editCharacteristicValueInput" />
+                                        <Input id="editCharacteristicValueInput" />
+                                        
+                                        <Label text="Value Description:" labelFor="editCharacteristicValueDesInput" />
+                                        <Input id="editCharacteristicValueDesInput" />
+                                        
+                                        <Button text="Save" press="onSaveCharacteristicValue" id="saveCharacteristicValueButton"/>
+                                        <Button text="Cancel" press="onCancelEditCharacteristicValue" />
+                                    </VBox>
                         </VBox>
                     </IconTabFilter>
 
@@ -198,22 +264,27 @@
                     <IconTabFilter text="Product Class" key="productClass">
                         <VBox>
                             <!-- Product Class input fields with labels -->
-                            <Label text="Product Id:" labelFor="productClassIdInput" />
-                            <Input id="productClassIdInput" />
-                            
+                            <Label text="Product Class Id:" labelFor="productsClassIdInput" />
+                            <Input id="productsClassIdInput" />
+
                             <Label text="Class Id:" labelFor="classProductIdInput" />
                             <Input id="classProductIdInput" />
                             
+                             <Label text="Product Id:" labelFor="productClassIdInput" />
+                            <Input id="productClassIdInput" />
                             <Button text="Save Product Class" press="onSaveProductClassIds" />
 
                             <!-- Table for Product Classes -->
-                            <Table id="productClassTable" items="{PRODUCTCLASS>/value}">
+                            <Table id="productClassTable" items="{/PRODUCTCLASS}">
                                 <columns>
                                     <Column>
-                                        <Text text="Product ID" />
+                                        <Text text="Product Class ID" />
                                     </Column>
                                     <Column>
                                         <Text text="Class ID" />
+                                    </Column>
+                                    <Column>
+                                        <Text text="Product ID" />
                                     </Column>
                                     <Column>
                                         <Text text="Actions" />
@@ -222,17 +293,19 @@
                                 <items>
                                     <ColumnListItem>
                                         <cells>
-                                            <Text text="{PRODUCTCLASS>productID_productID}" />
-                                            <Text text="{PRODUCTCLASS>classID_classID}" />
+                                            <Text text="{productClassID}"/>
+                                            <Text text="{classID_classID}" />
+                                             <Text text="{productID_productID}" />
                                             <HBox>
-                                                <Button icon="sap-icon://edit" press="onEditProductClass" class="sapUiSmallMarginEnd" type="Success"/>
+                                                <!-- <Button icon="sap-icon://edit" press="onEditProductClass" class="sapUiSmallMarginEnd" type="Success"/> -->
                                                 <Button icon="sap-icon://delete" press="onDeleteProductClass" type="Reject"/>
                                             </HBox>
                                         </cells>
                                     </ColumnListItem>
                                 </items>
                             </Table>
-                        </VBox>
+
+                                                </VBox>
                     </IconTabFilter>
                 </items>
             </IconTabBar>

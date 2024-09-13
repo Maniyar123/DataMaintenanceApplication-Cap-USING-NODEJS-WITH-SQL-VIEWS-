@@ -3,24 +3,32 @@
     xmlns:mvc="sap.ui.core.mvc" 
     xmlns="sap.m">
     
-    <Page title="Add New Product" >
+    <Page title="Product Maintenance Application" titleAlignment="Center" >
         <content>
          <Button  icon="sap-icon://nav-back" press="addProductOnNavBack" tooltip="Click to go back" />
+         
             <IconTabBar id="iconTabBar">
                 <items>
                  
                     <!-- Class Tab -->
                     <IconTabFilter text="Class" key="class" >
                         <VBox>
-                            <!-- Class input fields with labels -->
+                        <!-- HBox to Align Button to the Right -->
+                            <HBox justifyContent="End">
+                                <!-- Create Button -->
+                                <Button text="Create Class" press="onCreateClass" type="Emphasized" icon="sap-icon://add" class= "sapUiLargeMarginEnd sapUiSmallMarginBottom"/>
+                            </HBox>
+
+                            <!-- Class input fields with labels
                             <Label text="Class ID:" labelFor="classIdInput" />
                             <Input id="classIdInput" />
                             
                             <Label text="Class Name:" labelFor="classNameInput" />
                             <Input id="classNameInput" />
                             
-                            <Button text="Save Class" press="onSaveClasses" />
+                            <Button text="Save Class" press="onSaveClasses" /> -->
 
+                             
                             <!-- Table for Classes -->
                             <Table id="classTable" items="{/CLASS}" >
                                 <columns>
@@ -48,7 +56,7 @@
                                 </items>
                             </Table>
                                      
-                                <VBox id="editClassContainer" visible="false">
+                                <!-- <VBox id="editClassContainer" visible="false">
                                 <Label text="Class ID:" labelFor="editClassIdInput" />
                                 <Input id="editClassIdInput" />
                                 
@@ -57,14 +65,18 @@
                                 
                                 <Button text="Save" press="onSaveClass" id="saveClassButton"/>
                                 <Button text="Cancel" press="onCancelEdit" />
-                            </VBox>
+                            </VBox> -->
                         </VBox>
                     </IconTabFilter>
 
                     <!-- Product Tab -->
                     <IconTabFilter text="Product" key="product">
                         <VBox>
-                            <!-- Product input fields with labels -->
+                          <HBox justifyContent="End">
+                                <!-- Create Button -->
+                                <Button text="Create Product" press="onCreateProduct" type="Emphasized" icon="sap-icon://add" class="sapUiLargeMarginEnd sapUiSmallMarginBottom"/>
+                         </HBox>
+                            <!-- Product input fields with labels
                             <Label text="Product Id:" labelFor="productIdInput" />
                             <Input id="productIdInput" />
                             
@@ -74,7 +86,7 @@
                             <Label text="Type:" labelFor="productTypeInput" />
                             <Input id="productTypeInput" />
                             
-                            <Button text="Save Product" press="onSaveProducts" />
+                            <Button text="Save Product" press="onSaveProducts" /> -->
 
                             <!-- Table for Products -->
                             <Table id="productsTable" items="{/PRODUCT}">
@@ -108,9 +120,9 @@
                             </Table>
 
                              <!-- Editable Mode for Product -->
-                            <VBox id="editProductContainer" visible="false">
+                            <!-- <VBox id="editProductContainer" visible="false">
                                 <Label text="Product ID:" labelFor="editProductIdInput" />
-                                <Text id="editProductIdInput" /> <!-- ID is not editable -->
+                                <Text id="editProductIdInput" /> 
                                 
                                 <Label text="Product Name:" labelFor="editProductNameInput" />
                                 <Input id="editProductNameInput" />
@@ -120,7 +132,9 @@
                                 
                                 <Button text="Save" press="onSaveProduct" id="saveProductButton"/>
                                 <Button text="Cancel" press="onCancelEditProduct" />
-                            </VBox>
+                            </VBox> -->
+
+
                         </VBox>
 
                     </IconTabFilter>
@@ -128,7 +142,12 @@
                     <!-- Characteristics Tab -->
                     <IconTabFilter text="Characteristics" key="characteristics">
                         <VBox>
-                            <!-- Characteristics input fields with labels -->
+
+                           <HBox justifyContent="End">
+                                <!-- Create Button -->
+                                <Button text="Create Characteristic" press="onCreateCharacteristic" type="Emphasized" icon="sap-icon://add" class="sapUiLargeMarginEnd sapUiSmallMarginBottom"/>
+                            </HBox>
+                            <!-- Characteristics input fields with labels
                             <Label text="Characteristic Id:" labelFor="characteristicIdInput" />
                             <Input id="characteristicIdInput" />
                             
@@ -138,7 +157,7 @@
                             <Label text="Characteristic Name:" labelFor="characteristicNameInput" />
                             <Input id="characteristicNameInput" />
                             
-                            <Button text="Save Characteristic" press="onSaveCharacteristics" />
+                            <Button text="Save Characteristic" press="onSaveCharacteristics" /> -->
 
                             <!-- Table for Characteristics -->
                             <Table id="characteristicsTable" items="{/CHARACTERISTICS}">
@@ -171,23 +190,27 @@
                                 </items>
                             </Table>
                              <!-- Editable Mode for Characteristic -->
-                                <VBox id="editCharacteristicContainer" visible="false">
+                                <!-- <VBox id="editCharacteristicContainer" visible="false">
                                     <Label text="Characteristic ID:" labelFor="editCharacteristicIdInput" />
-                                    <Text id="editCharacteristicIdInput" /> <!-- ID is not editable -->
+                                    <Text id="editCharacteristicIdInput" /> 
                                     
                                     <Label text="Characteristic Name:" labelFor="editCharacteristicNameInput" />
                                     <Input id="editCharacteristicNameInput" />
                                     
                                     <Button text="Save" press="onSaveCharacteristic" id="saveCharacteristicButton"/>
                                     <Button text="Cancel" press="onCancelEditCharacteristic" />
-                                </VBox>
+                                </VBox> -->
                         </VBox>
                     </IconTabFilter>
 
                     <!-- Characteristics Value Tab -->
                     <IconTabFilter text="Characteristics Value" key="characteristicsValue">
                         <VBox>
-                            <!-- Characteristics Value input fields with labels -->
+                          <HBox justifyContent="End">
+                                <!-- Create Button -->
+                                <Button text="Create Value" press="onCreateCharacteristicValue" type="Emphasized" icon="sap-icon://add" class="sapUiLargeMarginEnd sapUiSmallMarginBottom"/>
+                            </HBox>
+                            <!-- Characteristics Value input fields with labels
                             <Label text="CharacteristicValue Id:" labelFor="characteristicValueIdInput" />
                             <Input id="characteristicValueIdInput" />
                             
@@ -200,7 +223,7 @@
                             <Label text="Characteristic Id:" labelFor="characteristicsIdInput" />
                             <Input id="characteristicsIdInput" />
                             
-                            <Button text="Save Characteristic Value" press="onSaveCharacteristicValues" />
+                            <Button text="Save Characteristic Value" press="onSaveCharacteristicValues" /> -->
 
                             <!-- Table for Characteristics Value -->
                             <Table id="characteristicsValueTable" items="{/CHARACTERISTICSVALUE}">
@@ -244,9 +267,9 @@
                                 </items>
                             </Table>
                                 <!-- Editable Mode for Characteristic Value -->
-                                    <VBox id="editCharacteristicValueContainer" visible="false">
+                                    <!-- <VBox id="editCharacteristicValueContainer" visible="false">
                                         <Label text="CharacteristicValue ID:" labelFor="editCharacteristicValueIdInput" />
-                                        <Text id="editCharacteristicValueIdInput" /> <!-- ID is not editable -->
+                                        <Text id="editCharacteristicValueIdInput" /> 
                                         
                                         <Label text="Value:" labelFor="editCharacteristicValueInput" />
                                         <Input id="editCharacteristicValueInput" />
@@ -256,15 +279,21 @@
                                         
                                         <Button text="Save" press="onSaveCharacteristicValue" id="saveCharacteristicValueButton"/>
                                         <Button text="Cancel" press="onCancelEditCharacteristicValue" />
-                                    </VBox>
+                                    </VBox> -->
                         </VBox>
                     </IconTabFilter>
 
                     <!-- Product Class Tab -->
                     <IconTabFilter text="Product Class" key="productClass">
                         <VBox>
+
+                           <!-- HBox to Align Create Button to the Right -->
+                            <HBox justifyContent="End">
+                                <!-- Create Button -->
+                                <Button text="Create Product Class" press="onCreateProductClass" type="Emphasized" icon="sap-icon://add" class="sapUiLargeMarginEnd sapUiSmallMarginBottom"/>
+                            </HBox>
                             <!-- Product Class input fields with labels -->
-                            <Label text="Product Class Id:" labelFor="productsClassIdInput" />
+                            <!-- <Label text="Product Class Id:" labelFor="productsClassIdInput" />
                             <Input id="productsClassIdInput" />
 
                             <Label text="Class Id:" labelFor="classProductIdInput" />
@@ -272,7 +301,7 @@
                             
                              <Label text="Product Id:" labelFor="productClassIdInput" />
                             <Input id="productClassIdInput" />
-                            <Button text="Save Product Class" press="onSaveProductClassIds" />
+                            <Button text="Save Product Class" press="onSaveProductClassIds" /> -->
 
                             <!-- Table for Product Classes -->
                             <Table id="productClassTable" items="{/PRODUCTCLASS}">
@@ -307,6 +336,7 @@
 
                                                 </VBox>
                     </IconTabFilter>
+                    
                 </items>
             </IconTabBar>
         </content>

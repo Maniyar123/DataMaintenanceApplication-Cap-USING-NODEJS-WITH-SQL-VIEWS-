@@ -1,0 +1,31 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Dialog title="Class Data" id="classEditDialog" draggable="true" contentHeight="250px">
+        <content>
+            <VBox class="sapUiSmallMargin">
+                
+                <Label text="Class Id:" labelFor="classIdEditInput" design="Bold"/>
+                <Input id="classIdEditInput" editable="false" width="100%" class="sapUiSmallMarginBottom"/>
+                
+               
+                <Label text="Class Name:" labelFor="classNameEditInput" design="Bold"/>
+                <Input id="classNameEditInput" width="100%" class="sapUiSmallMarginBottom"/>
+            </VBox>
+        </content>
+
+        <beginButton>
+            <Button
+                text="Update Class"
+                press="onUpdateClass"
+                type="Emphasized"
+            />
+        </beginButton>
+        
+        <endButton>
+            <Button
+                text="Cancel"
+                press="onCancelClassUpdateDialog"
+                type="Reject"
+            />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

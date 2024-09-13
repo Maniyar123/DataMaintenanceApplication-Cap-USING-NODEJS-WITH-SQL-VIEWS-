@@ -1,0 +1,37 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Dialog title="Characteristic Data" id="charecetricsInputUpdateDialog" draggable="true" contentHeight="300px">
+        <content>
+            <VBox class="sapUiSmallMargin">
+                <!-- Characteristic ID input field -->
+                <Label text="Characteristic Id:" labelFor="characteristicIdUpdateInput" design="Bold"/>
+                <Input id="characteristicIdUpdateInput" width="100%" class="sapUiSmallMarginBottom"/>
+
+                <!-- Class ID ComboBox -->
+                <Label text="Class Id:" labelFor="characteristicClassIdUpdateInput" design="Bold"/>
+                <ComboBox id="characteristicClassIdUpdateInput" items="{ path: '/CLASS' }" width="100%" class="sapUiSmallMarginBottom">
+                    <core:Item key="{classID}" text="{classID}" />
+                </ComboBox>
+
+                <!-- Characteristic Name input field -->
+                <Label text="Characteristic Name:" labelFor="characteristicNameUpdateInput" design="Bold"/>
+                <Input id="characteristicNameUpdateInput" width="100%" class="sapUiSmallMarginBottom"/>
+            </VBox>
+        </content>
+
+        <beginButton>
+            <Button
+                text="Save Characteristic"
+                press="onSaveCharacteristicsUpdateDialog"
+                type="Success"
+            />
+        </beginButton>
+        
+        <endButton>
+            <Button
+                text="Cancel"
+                press="onCancelChareectcisDialogUpdate"
+                type="Reject"
+            />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

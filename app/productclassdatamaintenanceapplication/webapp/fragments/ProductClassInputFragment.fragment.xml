@@ -1,0 +1,31 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Dialog title="Product Class Data" id="productClassInputDialog" draggable="true" contentHeight="300px">
+        <content>
+            <VBox class="sapUiMediumMargin">
+                <!-- Product Class ID input field -->
+                <Label text="Product Class Id:" labelFor="productsClassIdInput" design="Bold"/>
+                <Input id="productsClassIdInput" width="100%" class="sapUiSmallMarginBottom"/>
+
+                <!-- Class ID ComboBox -->
+                <Label text="Class Id:" labelFor="classProductIdInput" design="Bold"/>
+                <ComboBox id="classProductIdInput" items="{ path: '/CLASS' }" width="100%" class="sapUiSmallMarginBottom">
+                    <core:Item key="{classID}" text="{classID}" />
+                </ComboBox>
+
+                <!-- Product ID ComboBox -->
+                <Label text="Product Id:" labelFor="productClassIdInput" design="Bold"/>
+                <ComboBox id="productClassIdInput" items="{ path: '/PRODUCT' }" width="100%" class="sapUiSmallMarginBottom">
+                    <core:Item key="{productID}" text="{productID}" />
+                </ComboBox>
+            </VBox>
+        </content>
+
+        <beginButton>
+            <Button text="Save Product Class" press="onSaveProductClassIds" type="Success"/>
+        </beginButton>
+
+        <endButton>
+            <Button text="Cancel" press="onCancelProductClassDialog" type="Reject"/>
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

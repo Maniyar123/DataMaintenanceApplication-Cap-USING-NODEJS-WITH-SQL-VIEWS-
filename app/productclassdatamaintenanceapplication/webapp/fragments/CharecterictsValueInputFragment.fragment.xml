@@ -2,6 +2,20 @@
     <Dialog title="Characteristic Value Data" id="characterictsValueInputDialog" draggable="true" contentHeight="300px">
         <content>
             <VBox class="sapUiSmallMargin">
+
+                  <!-- Characteristic ID ComboBox -->
+                <Label text="Characteristic Id:" labelFor="characteristicsIdInput" design="Bold"/>
+                <!-- <ComboBox id="characteristicsIdInput" items="{ path: '/CHARACTERISTICS' }" width="100%" class="sapUiSmallMarginBottom">
+                    <core:Item key="{characteristicID}" text="{characteristicID}" />
+                </ComboBox> -->
+                 <Input id="characteristicsIdInput" 
+                       width="100%" 
+                       class="sapUiSmallMarginBottom"
+                       showValueHelp="true"
+                       valueHelpRequest="onValueHelpForCharacteristic"
+                       editable="true"/>
+
+                
                 <!-- Characteristic Value ID input field -->
                 <Label text="CharacteristicValue Id:" labelFor="characteristicValueIdInput" design="Bold"/>
                 <Input id="characteristicValueIdInput" width="100%" class="sapUiSmallMarginBottom"/>
@@ -14,11 +28,7 @@
                 <Label text="Value Description:" labelFor="characteristicValueDesInput" design="Bold"/>
                 <Input id="characteristicValueDesInput" width="100%" class="sapUiSmallMarginBottom"/>
                 
-                <!-- Characteristic ID ComboBox -->
-                <Label text="Characteristic Id:" labelFor="characteristicsIdInput" design="Bold"/>
-                <ComboBox id="characteristicsIdInput" items="{ path: '/CHARACTERISTICS' }" width="100%" class="sapUiSmallMarginBottom">
-                    <core:Item key="{characteristicID}" text="{characteristicID}" />
-                </ComboBox>
+                
             </VBox>
         </content>
 

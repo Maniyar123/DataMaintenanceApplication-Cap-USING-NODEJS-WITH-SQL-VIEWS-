@@ -1,0 +1,43 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Dialog title="Select Class ID" id="charDropDownDialog" draggable="true" contentHeight="400px" contentWidth="600px">
+        <content>
+            <VBox class="sapUiSmallMargin">
+                <!-- Search Field for Filtering -->
+                <SearchField
+                    id="classSearchField"
+                    placeholder="Search for Class ID..."
+                    liveChange="onClassSearch"
+                    width="100%"
+                    class="sapUiSmallMarginBottom"
+                />
+
+                <!-- List for Class ID Selection -->
+                <List
+                    id="classIdList"
+                    mode="SingleSelectMaster"
+                   
+                    items="{
+                        path: '/CLASS',
+                        templateShareable: false
+                    }"
+                    selectionChange="onClassIdSelect"
+                    class="sapUiSmallMarginBottom"
+                    
+                >
+                    <items>
+                        <StandardListItem title="{classID}"  />
+                    </items>
+                </List>
+            </VBox>
+        </content>
+
+      
+        <endButton>
+            <Button
+                text="Cancel"
+                press="onCancelClassSelectionDropDown"
+                type="Reject"
+            />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

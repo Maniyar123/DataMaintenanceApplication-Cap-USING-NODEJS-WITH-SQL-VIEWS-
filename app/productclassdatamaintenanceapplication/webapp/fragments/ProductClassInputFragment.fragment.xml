@@ -8,15 +8,27 @@
 
                 <!-- Class ID ComboBox -->
                 <Label text="Class Id:" labelFor="classProductIdInput" design="Bold"/>
-                <ComboBox id="classProductIdInput" items="{ path: '/CLASS' }" width="100%" class="sapUiSmallMarginBottom">
+                <!-- <ComboBox id="classProductIdInput" items="{ path: '/CLASS' }" width="100%" class="sapUiSmallMarginBottom">
                     <core:Item key="{classID}" text="{classID}" />
-                </ComboBox>
+                </ComboBox> -->
+                  <Input id="classProductIdInput" 
+                       width="100%" 
+                       class="sapUiSmallMarginBottom"
+                       showValueHelp="true"
+                       valueHelpRequest="onClassValueHelpRequest"
+                       editable="true"/>
 
                 <!-- Product ID ComboBox -->
                 <Label text="Product Id:" labelFor="productClassIdInput" design="Bold"/>
-                <ComboBox id="productClassIdInput" items="{ path: '/PRODUCT' }" width="100%" class="sapUiSmallMarginBottom">
+                <!-- <ComboBox id="productClassIdInput" items="{ path: '/PRODUCT' }" width="100%" class="sapUiSmallMarginBottom">
                     <core:Item key="{productID}" text="{productID}" />
-                </ComboBox>
+                </ComboBox> -->
+                 <Input id="productClassIdInput" 
+                       width="100%" 
+                       class="sapUiSmallMarginBottom"
+                       showValueHelp="true"
+                       valueHelpRequest="onProductValueHelpRequest"
+                       editable="true"/>
             </VBox>
         </content>
 

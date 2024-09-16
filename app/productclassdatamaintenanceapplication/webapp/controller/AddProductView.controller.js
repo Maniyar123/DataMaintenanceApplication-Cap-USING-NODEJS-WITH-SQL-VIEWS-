@@ -4,8 +4,10 @@ sap.ui.define([
     "sap/ui/core/routing/History",
     "sap/ui/core/Fragment",
     "sap/m/MessageBox",
+     "sap/ui/model/Filter",
+    "sap/ui/model/FilterOperator"
 
-], function (Controller, MessageToast, History, Fragment,MessageBox) {
+], function (Controller, MessageToast, History, Fragment,MessageBox,Filter,FilterOperator) {
     "use strict";
     var that;
     return Controller.extend("com.productclassdatamaintenanceapplication.controller.AddProductView", {
@@ -563,6 +565,118 @@ sap.ui.define([
         //         },
 
 
+        onValueHelpRequest: function () {  //--------------value help for chareacterics class id selection(open fragmnet)------------------
+            // Check if the dialog already exists
+            if (!this._oClassDropDownDialog) {
+                // Load the fragment asynchronously
+                this._oClassDropDownDialog = sap.ui.xmlfragment("com.productclassdatamaintenanceapplication.dropDownFragments.characteristicsDropDownFragment", this);
+                this.getView().addDependent(this._oClassDropDownDialog);
+            }
+            // Open the dialog
+            this._oClassDropDownDialog.open();
+        },
+
+        onClassIdSelect: function(oEvent) { //--------------value help for chareacterics class id selection  (onclick item code)------------------
+            // Get the selected item from the selectionChange event
+            var selectedItem = oEvent.getParameter("listItem");
+            var selectedClassId = selectedItem.getTitle(); // Assuming the class ID is the title
+        
+            // Get the 'Characteristic Data' dialog input field
+            var oCharDialog = sap.ui.core.Fragment.byId("charecetricsInputDialog", "characteristicClassIdInput");
+        
+            // Set the selected Class ID into the 'classID' input field of the Characteristic Data Dialog
+            oCharDialog.setValue(selectedClassId);
+        
+            // Close the Class ID selection dialog if it exists
+            if (this._oClassDropDownDialog) {
+                this._oClassDropDownDialog.close(); // Ensure that the dialog exists before trying to close it
+            } else {
+                console.error("Class DropDown Dialog is not defined");
+            }
+        },
+        
+        // onCancelClassSelectionDropDown: function() { //-----------value help for chareectrics class id (/fragmentclose)----------------
+        //     // Check if the dialog exists before attempting to close it
+        //     if (this._oClassDropDownDialog) {
+        //         this._oClassDropDownDialog.close(); // Close the dialog
+        //     } else {
+        //         console.error("Class DropDown Dialog is not defined");
+        //     }
+        // },
+        onCancelClassSelectionDropDown: function() {
+            // Check if the dialog exists before attempting to close it
+            if (this._oClassDropDownDialog) {
+                // Clear the search field
+                var oSearchField = sap.ui.getCore().byId("classSearchField");
+                if (oSearchField) {
+                    oSearchField.setValue(""); // Clear the search field
+                } else {
+                    console.error("Search Field not found");
+                }
+        
+                // Clear the filter on the list
+                var oList = sap.ui.getCore().byId("classIdList");
+                if (oList) {
+                    var oBinding = oList.getBinding("items");
+                    if (oBinding) {
+                        oBinding.filter([]); // Reset filter to show all items
+                    } else {
+                        console.error("Binding for List control not found");
+                    }
+                } else {
+                    console.error("List control not found in dialog");
+                }
+        
+                // Close the dialog
+                this._oClassDropDownDialog.close();
+            } else {
+                console.error("Class DropDown Dialog is not defined");
+            }
+        },
+        
+
+        onClassSearch: function (oEvent) { //------------search field for characteric value help-------------
+            // Get the search value
+            var sValue = oEvent.getParameter("newValue");
+            
+            // Get the dialog and list controls
+            var oDialog = sap.ui.getCore().byId("charDropDownDialog");
+            var oList = sap.ui.getCore().byId("classIdList");
+            
+            // Check if the controls are found
+            if (oDialog && oList) {
+                var oBinding = oList.getBinding("items");
+        
+                if (oBinding) {
+                    // Create a filter based on the search value
+                    var oFilter;
+                    if (sValue) {
+                        // Convert the search value to an integer
+                        var iValue = parseInt(sValue, 10);
+                        
+                        // Create a filter based on the numeric value
+                        if (!isNaN(iValue)) {
+                            oFilter = new sap.ui.model.Filter("classID", sap.ui.model.FilterOperator.EQ, iValue);
+                        } else {
+                            // If the search value is not a number, handle appropriately
+                            oFilter = new sap.ui.model.Filter("classID", sap.ui.model.FilterOperator.EQ, null);
+                        }
+                    } else {
+                        // If the search value is empty, show all items
+                        oFilter = [];
+                    }
+        
+                    // Apply the filter
+                    oBinding.filter(oFilter);
+                } else {
+                    console.error("Binding for List control not found");
+                }
+            } else {
+                console.error("Dialog or List control not found");
+            }
+        },
+        
+        
 
 
 
@@ -711,6 +825,110 @@ sap.ui.define([
         // },
 
 
+        onValueHelpForCharacteristic: function () { //------------value help dailog for chareactericsvalue ---(fragmnet open)--------
+            // Check if the characteristic value help dialog already exists
+            if (!this._oCharacteristicDropDownDialog) {
+                // Load the fragment asynchronously
+                this._oCharacteristicDropDownDialog = sap.ui.xmlfragment("com.productclassdatamaintenanceapplication.dropDownFragments.chareacterictsValueDropDownFragment", this);
+                this.getView().addDependent(this._oCharacteristicDropDownDialog);
+            }
+            // Open the dialog
+            this._oCharacteristicDropDownDialog.open();
+        },
+
+        
+        onCharacteristicIdSelect: function(oEvent) {  //------------value help dailog for chareactericsvalue ---(onclcick item code)--------
+            // Get the selected item from the selectionChange event
+            var selectedItem = oEvent.getParameter("listItem");
+            var selectedCharacteristicId = selectedItem.getTitle(); // Assuming the Characteristic ID is the title
+            
+            // Get the 'Characteristic Value Data' dialog input field
+            var oCharacteristicDialog = sap.ui.core.Fragment.byId("characterictsValueInputDialog", "characteristicsIdInput");
+            
+            // Set the selected Characteristic ID into the input field of the Characteristic Value Dialog
+            oCharacteristicDialog.setValue(selectedCharacteristicId);
+            
+            // Close the Characteristic ID selection dialog if it exists
+            if (this._oCharacteristicDropDownDialog) {
+                this._oCharacteristicDropDownDialog.close(); // Ensure that the dialog exists before trying to close it
+            } else {
+                console.error("Characteristic DropDown Dialog is not defined");
+            }
+        },
+ 
+        onCancelChareectcisValueDialogDropDown: function() {//---------value help dailog for chareactericsvalue--(fragmnet close)----------
+            // Check if the dialog exists before attempting to close it
+            if (this._oCharacteristicDropDownDialog) {
+                // Clear the search field
+                var oSearchField = sap.ui.getCore().byId("characteristicSearchField");
+                if (oSearchField) {
+                    oSearchField.setValue(""); // Clear the search field
+                } else {
+                    console.error("Search Field not found");
+                }
+        
+                // Clear the filter on the list
+                var oList = sap.ui.getCore().byId("characteristicIdList");
+                if (oList) {
+                    var oBinding = oList.getBinding("items");
+                    if (oBinding) {
+                        oBinding.filter([]); // Reset filter to show all items
+                    } else {
+                        console.error("Binding for List control not found");
+                    }
+                } else {
+                    console.error("List control not found in dialog");
+                }
+        
+                // Close the dialog
+                this._oCharacteristicDropDownDialog.close();
+            } else {
+                console.error("Characteristic Value Dialog is not defined");
+            }
+        },
+        
+        
+        onCharacteristicSearch: function (oEvent) {//-------value help search filed for chareacetrictsvalue------------
+            // Get the search value
+            var sValue = oEvent.getParameter("newValue");
+        
+            // Get the dialog and list controls
+            var oDialog = sap.ui.getCore().byId("characterictsValueDropDownDialog");
+            var oList = sap.ui.getCore().byId("characteristicIdList");
+        
+            // Check if the controls are found
+            if (oDialog && oList) {
+                var oBinding = oList.getBinding("items");
+        
+                if (oBinding) {
+                    // Create a filter based on the search value
+                    var oFilter;
+                    if (sValue) {
+                        // Convert the search value to an integer if possible
+                        var iValue = parseInt(sValue, 10);
+        
+                        // Create a filter based on the numeric value
+                        if (!isNaN(iValue)) {
+                            oFilter = new sap.ui.model.Filter("characteristicID", sap.ui.model.FilterOperator.EQ, iValue);
+                        } else {
+                            // If the search value is not a number, use contains operator
+                            oFilter = new sap.ui.model.Filter("characteristicID", sap.ui.model.FilterOperator.Contains, sValue);
+                        }
+                    } else {
+                        // If the search value is empty, show all items
+                        oFilter = [];
+                    }
+        
+                    // Apply the filter
+                    oBinding.filter(oFilter);
+                } else {
+                    console.error("Binding for List control not found");
+                }
+            } else {
+                console.error("Dialog or List control not found");
+            }
+        },
+
 
 
 
@@ -855,6 +1073,199 @@ sap.ui.define([
 
         // ---------------sstart of delete functionality---------------------
 
+        onClassValueHelpRequest: function() {//----------value help for product class(fragment open for CLASS field)------
+            if (!this._oClassDialog) {
+                this._oClassDialog = sap.ui.xmlfragment("com.productclassdatamaintenanceapplication.dropDownFragments.productClassClassDropDownFragmnet", this);
+                this.getView().addDependent(this._oClassDialog);
+            }
+            this._oClassDialog.open();
+        },
+        
+        onProductValueHelpRequest: function() { //---------value help for productclass(fragment open for PRODUCT field)
+            if (!this._oProductDialog) {
+                this._oProductDialog = sap.ui.xmlfragment("com.productclassdatamaintenanceapplication.dropDownFragments.productClassProductDropDownFrgamnet", this);
+                this.getView().addDependent(this._oProductDialog);
+            }
+            this._oProductDialog.open();
+        },
+        
+        onClassIdSelectCharValue: function(oEvent) { //----------value help for product class(onClassIdSelectCharValue logic for CLASS field)-----------
+            var selectedClassId = oEvent.getParameter("listItem").getTitle();
+            var oClassInput = sap.ui.core.Fragment.byId("productClassInputDialog", "classProductIdInput");
+            oClassInput.setValue(selectedClassId);
+            if (this._oClassDialog) {
+                this._oClassDialog.close();
+            }
+        },
+        
+        onProductIdSelectCharValue: function(oEvent) { //-----------value help for product class(onProductIdSelectCharValue logic for CLASS field)--------
+            var selectedProductId = oEvent.getParameter("listItem").getTitle();
+            var oProductInput = sap.ui.core.Fragment.byId("productClassInputDialog", "productClassIdInput");
+            oProductInput.setValue(selectedProductId);
+            if (this._oProductDialog) {
+                this._oProductDialog.close();
+            }
+        },
+        
+        onCancelCharValueClassDialogDropDown: function() {
+            // Check if the dialog exists before attempting to close it
+            if (this._oClassDialog) {
+                // Clear the search field
+                var oSearchField = sap.ui.getCore().byId("classIdSearchField");
+                if (oSearchField) {
+                    oSearchField.setValue(""); // Clear the search field
+                } else {
+                    console.error("Search Field for Class ID not found");
+                }
+        
+                // Clear the filter on the list
+                var oList = sap.ui.getCore().byId("classProductIdList");
+                if (oList) {
+                    var oBinding = oList.getBinding("items");
+                    if (oBinding) {
+                        oBinding.filter([]); // Reset filter to show all items
+                    } else {
+                        console.error("Binding for List control not found");
+                    }
+                } else {
+                    console.error("List control for Class ID not found in dialog");
+                }
+        
+                // Close the dialog
+                this._oClassDialog.close();
+            } else {
+                console.error("Class Dialog is not defined");
+            }
+        },
+        
+        
+        onCancelCharProductDialogDropDown: function() {
+            // Check if the dialog exists before attempting to close it
+            if (this._oProductDialog) {
+                // Clear the search field
+                var oSearchField = sap.ui.getCore().byId("productIdSearchField");
+                if (oSearchField) {
+                    oSearchField.setValue(""); // Clear the search field
+                } else {
+                    console.error("Search Field for Product ID not found");
+                }
+        
+                // Clear the filter on the list
+                var oList = sap.ui.getCore().byId("productIdList");
+                if (oList) {
+                    var oBinding = oList.getBinding("items");
+                    if (oBinding) {
+                        oBinding.filter([]); // Reset filter to show all items
+                    } else {
+                        console.error("Binding for List control not found");
+                    }
+                } else {
+                    console.error("List control for Product ID not found in dialog");
+                }
+        
+                // Close the dialog
+                this._oProductDialog.close();
+            } else {
+                console.error("Product Dialog is not defined");
+            }
+        },
+        
+
+
+        onProductClassClassSearch: function(oEvent) { //---------value help for product class for search filed(class field)-----
+            // Get the search value
+            var sValue = oEvent.getParameter("newValue");
+        
+            // Get the dialog and list controls
+            var oDialog = sap.ui.getCore().byId("classIdSelectDialog");
+            var oList = sap.ui.getCore().byId("classProductIdList");
+        
+            // Check if the controls are found
+            if (oDialog && oList) {
+                var oBinding = oList.getBinding("items");
+        
+                if (oBinding) {
+                    // Create a filter based on the search value
+                    var oFilter;
+                    if (sValue) {
+                        // Convert the search value to an integer if possible
+                        var iValue = parseInt(sValue, 10);
+        
+                        // Create a filter based on the numeric value
+                        if (!isNaN(iValue)) {
+                            oFilter = new sap.ui.model.Filter("classID", sap.ui.model.FilterOperator.EQ, iValue);
+                        } else {
+                            // If the search value is not a number, use contains operator
+                            oFilter = new sap.ui.model.Filter("classID", sap.ui.model.FilterOperator.Contains, sValue);
+                        }
+                    } else {
+                        // If the search value is empty, show all items
+                        oFilter = [];
+                    }
+        
+                    // Apply the filter
+                    oBinding.filter(oFilter);
+                } else {
+                    console.error("Binding for List control not found");
+                }
+            } else {
+                console.error("Dialog or List control not found");
+            }
+        },
+        
+        onProductClassProductSearch: function(oEvent) {//-----value help search filed for productclassproduct field--------(product field)
+            // Get the search value
+            var sValue = oEvent.getParameter("newValue");
+        
+            // Get the dialog and list controls
+            var oDialog = sap.ui.getCore().byId("productIdSelectDialog");
+            var oList = sap.ui.getCore().byId("productIdList");
+        
+            // Check if the controls are found
+            if (oDialog && oList) {
+                var oBinding = oList.getBinding("items");
+        
+                if (oBinding) {
+                    // Create a filter based on the search value
+                    var oFilter;
+                    if (sValue) {
+                        // Convert the search value to an integer if possible
+                        var iValue = parseInt(sValue, 10);
+        
+                        // Create a filter based on the numeric value
+                        if (!isNaN(iValue)) {
+                            oFilter = new sap.ui.model.Filter("productID", sap.ui.model.FilterOperator.EQ, iValue);
+                        } else {
+                            // If the search value is not a number, use contains operator
+                            oFilter = new sap.ui.model.Filter("productID", sap.ui.model.FilterOperator.Contains, sValue);
+                        }
+                    } else {
+                        // If the search value is empty, show all items
+                        oFilter = [];
+                    }
+        
+                    // Apply the filter
+                    oBinding.filter(oFilter);
+                } else {
+                    console.error("Binding for List control not found");
+                }
+            } else {
+                console.error("Dialog or List control not found");
+            }
+        },
+        
+        
+        
+
+       
+        
+
+
+
+
+        // -------------search field functiloaity for chareactericts,chareactericsvalue and for product class---------------
+          
+
         onDeleteClass: function(oEvent) {
             var oSource = oEvent.getSource();
             var oContext = oSource.getBindingContext();
@@ -965,7 +1376,7 @@ sap.ui.define([
                                                             groupId: "deletionGroup",
                                                             success: function(oData) {
                                                                 console.log("Batch delete successful:", oData);
-                                                                sap.m.MessageToast.show("Records and class deleted successfully.");
+                                                                sap.m.MessageToast.show("Records In Other Entites with "+ classID +" and class deleted successfully.");
                                                                 oModel.refresh(true);
                                                             },
                                                             error: function(oError) {
@@ -996,22 +1407,8 @@ sap.ui.define([
                     }
                 }.bind(this)
             });
-        }
+        },
         
-        
-        ,
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-       
         // onDeleteClass: function (oEvent) {   //  ---delete functionality for class-----------
         //     var oButton = oEvent.getSource();
         //     var oTable = oButton.getParent().getParent(); // Assuming the delete button is inside a row in the table
@@ -1040,6 +1437,7 @@ sap.ui.define([
 
 
         // ------delete functionality for product--------
+
 
         onDeleteProduct: function (oEvent) {
             var oButton = oEvent.getSource();
@@ -1095,8 +1493,6 @@ sap.ui.define([
                 }.bind(this)
             });
         },
-
-
 
         // ------delte fucntionality for characteristic value------
         onDeleteCharacteristicValue: function (oEvent) {

@@ -5,7 +5,18 @@
     
     <Page title="Product Maintenance Application" titleAlignment="Center" >
         <content>
-         <Button  icon="sap-icon://nav-back" press="addProductOnNavBack" tooltip="Click to go back" />
+         <!-- <Button  icon="sap-icon://nav-back" press="addProductOnNavBack" tooltip="Click to go back"  /> -->
+        
+         <HBox justifyContent="End" class="sapUiSmallMarginTop  sapUiLargeMarginRight">
+                    <Button
+                        icon="sap-icon://display"
+                         text="Display Master Data"
+                        press="addProductOnNavBack"
+                        tooltip="Click to move to the next page"
+                        type="Attention"
+                       
+                        class="sapUiMediumMarginEnd"/>
+                </HBox>
          
             <IconTabBar id="iconTabBar">
                 <items>

@@ -18,7 +18,7 @@
                     <Toolbar>
                         <Title text="Products" />
                         <ToolbarSpacer />
-                        <Button text="Add" icon="sap-icon://add" press="onAddProduct" />
+                        <Button text="Maintain Master Data" icon="sap-icon://add" press="onAddProduct" />
                     </Toolbar>
                 </headerToolbar>
                 <columns>

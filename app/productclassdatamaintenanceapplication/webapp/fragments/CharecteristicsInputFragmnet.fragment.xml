@@ -2,15 +2,28 @@
     <Dialog title="Characteristic Data" id="charecetricsInputDialog" draggable="true" contentHeight="300px">
         <content>
             <VBox class="sapUiSmallMargin">
+                              <!-- Class ID ComboBox -->
+                <Label text="Class Id:" labelFor="characteristicClassIdInput" design="Bold"/>
+                <!-- <ComboBox id="characteristicClassIdInput" items="{ path: '/CLASS' }" width="100%" class="sapUiSmallMarginBottom">
+                    <core:Item key="{classID}" text="{classID}" />
+                </ComboBox> -->
+                 <!-- Class ID Input field with Value Help -->
+                
+                <Input id="characteristicClassIdInput" 
+                       width="100%" 
+                       class="sapUiSmallMarginBottom"
+                       showValueHelp="true"
+                       valueHelpRequest="onValueHelpRequest"
+                       editable="true"/>
+                <!-- Trigger the value help dialog on valueHelpRequest -->
+
+
+
                 <!-- Characteristic ID input field -->
                 <Label text="Characteristic Id:" labelFor="characteristicIdInput" design="Bold"/>
                 <Input id="characteristicIdInput" width="100%" class="sapUiSmallMarginBottom"/>
 
-                <!-- Class ID ComboBox -->
-                <Label text="Class Id:" labelFor="characteristicClassIdInput" design="Bold"/>
-                <ComboBox id="characteristicClassIdInput" items="{ path: '/CLASS' }" width="100%" class="sapUiSmallMarginBottom">
-                    <core:Item key="{classID}" text="{classID}" />
-                </ComboBox>
+
 
                 <!-- Characteristic Name input field -->
                 <Label text="Characteristic Name:" labelFor="characteristicNameInput" design="Bold"/>

@@ -16,7 +16,7 @@ context productdetailsdataclass {
     entity CharacteristicValue {
        
        key  characteristicID      : Association to Characteristic;
-            value                 : String(100);
+       key  value                 : String(100); // Part of composite key (value must be unique for a given characteristic)
             valueDescription      : String(255);
     }
 
@@ -33,29 +33,29 @@ context productdetailsdataclass {
     }
 }
 
-// @cds.persistence.exists
-// @cds.persistence.table
-// entity PRODUCTCALCLASSVIEWS {
-//     PRODUCTNAME        : String(100);
-//     PRODUCTID          : Integer;
-//     TYPE               : String(50);
-//     CHARACTERISTICNAME : String(100);
-//     VALUE              : String(100);
-//     VALUEDESCRIPTION   : String(255);
-//     CLASSID_CLASSID    : Integer;
-
-// }
 @cds.persistence.exists
 @cds.persistence.table
-entity PRODUCTCLASSSQLVIEW {
+entity PRODUCTCALCLASSVIEWS {
     PRODUCTNAME        : String(100);
-    PRODUCTID          : String;
+    PRODUCTID          : Integer;
     TYPE               : String(50);
     CHARACTERISTICNAME : String(100);
     VALUE              : String(100);
     VALUEDESCRIPTION   : String(255);
-    CLASSID   : String;
-}
+    CLASSID_CLASSID    : Integer;
+ }
+ 
+// @cds.persistence.exists
+// @cds.persistence.table
+// entity PRODUCTCLASSSQLVIEW {    //-----entity for PRODUCTCLASSSQLVIEW------
+//     PRODUCTNAME        : String(100);
+//     PRODUCTID          : String;
+//     TYPE               : String(50);
+//     CHARACTERISTICNAME : String(100);
+//     VALUE              : String(100);
+//     VALUEDESCRIPTION   : String(255);
+//     CLASSID   : String;
+// }
 
 
 // @cds.persistence.exists

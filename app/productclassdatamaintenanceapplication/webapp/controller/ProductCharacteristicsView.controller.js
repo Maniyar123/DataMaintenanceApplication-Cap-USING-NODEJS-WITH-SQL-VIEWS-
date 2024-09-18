@@ -19,7 +19,7 @@ function (Controller,History,MessageToast,Filter) {
         _onRouteMatched: function (oEvent) {
             // Get the productId from the route parameter
             var sProductId = oEvent.getParameter("arguments").productId;
-            var iProductId = parseInt(sProductId, 10); // Convert to integer
+            var iProductId = sProductId; // Convert to integer
 
             console.log(iProductId, "Product ID from route");
 

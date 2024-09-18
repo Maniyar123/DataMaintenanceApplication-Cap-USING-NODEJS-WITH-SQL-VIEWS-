@@ -3,8 +3,8 @@
         <content>
             <VBox class="sapUiMediumMargin">
                 <!-- Product Class ID input field -->
-                <Label text="Product Class Id:" labelFor="productsClassIdInput" design="Bold"/>
-                <Input id="productsClassIdInput" width="100%" class="sapUiSmallMarginBottom"/>
+                <!-- <Label text="Product Class Id:" labelFor="productsClassIdInput" design="Bold"/>
+                <Input id="productsClassIdInput" width="100%" class="sapUiSmallMarginBottom"/> -->
 
                 <!-- Class ID ComboBox -->
                 <Label text="Class Id:" labelFor="classProductIdInput" design="Bold"/>

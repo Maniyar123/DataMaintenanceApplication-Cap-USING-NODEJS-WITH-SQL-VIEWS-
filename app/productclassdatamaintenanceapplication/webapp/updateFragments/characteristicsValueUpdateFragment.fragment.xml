@@ -3,9 +3,9 @@
         <content>
             <VBox class="sapUiSmallMargin">
                 <!-- Characteristic Value ID input field -->
-                <Label text="CharacteristicValue Id:" labelFor="characteristicValueIdUpdateInput" design="Bold"/>
+                <!-- <Label text="CharacteristicValue Id:" labelFor="characteristicValueIdUpdateInput" design="Bold"/>
                 <Input id="characteristicValueIdUpdateInput" width="100%" class="sapUiSmallMarginBottom"/>
-                
+                 -->
                 <!-- Value input field -->
                 <Label text="Value:" labelFor="characteristicValueUpdateInput" design="Bold"/>
                 <Input id="characteristicValueUpdateInput" width="100%" class="sapUiSmallMarginBottom"/>

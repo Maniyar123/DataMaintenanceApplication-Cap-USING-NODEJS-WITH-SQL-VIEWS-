@@ -14,7 +14,8 @@
                        class="sapUiSmallMarginBottom"
                        showValueHelp="true"
                        valueHelpRequest="onValueHelpRequest"
-                       editable="true"/>
+                       editable="true"
+                       />
                 <!-- Trigger the value help dialog on valueHelpRequest -->
 
 

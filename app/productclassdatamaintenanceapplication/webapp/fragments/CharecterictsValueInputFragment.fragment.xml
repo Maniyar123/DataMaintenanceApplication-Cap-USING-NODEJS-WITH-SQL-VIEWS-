@@ -17,8 +17,8 @@
 
                 
                 <!-- Characteristic Value ID input field -->
-                <Label text="CharacteristicValue Id:" labelFor="characteristicValueIdInput" design="Bold"/>
-                <Input id="characteristicValueIdInput" width="100%" class="sapUiSmallMarginBottom"/>
+                <!-- <Label text="CharacteristicValue Id:" labelFor="characteristicValueIdInput" design="Bold"/>
+                <Input id="characteristicValueIdInput" width="100%" class="sapUiSmallMarginBottom"/> -->
                 
                 <!-- Value input field -->
                 <Label text="Value:" labelFor="characteristicValueInput" design="Bold"/>

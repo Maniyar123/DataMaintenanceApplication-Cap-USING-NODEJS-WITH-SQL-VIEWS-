@@ -13,13 +13,16 @@
         <Table id="characteristicTable" inset="false" items="{characteristicData>/items}">
             <!-- Column Definitions -->
             <columns>
-                <Column>
+                <Column mergeDuplicates="true">
                     <Text text="Product ID" />
                 </Column>
-                <Column>
+                 <Column mergeDuplicates="true">
+                    <Text text="Class ID" />
+                </Column>
+                <Column >
                     <Text text="Product Name" />
                 </Column>
-                <Column>
+                <Column >
                     <Text text="Type" />
                 </Column>
                 <Column>
@@ -31,9 +34,7 @@
                 <Column>
                     <Text text="Value Description" />
                 </Column>
-                <Column>
-                    <Text text="Class ID" />
-                </Column>
+               
             </columns>
 
             <!-- Template for Table Rows -->
@@ -41,12 +42,12 @@
                 <ColumnListItem>
                     <cells>
                         <Text text="{characteristicData>PRODUCTID}" />
+                        <Text text="{characteristicData>CLASSID_CLASSID}" />
                         <Text text="{characteristicData>PRODUCTNAME}" />
                         <Text text="{characteristicData>TYPE}" />
                         <Text text="{characteristicData>CHARACTERISTICNAME}" />
                         <Text text="{characteristicData>VALUE}" />
                         <Text text="{characteristicData>VALUEDESCRIPTION}" />
-                        <Text text="{characteristicData>CLASSID_CLASSID}" />
                     </cells>
                 </ColumnListItem>
             </items>

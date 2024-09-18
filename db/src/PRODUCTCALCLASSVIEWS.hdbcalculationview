@@ -65,13 +65,14 @@
   </calculationView>
   <calculationView xsi:type="Calculation:JoinView" id="Join_1_3" cardinality="C1_N" joinType="inner" multiJoinNode="Join_1" multiJoinCentralTable="CATALOGSERVICE2_PRODUCT" multiJoinOrder="Outside In">
     <viewAttributes>
-      <viewAttribute id="PRODUCTNAME"/>
-      <viewAttribute id="PRODUCTID"/>
-      <viewAttribute id="TYPE"/>
       <viewAttribute id="CHARACTERISTICNAME"/>
       <viewAttribute id="VALUE"/>
       <viewAttribute id="VALUEDESCRIPTION"/>
       <viewAttribute id="CLASSID_CLASSID"/>
+      <viewAttribute id="PRODUCTID_PRODUCTID"/>
+      <viewAttribute id="PRODUCTNAME"/>
+      <viewAttribute id="PRODUCTID"/>
+      <viewAttribute id="TYPE"/>
       <viewAttribute hidden="true" id="JOIN$PRODUCTID$PRODUCTID_PRODUCTID"/>
     </viewAttributes>
     <calculatedViewAttributes/>
@@ -86,6 +87,7 @@
       <mapping xsi:type="Calculation:AttributeMapping" target="VALUE" source="VALUE"/>
       <mapping xsi:type="Calculation:AttributeMapping" target="VALUEDESCRIPTION" source="VALUEDESCRIPTION"/>
       <mapping xsi:type="Calculation:AttributeMapping" target="CLASSID_CLASSID" source="CLASSID_CLASSID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="PRODUCTID_PRODUCTID" source="PRODUCTID_PRODUCTID"/>
       <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$PRODUCTID$PRODUCTID_PRODUCTID" source="PRODUCTID_PRODUCTID"/>
     </input>
     <joinAttribute name="JOIN$PRODUCTID$PRODUCTID_PRODUCTID"/>
@@ -141,19 +143,19 @@
     </shape>
     <shape modelObjectName="CATALOGSERVICE2_PRODUCT" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput" multiJoinViewNodeName="Join_1">
       <upperLeftCorner x="-196" y="29"/>
-      <rectangleSize width="246.689453125"/>
+      <rectangleSize width="246"/>
     </shape>
     <shape modelObjectName="CATALOGSERVICE2_PRODUCTCLASS" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput" multiJoinViewNodeName="Join_1">
-      <upperLeftCorner x="320" y="30"/>
+      <upperLeftCorner x="126" y="42"/>
       <rectangleSize width="287.359375"/>
     </shape>
     <shape modelObjectName="CATALOGSERVICE2_CHARACTERISTICS" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput" multiJoinViewNodeName="Join_1">
       <upperLeftCorner x="476" y="33"/>
-      <rectangleSize width="302.025390625"/>
+      <rectangleSize width="302"/>
     </shape>
     <shape modelObjectName="CATALOGSERVICE2_CHARACTERISTICSVALUE" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput" multiJoinViewNodeName="Join_1">
       <upperLeftCorner x="860" y="21"/>
-      <rectangleSize width="341.8046875"/>
+      <rectangleSize width="341"/>
     </shape>
   </shapes>
 </layout>

@@ -239,9 +239,9 @@
                             <!-- Table for Characteristics Value -->
                             <Table id="characteristicsValueTable" items="{/CHARACTERISTICSVALUE}">
                                 <columns>
-                                   <Column>
+                                   <!-- <Column>
                                         <Text text="CharacteristicValue ID" />
-                                    </Column>
+                                    </Column> -->
                                     <!-- <Column>
                                         <Text text="Characteristic ID" />
                                     </Column> -->
@@ -264,7 +264,7 @@
                                     <ColumnListItem>
                                         <cells>
                                             <!-- <Text text="{characteristicID_characteristicID}" /> -->
-                                            <Text text="{characteristicValueID}" />
+                                            <!-- <Text text="{characteristicValueID}" /> -->
                                             <Text text="{value}" />
                                             <Text text="{valueDescription}" />
                                             <Text text="{characteristicID_characteristicID}" />
@@ -317,9 +317,9 @@
                             <!-- Table for Product Classes -->
                             <Table id="productClassTable" items="{/PRODUCTCLASS}">
                                 <columns>
-                                    <Column>
+                                    <!-- <Column>
                                         <Text text="Product Class ID" />
-                                    </Column>
+                                    </Column> -->
                                     <Column>
                                         <Text text="Class ID" />
                                     </Column>
@@ -333,7 +333,7 @@
                                 <items>
                                     <ColumnListItem>
                                         <cells>
-                                            <Text text="{productClassID}"/>
+                                            <!-- <Text text="{productClassID}"/> -->
                                             <Text text="{classID_classID}" />
                                              <Text text="{productID_productID}" />
                                             <HBox>

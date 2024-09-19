@@ -16,7 +16,7 @@ context productdetailsdataclass {
     entity CharacteristicValue {
        
        key  characteristicID      : Association to Characteristic;
-       key  value                 : String(100); // Part of composite key (value must be unique for a given characteristic)
+            value                 : String(100); // Part of composite key (value must be unique for a given characteristic)
             valueDescription      : String(255);
     }
 

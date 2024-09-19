@@ -1299,8 +1299,8 @@ sap.ui.define([
         
                                         // Add delete operations for CharacteristicValue to batch
                                         aCharacteristicValues.forEach(function(item) {
-                                            console.log("Deleting CharacteristicValue with ID: ", item.characteristicID_characteristicID, item.value);
-                                            oModel.remove("/CHARACTERISTICSVALUE(characteristicID_characteristicID='" + item.characteristicID_characteristicID + "',value='" + item.value + "')", {
+                                            // console.log("Deleting CharacteristicValue with ID: ", item.characteristicID_characteristicID, item.value);
+                                            oModel.remove("/CHARACTERISTICSVALUE(characteristicID_characteristicID='" + item.characteristicID_characteristicID + "')", {
                                                 groupId: "deletionGroup"
                                             });
                                         });
@@ -1493,9 +1493,9 @@ sap.ui.define([
             var oTable = oButton.getParent().getParent(); // Adjust based on your table structure
             var oItem = oTable.getBindingContext().getObject(); // Get the characteristic object
             var oModel = this.getOwnerComponent().getModel("productclassmodel");
-            // var sPath = "/CHARACTERISTICSVALUE('" + oItem.characteristicID_characteristicID + "')";
+            var sPath = "/CHARACTERISTICSVALUE('" + oItem.characteristicID_characteristicID + "')";
                // Construct the path with both keys: characteristicID_characteristicID and value
-             var sPath = "/CHARACTERISTICSVALUE(characteristicID_characteristicID='" + oItem.characteristicID_characteristicID + "',value='" + oItem.value + "')";
+            //  var sPath = "/CHARACTERISTICSVALUE(characteristicID_characteristicID='" + oItem.characteristicID_characteristicID + "',value='" + oItem.value + "')";
             sap.m.MessageBox.confirm("Are you sure you want to delete this characteristicvalue?", {
                 actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
                 onClose: function (sAction) {
@@ -2039,9 +2039,9 @@ sap.ui.define([
             var oContext = oEvent.getSource().getBindingContext(); // Get selected row's context
         
             var sCharacteristicID = oContext.getProperty("characteristicID_characteristicID"); // Composite key part
-            var sValue = oContext.getProperty("value"); // Composite key part
+            // var sValue = oContext.getProperty("value"); // Composite key part
              // Construct the OData URL using both parts of the composite key
-           var sPath = `/CHARACTERISTICSVALUE(characteristicID_characteristicID='${sCharacteristicID}',value='${sValue}')`;
+           var sPath = `/CHARACTERISTICSVALUE(characteristicID_characteristicID='${sCharacteristicID}')`;
             oModel.read(sPath, {
                 success: function (oData) {
                     if (!this._characteristicValueUpdateDialog) {
@@ -2099,11 +2099,11 @@ sap.ui.define([
         
                 var oUpdatedCharacteristicValue = {
                     // characteristicValueID: parseInt(sCharacteristicValueID, 10),
-                    // value: sValue,
+                    value: sValue,
                     valueDescription: sValueDescription,
                     characteristicID_characteristicID: sCharacteristicID
                 };
-                var sPath = `/CHARACTERISTICSVALUE(characteristicID_characteristicID='${sCharacteristicID}',value='${sValue}')`;
+                var sPath = `/CHARACTERISTICSVALUE(characteristicID_characteristicID='${sCharacteristicID}')`;
                 var oModel = this.getView().getModel();
         
                 oModel.update(sPath, oUpdatedCharacteristicValue, {

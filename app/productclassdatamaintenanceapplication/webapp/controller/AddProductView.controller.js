@@ -499,7 +499,7 @@ sap.ui.define([
             });
         },
 
-        onCancelChareectcisDialog: function () {
+        onCancelChareectcisDialog: function () { //-------characteristics fragment close---------------
             // Close the dialog
             this._oCharacteristicFragment.then(function (oDialog) {
                 oDialog.close();
@@ -1090,7 +1090,7 @@ sap.ui.define([
             }
         },
         
-        onCancelCharValueClassDialogDropDown: function() {
+        onCancelCharValueClassDialogDropDown: function() { //--------value help chareacterictsvalue for class fragment close------------------
             // Check if the dialog exists before attempting to close it
             if (this._oClassDialog) {
                 // Clear the search field
@@ -1122,7 +1122,7 @@ sap.ui.define([
         },
         
         
-        onCancelCharProductDialogDropDown: function() {
+        onCancelCharProductDialogDropDown: function() { //--------value help chareacterictsvalue for product fragment close------------------
             // Check if the dialog exists before attempting to close it
             if (this._oProductDialog) {
                 // Clear the search field

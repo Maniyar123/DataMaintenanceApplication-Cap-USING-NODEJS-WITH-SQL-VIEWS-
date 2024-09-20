@@ -1,5 +1,5 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
-    <Dialog title="Select Product ID" id="productIdSelectDialog" draggable="true" contentHeight="400px" contentWidth="600px">
+    <Dialog title="Select Product ID" id="productIdSelectDialog" draggable="true" contentHeight="400px" contentWidth="300px">
         <content>
             <VBox class="sapUiSmallMargin">
                 <!-- Search Field for Filtering -->
@@ -23,7 +23,7 @@
                     class="sapUiSmallMarginBottom"
                 >
                     <items>
-                        <StandardListItem title="{productID}" />
+                        <StandardListItem title="{productID}"  description="{productName}" />
                     </items>
                 </List>
             </VBox>

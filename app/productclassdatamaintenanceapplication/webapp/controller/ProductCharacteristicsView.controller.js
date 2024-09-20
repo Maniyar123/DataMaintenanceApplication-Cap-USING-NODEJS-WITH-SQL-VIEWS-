@@ -14,12 +14,72 @@ function (Controller,History,MessageToast,Filter) {
             var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
 
             oRouter.getRoute("ProductCharacteristicsView").attachPatternMatched(this._onRouteMatched, this);
+            
         },
+        
+        // _onRouteMatched: function (oEvent) {
+        //     // Get the productId from the route parameter
+        //     var sProductId = oEvent.getParameter("arguments").productId;
+        //     var iProductId = sProductId; // Convert to integer
+
+        //     console.log(iProductId, "Product ID from route");
+
+        //     // Get the OData model
+        //     var oModel = this.getView().getModel("productclassmodel");
+
+        //     // Read characteristics data from OData
+        //     oModel.read("/productclasscalview", {
+        //         success: function (oData) {
+        //             // var aCharacteristics = oData.results; // Get the characteristics data
+
+        //             // // Filter characteristics based on productId
+        //             // var aFilteredCharacteristics = aCharacteristics.filter(function (item) {
+        //             //     return item.PRODUCTID === iProductId; // Compare as integers
+        //             // });
+
+        //             // // Create a new model for the filtered data
+        //             // // var oFilteredModel = new sap.ui.model.json.JSONModel({
+        //             // //     items: aFilteredCharacteristics
+        //             // // });
+        //             // var oModel = new sap.ui.model.json.JSONModel();
+        //             // oModel.setData({
+        //             //     items: aFilteredCharacteristics
+        //             // })
+
+        //             // // Set the filtered model to the table
+        //             // // var oCharFragment = this.byId("characteristicsForm");
+        //             // // oCharFragment.setModel(oFilteredModel);
+        //             //  this.getView().setModel(oFilteredModel, "oModel");
+        //          //   sap.ui.getCore().byId("characteristicsForm").setModel(oModel);
+        //          var aCharacteristics = oData.results; // Get the characteristics data
+ 
+        //          // Filter characteristics based on productId
+        //          var aFilteredCharacteristics = aCharacteristics.filter(function (item) {
+        //              return item.PRODUCTID === iProductId; // Compare as integers
+        //          });
+                  
+        //          // Create a new model for the filtered data
+        //          var oModel = new sap.ui.model.json.JSONModel();
+        //          oModel.setData({
+        //              items: aFilteredCharacteristics
+        //          });
+                  
+        //          // Set the filtered model to the view
+        //          this.getView().setModel(oModel, "characteristicData");
+        //             // Store filtered data for later use
+        //             this._filteredCharacteristicsData = oFilteredModel;
+
+        //         }.bind(this), 
+        //         error: function () {
+        //             MessageToast.show("Failed to fetch characteristics.");
+        //         }
+        //     });
+        // },
         
         _onRouteMatched: function (oEvent) {
             // Get the productId from the route parameter
             var sProductId = oEvent.getParameter("arguments").productId;
-            var iProductId = sProductId; // Convert to integer
+            var iProductId = sProductId ;
 
             console.log(iProductId, "Product ID from route");
 
@@ -29,50 +89,51 @@ function (Controller,History,MessageToast,Filter) {
             // Read characteristics data from OData
             oModel.read("/productclasscalview", {
                 success: function (oData) {
-                    // var aCharacteristics = oData.results; // Get the characteristics data
+                    var aCharacteristics = oData.results; // Get the characteristics data
 
-                    // // Filter characteristics based on productId
-                    // var aFilteredCharacteristics = aCharacteristics.filter(function (item) {
-                    //     return item.PRODUCTID === iProductId; // Compare as integers
-                    // });
+                    // Filter characteristics based on productId
+                    var aFilteredCharacteristics = aCharacteristics.filter(function (item) {
+                        return item.PRODUCTID === iProductId; // Compare as integers
+                    });
 
-                    // // Create a new model for the filtered data
-                    // // var oFilteredModel = new sap.ui.model.json.JSONModel({
-                    // //     items: aFilteredCharacteristics
-                    // // });
-                    // var oModel = new sap.ui.model.json.JSONModel();
-                    // oModel.setData({
-                    //     items: aFilteredCharacteristics
-                    // })
+                    // Create a new model for the filtered data
+                    var oFilteredModel = new sap.ui.model.json.JSONModel();
+                    oFilteredModel.setData({
+                        items: aFilteredCharacteristics
+                    });
 
-                    // // Set the filtered model to the table
-                    // // var oCharFragment = this.byId("characteristicsForm");
-                    // // oCharFragment.setModel(oFilteredModel);
-                    //  this.getView().setModel(oFilteredModel, "oModel");
-                 //   sap.ui.getCore().byId("characteristicsForm").setModel(oModel);
-                 var aCharacteristics = oData.results; // Get the characteristics data
- 
-                 // Filter characteristics based on productId
-                 var aFilteredCharacteristics = aCharacteristics.filter(function (item) {
-                     return item.PRODUCTID === iProductId; // Compare as integers
-                 });
-                  
-                 // Create a new model for the filtered data
-                 var oModel = new sap.ui.model.json.JSONModel();
-                 oModel.setData({
-                     items: aFilteredCharacteristics
-                 });
-                  
-                 // Set the filtered model to the view
-                 this.getView().setModel(oModel, "characteristicData");
-                    // Store filtered data for later use
-                    this._filteredCharacteristicsData = oFilteredModel;
+                    // Set the filtered model to the view
+                    this.getView().setModel(oFilteredModel, "characteristicData");
 
-                }.bind(this), 
+                    // Optionally: Group the filtered data
+                    this._addGroupHeader(oFilteredModel);
+                }.bind(this),
                 error: function () {
                     MessageToast.show("Failed to fetch characteristics.");
                 }
             });
+        },
+
+        _addGroupHeader: function (oFilteredModel) {
+            var aItems = oFilteredModel.getData().items;
+            var aGroupedItems = [];
+            var currentId = "";
+
+            aItems.forEach(function (item) {
+                if (item.PRODUCTID !== currentId) {
+                    currentId = item.PRODUCTID;
+                    // Create a group header
+                    aGroupedItems.push({
+                        isGroupHeader: true,
+                        PRODUCTID: currentId
+                    });
+                }
+                // Push the actual item data
+                aGroupedItems.push(item);
+            });
+
+            // Update the model with the grouped data
+            oFilteredModel.setData({ items: aGroupedItems });
         },
         onNavBack: function () {
             var oHistory = History.getInstance();

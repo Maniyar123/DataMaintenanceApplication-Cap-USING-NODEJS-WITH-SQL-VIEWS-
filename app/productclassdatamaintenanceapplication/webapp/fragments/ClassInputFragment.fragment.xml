@@ -1,5 +1,5 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
-<Dialog id="classInputDialog" title="Class Dialog" draggable="true" contentHeight="200px">
+<Dialog id="classInputDialog" title="Class Dialog" draggable="true" contentHeight="170px">
 <content>
     <VBox class="sapUiSmallMargin" >
         <!-- Class input fields with labels -->

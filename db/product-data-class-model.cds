@@ -35,7 +35,7 @@ context productdetailsdataclass {
 
 @cds.persistence.exists
 @cds.persistence.table
-entity PRODUCTCALCLASSVIEWS {
+entity PRODUCTCALCLASSVIEWS { //---------entity for productclass hdb view----------
     PRODUCTNAME        : String(100);
     PRODUCTID          : Integer;
     TYPE               : String(50);

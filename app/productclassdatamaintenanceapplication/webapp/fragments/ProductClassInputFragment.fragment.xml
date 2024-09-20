@@ -1,7 +1,7 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
-    <Dialog title="Product Class Data" id="productClassInputDialog" draggable="true" contentHeight="300px">
+    <Dialog title="Product Class Data" id="productClassInputDialog" draggable="true" contentHeight="190px">
         <content>
-            <VBox class="sapUiMediumMargin">
+            <VBox class="sapUiSmallMargin">
                 <!-- Product Class ID input field -->
                 <!-- <Label text="Product Class Id:" labelFor="productsClassIdInput" design="Bold"/>
                 <Input id="productsClassIdInput" width="100%" class="sapUiSmallMarginBottom"/> -->

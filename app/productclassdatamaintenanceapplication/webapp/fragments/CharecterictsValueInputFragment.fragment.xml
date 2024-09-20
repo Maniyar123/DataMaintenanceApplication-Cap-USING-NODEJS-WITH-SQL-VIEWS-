@@ -1,5 +1,5 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
-    <Dialog title="Characteristic Value Data" id="characterictsValueInputDialog" draggable="true" contentHeight="300px">
+    <Dialog title="Characteristic Value Data" id="characterictsValueInputDialog" draggable="true" contentHeight="230px">
         <content>
             <VBox class="sapUiSmallMargin">
 

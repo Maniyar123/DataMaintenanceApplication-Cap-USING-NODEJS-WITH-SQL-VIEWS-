@@ -1,5 +1,5 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
-    <Dialog title="Select Characteristic ID" id="characterictsValueDropDownDialog" draggable="true" contentHeight="400px" contentWidth="600px">
+    <Dialog title="Select Characteristic ID" id="characterictsValueDropDownDialog" draggable="true" contentHeight="400px" contentWidth="300px">
         <content>
             <VBox class="sapUiSmallMargin">
                 <!-- Search Field for Filtering -->
@@ -20,7 +20,7 @@
                     class="sapUiSmallMarginBottom"
                 >
                     <items>
-                        <StandardListItem title="{characteristicID}" />
+                        <StandardListItem title="{characteristicID}"  description="{characteristicName}"/>
                     </items>
                 </List>
             </VBox>

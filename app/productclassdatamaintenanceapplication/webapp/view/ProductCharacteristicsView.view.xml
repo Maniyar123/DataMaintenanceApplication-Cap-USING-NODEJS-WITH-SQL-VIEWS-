@@ -3,26 +3,32 @@
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
+    xmlns:table="sap.m.table"
 >
+
+ <Page title="Product Characteristics" titleAlignment="Center" >
+ <content>
     <VBox class="sapUiSmallMargin">
+
+       
 
         <!-- Back Button -->
         <Button icon="sap-icon://nav-back" press="onNavBack" tooltip="Click to go back" />
 
         <!-- Table for Product Characteristics -->
-        <Table id="characteristicTable" inset="false" items="{characteristicData>/items}">
+        <Table id="characteristicTable" inset="true" items="{characteristicData>/items}">
             <!-- Column Definitions -->
             <columns>
-                <Column mergeDuplicates="true">
+                <Column >
                     <Text text="Product ID" />
                 </Column>
-                 <Column mergeDuplicates="true">
+                <Column >
                     <Text text="Class ID" />
                 </Column>
-                <Column >
+                <Column>
                     <Text text="Product Name" />
                 </Column>
-                <Column >
+                <Column>
                     <Text text="Type" />
                 </Column>
                 <Column>
@@ -34,11 +40,14 @@
                 <Column>
                     <Text text="Value Description" />
                 </Column>
-               
             </columns>
 
             <!-- Template for Table Rows -->
             <items>
+             <GroupHeaderListItem
+             
+                  title="Class ID: {characteristicData>CLASSID_CLASSID}"/>
+            
                 <ColumnListItem>
                     <cells>
                         <Text text="{characteristicData>PRODUCTID}" />
@@ -50,8 +59,12 @@
                         <Text text="{characteristicData>VALUEDESCRIPTION}" />
                     </cells>
                 </ColumnListItem>
+
+               
             </items>
         </Table>
 
     </VBox>
+    </content>
+    </Page>
 </mvc:View>

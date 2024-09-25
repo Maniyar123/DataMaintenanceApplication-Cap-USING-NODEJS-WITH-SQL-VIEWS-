@@ -45,9 +45,8 @@
             <!-- Template for Table Rows -->
             <items>
              <GroupHeaderListItem
-             
-                  title="Class ID: {characteristicData>CLASSID_CLASSID}"/>
-            
+                            visible="{characteristicData>isGroupHeader}"
+                            title="{characteristicData>PRODUCTID}" />
                 <ColumnListItem>
                     <cells>
                         <Text text="{characteristicData>PRODUCTID}" />

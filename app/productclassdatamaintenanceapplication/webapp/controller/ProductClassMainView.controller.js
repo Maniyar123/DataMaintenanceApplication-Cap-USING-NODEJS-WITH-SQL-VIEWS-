@@ -20,7 +20,7 @@ function (Controller) {
         onProductPress: function (oEvent) {
             var oRouter = sap.ui.core.UIComponent.getRouterFor(this);
             var oContext = oEvent.getSource().getBindingContext();
-            var sProductId = oContext.getProperty("productID");
+            var sProductId = oContext.getProperty("PRODUCTID");
 
               // Store the productId in the component model
             // var oComponentModel = this.getOwnerComponent().getModel("productclassmodel");

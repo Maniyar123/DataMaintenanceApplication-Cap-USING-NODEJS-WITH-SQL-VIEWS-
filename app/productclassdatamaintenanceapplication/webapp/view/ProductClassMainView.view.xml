@@ -13,7 +13,7 @@
         </f:title>
 
         <f:content>
-            <Table id="productTable" items="{/PRODUCT}">
+            <Table id="productTable" items="{/productidclassidcalview}">
                 <headerToolbar>
                     <Toolbar>
                         <Title text="Products" />
@@ -32,8 +32,8 @@
                 <items>
                     <ColumnListItem type="Navigation" press="onProductPress">
                         <cells>
-                            <Text text="{productName}" />
-                            <Text text="{productID}" />
+                            <Text text="{PRODUCTNAME}" />
+                            <Text text="{PRODUCTID}" />
                         </cells>
                     </ColumnListItem>
                 </items>

@@ -4,10 +4,10 @@ sap.ui.define([
     "sap/ui/core/routing/History",
     "sap/ui/core/Fragment",
     "sap/m/MessageBox",
-     "sap/ui/model/Filter",
+    "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator"
 
-], function (Controller, MessageToast, History, Fragment,MessageBox,Filter,FilterOperator) {
+], function (Controller, MessageToast, History, Fragment, MessageBox, Filter, FilterOperator) {
     "use strict";
     var that;
     return Controller.extend("com.productclassdatamaintenanceapplication.controller.AddProductView", {
@@ -15,7 +15,7 @@ sap.ui.define([
             that = this;
             var oModel = this.getOwnerComponent().getModel("productclassmodel");
             this.getView().setModel(oModel);
-           
+
             //    ----for classedit----
             this._oTable = this.byId("classTable");
             this._oEditContainer = this.byId("editClassContainer");
@@ -95,79 +95,49 @@ sap.ui.define([
 
         //  ------------------ start of create operations-----------------------------
 
-      
-      
-      
-      
-      
-        onSaveClasses: function () { //-----------create class and fragment (with fragment)------------------
+
+
+
+
+
+
+        onSaveClasses: function () { //-------------create class (with frgamnet with nodejs)---------------------
             var oView = this.getView();
-            var oModel = oView.getModel();
-            // var sClassID = oView.byId("classIdInput").getValue();
-            // var sClassName = oView.byId("classNameInput").getValue();
+            var oModel = oView.getModel();  // This is the OData v2 model
+
             // Use Fragment.byId to get input fields inside the fragment
-                var sClassID = Fragment.byId("ClassInputFragment", "classIdInput").getValue();
-                var sClassName = Fragment.byId("ClassInputFragment", "classNameInput").getValue();
+            var sClassID = Fragment.byId("ClassInputFragment", "classIdInput").getValue();
+            var sClassName = Fragment.byId("ClassInputFragment", "classNameInput").getValue();
 
             if (!sClassID || !sClassName) {
                 MessageToast.show("Please enter Class ID and Class Name");
                 return;
             }
 
-            // Check for existing classes
-            oModel.read("/CLASS", {
+            oModel.callFunction("/createClass", {
+                method: "GET",
+                urlParameters: {
+                    classID: sClassID,   // Ensure this is a string without quotes
+                    className: sClassName // Ensure this is a string without quotes
+                },
                 success: function (oData) {
-                    var aExistingClasses = oData.results || [];
-                    var bDuplicateID = aExistingClasses.some(function (oClass) {
-                        return oClass.classID === sClassID;
-                    });
-
-                    if (bDuplicateID) {
-                        MessageToast.show("Class ID already exists. Please choose a different ID.");
-                        return;
-                    }
-
-                    // Create the new class
-                    var oClass = {
-                        classID: sClassID,
-                        className: sClassName
-                    };
-
-                    oModel.create("/CLASS", oClass, {
-                        success: function () {
-                            MessageToast.show("Class created successfully");
-                            oModel.refresh(); // Refresh model to update the table
-
-                            // Close the fragment dialog
-                            this._pDialog.then(function (oDialog) {
-                                oDialog.close();
-
-
-                                // Reset the input fields after closing
-                                this._resetClassForm();
-                            }.bind(this));
-                        }.bind(this),
-                        error: function (oError) {
-                            // Handle OData error
-                            var oErrorResponse = JSON.parse(oError.responseText);
-                            var sErrorMessage = oErrorResponse.error.message.value;
-
-                            if (sErrorMessage === "Entity already exists") {
-                                MessageToast.show("Class ID already exists. Please choose a different ID.");
-                            } else {
-                                MessageToast.show("Error creating Class. Check the console for details.");
-                            }
-                            console.error("Error creating Class:", oError);
-                        }
-                    });
-                }.bind(this), // Ensure 'this' is correctly bound
+                    MessageToast.show("Class created successfully");
+                    oModel.refresh(); // Refresh model to update the table
+                    this._pDialog.then(function (oDialog) {
+                        oDialog.close();
+                        this._resetClassForm();
+                    }.bind(this));
+                }.bind(this),
                 error: function (oError) {
-                    // Handle error in fetching existing classes
-                    MessageToast.show("Error fetching existing classes data");
-                    console.error("Error fetching existing classes data:", oError);
+                    var oErrorResponse = JSON.parse(oError.responseText);
+                    var sErrorMessage = oErrorResponse.error.message.value || "Error creating class.";
+                    MessageToast.show(sErrorMessage);
+                    console.error("Error creating class:", oError);
                 }
             });
+
         },
+
 
         //-------- Create Class open fragment-------
         onCreateClass: function () {
@@ -205,7 +175,75 @@ sap.ui.define([
             Fragment.byId("ClassInputFragment", "classIdInput").setValue("");
             Fragment.byId("ClassInputFragment", "classNameInput").setValue("");
         },
-         // ----------------Create Class  without fragmnet----------------------------
+        // onSaveClasses: function () { //-----------create class and fragment (with fragment without nodejs)------------------
+        //     var oView = this.getView();
+        //     var oModel = oView.getModel();
+        //     // var sClassID = oView.byId("classIdInput").getValue();
+        //     // var sClassName = oView.byId("classNameInput").getValue();
+        //     // Use Fragment.byId to get input fields inside the fragment
+        //         var sClassID = Fragment.byId("ClassInputFragment", "classIdInput").getValue();
+        //         var sClassName = Fragment.byId("ClassInputFragment", "classNameInput").getValue();
+
+        //     if (!sClassID || !sClassName) {
+        //         MessageToast.show("Please enter Class ID and Class Name");
+        //         return;
+        //     }
+
+        //     // Check for existing classes
+        //     oModel.read("/CLASS", {
+        //         success: function (oData) {
+        //             var aExistingClasses = oData.results || [];
+        //             var bDuplicateID = aExistingClasses.some(function (oClass) {
+        //                 return oClass.classID === sClassID;
+        //             });
+
+        //             if (bDuplicateID) {
+        //                 MessageToast.show("Class ID already exists. Please choose a different ID.");
+        //                 return;
+        //             }
+
+        //             // Create the new class
+        //             var oClass = {
+        //                 classID: sClassID,
+        //                 className: sClassName
+        //             };
+
+        //             oModel.create("/CLASS", oClass, {
+        //                 success: function () {
+        //                     MessageToast.show("Class created successfully");
+        //                     oModel.refresh(); // Refresh model to update the table
+
+        //                     // Close the fragment dialog
+        //                     this._pDialog.then(function (oDialog) {
+        //                         oDialog.close();
+
+
+        //                         // Reset the input fields after closing
+        //                         this._resetClassForm();
+        //                     }.bind(this));
+        //                 }.bind(this),
+        //                 error: function (oError) {
+        //                     // Handle OData error
+        //                     var oErrorResponse = JSON.parse(oError.responseText);
+        //                     var sErrorMessage = oErrorResponse.error.message.value;
+
+        //                     if (sErrorMessage === "Entity already exists") {
+        //                         MessageToast.show("Class ID already exists. Please choose a different ID.");
+        //                     } else {
+        //                         MessageToast.show("Error creating Class. Check the console for details.");
+        //                     }
+        //                     console.error("Error creating Class:", oError);
+        //                 }
+        //             });
+        //         }.bind(this), // Ensure 'this' is correctly bound
+        //         error: function (oError) {
+        //             // Handle error in fetching existing classes
+        //             MessageToast.show("Error fetching existing classes data");
+        //             console.error("Error fetching existing classes data:", oError);
+        //         }
+        //     });
+        // },
+        // ----------------Create Class  without fragmnet----------------------------
 
         // onSaveClasses: function () {
         //     var oView = this.getView();
@@ -280,71 +318,55 @@ sap.ui.define([
         // -----------ending of create class and frgamnet---------------
 
 
-       
 
 
 
 
-        
 
-        onSaveProducts: function () {   //// -------------craete product with fragmnet-------------
+
+
+
+
+        onSaveProducts: function () {//-------------create product (withfragmnet and with node js)--------------
             var oView = this.getView();
-            var oModel = oView.getModel();
-            // var sProductID = oView.byId("productIdInput").getValue();
-            // var sProductName = oView.byId("productNameInput").getValue();
-            // var sType = oView.byId("productTypeInput").getValue();
-                var sProductID = Fragment.byId("ProductInputFragment", "productIdInput").getValue();
-                var sProductName = Fragment.byId("ProductInputFragment", "productNameInput").getValue();
-                var sType = Fragment.byId("ProductInputFragment", "productTypeInput").getValue();
+            var oModel = oView.getModel();  // This is the OData v2 model
+
+            // Use Fragment.byId to get input fields inside the fragment
+            var sProductID = Fragment.byId("ProductInputFragment", "productIdInput").getValue();
+            var sProductName = Fragment.byId("ProductInputFragment", "productNameInput").getValue();
+            var sType = Fragment.byId("ProductInputFragment", "productTypeInput").getValue();
 
             if (!sProductID || !sProductName || !sType) {
-                MessageToast.show("Please enter Product ID, Product Name and Type");
+                MessageToast.show("Please enter Product ID, Product Name, and Type");
                 return;
             }
 
-            // Check for existing products
-            oModel.read("/PRODUCT", {
+            // Call backend custom function 'createProduct'
+            oModel.callFunction("/createProduct", {
+                method: "GET",
+                urlParameters: {
+                    productID: sProductID,
+                    productName: sProductName,
+                    type: sType
+                },
                 success: function (oData) {
-                    var aExistingProducts = oData.results || [];
-                    var bDuplicateID = aExistingProducts.some(function (oProduct) {
-                        return oProduct.productID === sProductID;
-                    });
-
-                    if (bDuplicateID) {
-                        MessageToast.show("Product ID already exists. Please choose a different ID.");
-                        return;
-                    }
-
-                    // Create the new product
-                    var oProduct = {
-                        productID: sProductID,
-                        productName: sProductName,
-                        type: sType
-                    };
-
-                    oModel.create("/PRODUCT", oProduct, {
-                        success: function () {
-                            MessageToast.show("Product created successfully");
-                            oModel.refresh(); // Refresh model to update the table
-
-                            // Close the fragment dialog
-                            this._oProductFragment.then(function (oDialog) {
-                                oDialog.close();
-                                this._resetProductForm();
-                            }.bind(this));
-                        }.bind(this),
-                        error: function (oError) {
-                            MessageToast.show("Error creating Product. Check the console for details.");
-                            console.error("Error creating Product:", oError);
-                        }
-                    });
+                    MessageToast.show("Product created successfully");
+                    oModel.refresh(); // Refresh model to update the table
+                    // Close the fragment dialog
+                    this._oProductFragment.then(function (oDialog) {
+                        oDialog.close();
+                        this._resetProductForm(); // Reset the form after closing
+                    }.bind(this));
                 }.bind(this),
                 error: function (oError) {
-                    MessageToast.show("Error fetching existing products data");
-                    console.error("Error fetching existing products data:", oError);
+                    var oErrorResponse = JSON.parse(oError.responseText);
+                    var sErrorMessage = oErrorResponse.error.message.value || "Error creating product.";
+                    MessageToast.show(sErrorMessage);
+                    console.error("Error creating product:", oError);
                 }
             });
         },
+
         //  --------create product fragment open---------------
         onCreateProduct: function () {
             if (!this._oProductFragment) {
@@ -376,12 +398,69 @@ sap.ui.define([
             // oView.byId("productNameInput").setValue("");
             // oView.byId("productTypeInput").setValue("");
 
-           Fragment.byId("ProductInputFragment", "productIdInput").setValue("");
-           Fragment.byId("ProductInputFragment", "productNameInput").setValue("");
-           Fragment.byId("ProductInputFragment", "productTypeInput").setValue("");
+            Fragment.byId("ProductInputFragment", "productIdInput").setValue("");
+            Fragment.byId("ProductInputFragment", "productNameInput").setValue("");
+            Fragment.byId("ProductInputFragment", "productTypeInput").setValue("");
 
         },
+        // onSaveProducts: function () {   //// -------------craete product (with fragmnet without node js)-------------
+        //     var oView = this.getView();
+        //     var oModel = oView.getModel();
+        //     // var sProductID = oView.byId("productIdInput").getValue();
+        //     // var sProductName = oView.byId("productNameInput").getValue();
+        //     // var sType = oView.byId("productTypeInput").getValue();
+        //         var sProductID = Fragment.byId("ProductInputFragment", "productIdInput").getValue();
+        //         var sProductName = Fragment.byId("ProductInputFragment", "productNameInput").getValue();
+        //         var sType = Fragment.byId("ProductInputFragment", "productTypeInput").getValue();
 
+        //     if (!sProductID || !sProductName || !sType) {
+        //         MessageToast.show("Please enter Product ID, Product Name and Type");
+        //         return;
+        //     }
+
+        //     // Check for existing products
+        //     oModel.read("/PRODUCT", {
+        //         success: function (oData) {
+        //             var aExistingProducts = oData.results || [];
+        //             var bDuplicateID = aExistingProducts.some(function (oProduct) {
+        //                 return oProduct.productID === sProductID;
+        //             });
+
+        //             if (bDuplicateID) {
+        //                 MessageToast.show("Product ID already exists. Please choose a different ID.");
+        //                 return;
+        //             }
+
+        //             // Create the new product
+        //             var oProduct = {
+        //                 productID: sProductID,
+        //                 productName: sProductName,
+        //                 type: sType
+        //             };
+
+        //             oModel.create("/PRODUCT", oProduct, {
+        //                 success: function () {
+        //                     MessageToast.show("Product created successfully");
+        //                     oModel.refresh(); // Refresh model to update the table
+
+        //                     // Close the fragment dialog
+        //                     this._oProductFragment.then(function (oDialog) {
+        //                         oDialog.close();
+        //                         this._resetProductForm();
+        //                     }.bind(this));
+        //                 }.bind(this),
+        //                 error: function (oError) {
+        //                     MessageToast.show("Error creating Product. Check the console for details.");
+        //                     console.error("Error creating Product:", oError);
+        //                 }
+        //             });
+        //         }.bind(this),
+        //         error: function (oError) {
+        //             MessageToast.show("Error fetching existing products data");
+        //             console.error("Error fetching existing products data:", oError);
+        //         }
+        //     });
+        // },
         //-------- Create Product without fragmnet--------
 
         // onSaveProducts: function () {
@@ -421,63 +500,42 @@ sap.ui.define([
 
 
 
-
-        onSaveCharacteristics: function () {       //------- charectiristics create and fragment (charecetricts craete with fragment)-----------------
+        onSaveCharacteristics: function () { //-------CRAETE CHARACTIRESTICS( WITH FRGAMNET WITH NODE JS)-------------------
             var oView = this.getView();
-            var oModel = oView.getModel();
-            // var sCharacteristicID = oView.byId("characteristicIdInput").getValue();
-            // var sClassID = oView.byId("characteristicClassIdInput").getValue();
-            // var sCharacteristicName = oView.byId("characteristicNameInput").getValue();
-
-                var sCharacteristicID = Fragment.byId("charecetricsInputDialog", "characteristicIdInput").getValue();
-                var sClassID = Fragment.byId("charecetricsInputDialog", "characteristicClassIdInput").getValue();
-                var sCharacteristicName = Fragment.byId("charecetricsInputDialog", "characteristicNameInput").getValue();
-
+            var oModel = oView.getModel();  // This is the OData v2 model
+        
+            // Use Fragment.byId to get input fields inside the fragment
+            var sCharacteristicID = Fragment.byId("charecetricsInputDialog", "characteristicIdInput").getValue();
+            var sClassID = Fragment.byId("charecetricsInputDialog", "characteristicClassIdInput").getValue();
+            var sCharacteristicName = Fragment.byId("charecetricsInputDialog", "characteristicNameInput").getValue();
+        
             if (!sCharacteristicID || !sCharacteristicName || !sClassID) {
                 MessageToast.show("Please enter valid Characteristic ID, Class ID, and Characteristic Name");
                 return;
             }
-
-            // Check for existing characteristics
-            oModel.read("/CHARACTERISTICS", {
+        
+            // Call backend custom function 'createCharacteristic'
+            oModel.callFunction("/createCharacteristics", {
+                method: "GET", // Use POST if creating or modifying data
+                urlParameters: {
+                    characteristicID: sCharacteristicID,
+                    classID_classID: sClassID,
+                    characteristicName: sCharacteristicName
+                },
                 success: function (oData) {
-                    var aExistingCharacteristics = oData.results || [];
-                    var bDuplicateID = aExistingCharacteristics.some(function (oCharacteristic) {
-                        return oCharacteristic.characteristicID === sCharacteristicID;
-                    });
-
-                    if (bDuplicateID) {
-                        MessageToast.show("Characteristic ID already exists. Please choose a different ID.");
-                        return;
-                    }
-
-                    // Create the new characteristic
-                    var oCharacteristic = {
-                        characteristicID: sCharacteristicID,
-                        classID_classID: sClassID,
-                        characteristicName: sCharacteristicName
-                    };
-
-                    oModel.create("/CHARACTERISTICS", oCharacteristic, {
-                        success: function () {
-                            MessageToast.show("Characteristic created successfully");
-                            oModel.refresh();
-
-                            // Close the fragment dialog
-                            this._oCharacteristicFragment.then(function (oDialog) {
-                                oDialog.close();
-                                this._resetCharacteristicForm();
-                            }.bind(this));
-                        }.bind(this),
-                        error: function (oError) {
-                            MessageToast.show("Error creating Characteristic. Check the console for details.");
-                            console.error("Error creating Characteristic:", oError);
-                        }
-                    });
+                    MessageToast.show("Characteristic created successfully");
+                    oModel.refresh(); // Refresh model to update the table
+                    // Close the fragment dialog
+                    this._oCharacteristicFragment.then(function (oDialog) {
+                        oDialog.close();
+                        this._resetCharacteristicForm(); // Reset the form after closing
+                    }.bind(this));
                 }.bind(this),
                 error: function (oError) {
-                    MessageToast.show("Error fetching existing characteristics data");
-                    console.error("Error fetching existing characteristics data:", oError);
+                    var oErrorResponse = JSON.parse(oError.responseText);
+                    var sErrorMessage = oErrorResponse.error.message.value || "Error creating characteristic.";
+                    MessageToast.show(sErrorMessage);
+                    console.error("Error creating characteristic:", oError);
                 }
             });
         },
@@ -520,7 +578,65 @@ sap.ui.define([
             Fragment.byId("charecetricsInputDialog", "characteristicClassIdInput").setValue("");
             Fragment.byId("charecetricsInputDialog", "characteristicNameInput").setValue("");
         },
+              // onSaveCharacteristics: function () {       //------- charectiristics create and fragment (charecetricts craete with fragment without Node js)-----------------
+        //     var oView = this.getView();
+        //     var oModel = oView.getModel();
+        //     // var sCharacteristicID = oView.byId("characteristicIdInput").getValue();
+        //     // var sClassID = oView.byId("characteristicClassIdInput").getValue();
+        //     // var sCharacteristicName = oView.byId("characteristicNameInput").getValue();
 
+        //     var sCharacteristicID = Fragment.byId("charecetricsInputDialog", "characteristicIdInput").getValue();
+        //     var sClassID = Fragment.byId("charecetricsInputDialog", "characteristicClassIdInput").getValue();
+        //     var sCharacteristicName = Fragment.byId("charecetricsInputDialog", "characteristicNameInput").getValue();
+
+        //     if (!sCharacteristicID || !sCharacteristicName || !sClassID) {
+        //         MessageToast.show("Please enter valid Characteristic ID, Class ID, and Characteristic Name");
+        //         return;
+        //     }
+
+        //     // Check for existing characteristics
+        //     oModel.read("/CHARACTERISTICS", {
+        //         success: function (oData) {
+        //             var aExistingCharacteristics = oData.results || [];
+        //             var bDuplicateID = aExistingCharacteristics.some(function (oCharacteristic) {
+        //                 return oCharacteristic.characteristicID === sCharacteristicID;
+        //             });
+
+        //             if (bDuplicateID) {
+        //                 MessageToast.show("Characteristic ID already exists. Please choose a different ID.");
+        //                 return;
+        //             }
+
+        //             // Create the new characteristic
+        //             var oCharacteristic = {
+        //                 characteristicID: sCharacteristicID,
+        //                 classID_classID: sClassID,
+        //                 characteristicName: sCharacteristicName
+        //             };
+
+        //             oModel.create("/CHARACTERISTICS", oCharacteristic, {
+        //                 success: function () {
+        //                     MessageToast.show("Characteristic created successfully");
+        //                     oModel.refresh();
+
+        //                     // Close the fragment dialog
+        //                     this._oCharacteristicFragment.then(function (oDialog) {
+        //                         oDialog.close();
+        //                         this._resetCharacteristicForm();
+        //                     }.bind(this));
+        //                 }.bind(this),
+        //                 error: function (oError) {
+        //                     MessageToast.show("Error creating Characteristic. Check the console for details.");
+        //                     console.error("Error creating Characteristic:", oError);
+        //                 }
+        //             });
+        //         }.bind(this),
+        //         error: function (oError) {
+        //             MessageToast.show("Error fetching existing characteristics data");
+        //             console.error("Error fetching existing characteristics data:", oError);
+        //         }
+        //     });
+        // },
         // ------------- Create Characteristic without fragment-------------------
         //         onSaveCharacteristics: function () {
         //             var oView = this.getView();
@@ -575,19 +691,19 @@ sap.ui.define([
             // Open the dialog
             this._oClassDropDownDialog.open();
         },
-        
-        
-        onClassIdSelect: function(oEvent) { //--------------value help for chareacterics class id selection  (onclick item code)------------------
+
+
+        onClassIdSelect: function (oEvent) { //--------------value help for chareacterics class id selection  (onclick item code)------------------
             // Get the selected item from the selectionChange event
             var selectedItem = oEvent.getParameter("listItem");
             var selectedClassId = selectedItem.getTitle(); // Assuming the class ID is the title
-        
+
             // Get the 'Characteristic Data' dialog input field
             var oCharDialog = sap.ui.core.Fragment.byId("charecetricsInputDialog", "characteristicClassIdInput");
-        
+
             // Set the selected Class ID into the 'classID' input field of the Characteristic Data Dialog
             oCharDialog.setValue(selectedClassId);
-        
+
             // Close the Class ID selection dialog if it exists
             if (this._oClassDropDownDialog) {
                 this._oClassDropDownDialog.close(); // Ensure that the dialog exists before trying to close it
@@ -595,7 +711,7 @@ sap.ui.define([
                 console.error("Class DropDown Dialog is not defined");
             }
         },
-        
+
         // onCancelClassSelectionDropDown: function() { //-----------value help for chareectrics class id (/fragmentclose)----------------
         //     // Check if the dialog exists before attempting to close it
         //     if (this._oClassDropDownDialog) {
@@ -604,7 +720,7 @@ sap.ui.define([
         //         console.error("Class DropDown Dialog is not defined");
         //     }
         // },
-        onCancelClassSelectionDropDown: function() {
+        onCancelClassSelectionDropDown: function () {
             // Check if the dialog exists before attempting to close it
             if (this._oClassDropDownDialog) {
                 // Clear the search field
@@ -614,7 +730,7 @@ sap.ui.define([
                 } else {
                     console.error("Search Field not found");
                 }
-        
+
                 // Clear the filter on the list
                 var oList = sap.ui.getCore().byId("classIdList");
                 if (oList) {
@@ -627,34 +743,34 @@ sap.ui.define([
                 } else {
                     console.error("List control not found in dialog");
                 }
-        
+
                 // Close the dialog
                 this._oClassDropDownDialog.close();
             } else {
                 console.error("Class DropDown Dialog is not defined");
             }
         },
-        
+
 
         onClassSearch: function (oEvent) { //------------search field for characteric value help-------------
             // Get the search value
             var sValue = oEvent.getParameter("newValue");
-            
+
             // Get the dialog and list controls
             var oDialog = sap.ui.getCore().byId("charDropDownDialog");
             var oList = sap.ui.getCore().byId("classIdList");
-            
+
             // Check if the controls are found
             if (oDialog && oList) {
                 var oBinding = oList.getBinding("items");
-        
+
                 if (oBinding) {
                     // Create a filter based on the search value
                     var oFilter;
                     if (sValue) {
                         // Convert the search value to an integer
                         var iValue = parseInt(sValue, 10);
-                        
+
                         // Create a filter based on the numeric value
                         if (!isNaN(iValue)) {
                             oFilter = new sap.ui.model.Filter("classID", sap.ui.model.FilterOperator.EQ, iValue);
@@ -666,7 +782,7 @@ sap.ui.define([
                         // If the search value is empty, show all items
                         oFilter = [];
                     }
-        
+
                     // Apply the filter
                     oBinding.filter(oFilter);
                 } else {
@@ -676,8 +792,6 @@ sap.ui.define([
                 console.error("Dialog or List control not found");
             }
         },
-        
-        
 
 
 
@@ -685,48 +799,51 @@ sap.ui.define([
 
 
 
-        
-        onSaveCharacteristicValues: function () { //------------create charecteristics value and fragmnet----------------
+
+
+
+        onSaveCharacteristicValues: function () { //------------create characteristic value and (with fragment with Node Js)----------------
             var oView = this.getView();
-            var oModel = oView.getModel();
-            
-            // Get values from the fragment
+            var oModel = oView.getModel();  // This is the OData v2 model
+        
+            // Use Fragment.byId to get input fields inside the fragment
+            var sCharacteristicID = Fragment.byId("characterictsValueInputDialog", "characteristicsIdInput").getValue();
             var sValue = Fragment.byId("characterictsValueInputDialog", "characteristicValueInput").getValue();
             var sValueDescription = Fragment.byId("characterictsValueInputDialog", "characteristicValueDesInput").getValue();
-            var sCharacteristicID = Fragment.byId("characterictsValueInputDialog", "characteristicsIdInput").getValue();
         
             // Check if the required fields are filled
-            if (!sValue || !sValueDescription || !sCharacteristicID) {
+            if ( !sCharacteristicID ||!sValue || !sValueDescription ) {
                 MessageToast.show("Please enter Value, Description, and Characteristic ID");
                 return;
             }
         
-            // Create the new value object
-            var oValue = {
-                value: sValue,
-                valueDescription: sValueDescription,
-                characteristicID_characteristicID: sCharacteristicID
-            };
-        
-            // Create the entry in the OData service
-            oModel.create("/CHARACTERISTICSVALUE", oValue, {
-                success: function () {
-                    MessageToast.show("Value created successfully");
-                    oModel.refresh();
-        
+            // Call backend custom function 'createCharacteristicValue'
+            oModel.callFunction("/createCharacteristicValues", {
+                method: "GET", 
+                urlParameters: {
+                    characteristicID_characteristicID: sCharacteristicID,
+                    value: sValue,
+                    valueDescription: sValueDescription
+                },
+                success: function (oData) {
+                    MessageToast.show("Characteristic value created successfully");
+                    oModel.refresh(); // Refresh model to update the table
                     // Close the fragment dialog
                     this._oValueFragment.then(function (oDialog) {
                         oDialog.close();
-                        this._resetValueForm();
+                        this._resetValueForm(); // Reset the form after closing
                     }.bind(this));
                 }.bind(this),
                 error: function (oError) {
-                    MessageToast.show("Error creating Value. Check the console for details.");
-                    console.error("Error creating Value:", oError);
+                    var oErrorResponse = JSON.parse(oError.responseText);
+                    var sErrorMessage = oErrorResponse.error.message.value || "Error creating characteristic value.";
+                    MessageToast.show(sErrorMessage);
+                    console.error("Error creating characteristic value:", oError);
                 }
             });
         },
         
+
         onCreateCharacteristicValue: function () { //----------create characteristics value fragment open----------
             if (!this._oValueFragment) {
                 this._oValueFragment = Fragment.load({
@@ -758,14 +875,53 @@ sap.ui.define([
             // oView.byId("characteristicValueDesInput").setValue("");
             // oView.byId("characteristicsIdInput").setValue("");
             //  Fragment.byId("characterictsValueInputDialog", "characteristicValueIdInput").setValue("");
-                Fragment.byId("characterictsValueInputDialog", "characteristicValueInput").setValue("");
-              Fragment.byId("characterictsValueInputDialog", "characteristicValueDesInput").setValue("");
-                Fragment.byId("characterictsValueInputDialog", "characteristicsIdInput").setValue("");
-            
+            Fragment.byId("characterictsValueInputDialog", "characteristicsIdInput").setValue("");
+            Fragment.byId("characterictsValueInputDialog", "characteristicValueInput").setValue("");
+            Fragment.byId("characterictsValueInputDialog", "characteristicValueDesInput").setValue("");
+
 
         },
+        //    onSaveCharacteristicValues: function () { //------------create charecteristics value and (with fragmnet and without Node js)----------------
+        //     var oView = this.getView();
+        //     var oModel = oView.getModel();
 
-        //-------------Create Characteristic Value without fragment--------
+        //     // Get values from the fragment
+        //     var sValue = Fragment.byId("characterictsValueInputDialog", "characteristicValueInput").getValue();
+        //     var sValueDescription = Fragment.byId("characterictsValueInputDialog", "characteristicValueDesInput").getValue();
+        //     var sCharacteristicID = Fragment.byId("characterictsValueInputDialog", "characteristicsIdInput").getValue();
+
+        //     // Check if the required fields are filled
+        //     if (!sValue || !sValueDescription || !sCharacteristicID) {
+        //         MessageToast.show("Please enter Value, Description, and Characteristic ID");
+        //         return;
+        //     }
+
+        //     // Create the new value object
+        //     var oValue = {
+        //         value: sValue,
+        //         valueDescription: sValueDescription,
+        //         characteristicID_characteristicID: sCharacteristicID
+        //     };
+
+        //     // Create the entry in the OData service
+        //     oModel.create("/CHARACTERISTICSVALUE", oValue, {
+        //         success: function () {
+        //             MessageToast.show("Value created successfully");
+        //             oModel.refresh();
+
+        //             // Close the fragment dialog
+        //             this._oValueFragment.then(function (oDialog) {
+        //                 oDialog.close();
+        //                 this._resetValueForm();
+        //             }.bind(this));
+        //         }.bind(this),
+        //         error: function (oError) {
+        //             MessageToast.show("Error creating Value. Check the console for details.");
+        //             console.error("Error creating Value:", oError);
+        //         }
+        //     });
+        // },
+        // -------------Create Characteristic Value without fragment--------
 
         //             onSaveCharacteristicValues: function () {
         //             var oView = this.getView();
@@ -816,18 +972,18 @@ sap.ui.define([
             this._oCharacteristicDropDownDialog.open();
         },
 
-        
-        onCharacteristicIdSelect: function(oEvent) {  //------------value help dailog for chareactericsvalue ---(onclcick item code)--------
+
+        onCharacteristicIdSelect: function (oEvent) {  //------------value help dailog for chareactericsvalue ---(onclcick item code)--------
             // Get the selected item from the selectionChange event
             var selectedItem = oEvent.getParameter("listItem");
             var selectedCharacteristicId = selectedItem.getTitle(); // Assuming the Characteristic ID is the title
-            
+
             // Get the 'Characteristic Value Data' dialog input field
             var oCharacteristicDialog = sap.ui.core.Fragment.byId("characterictsValueInputDialog", "characteristicsIdInput");
-            
+
             // Set the selected Characteristic ID into the input field of the Characteristic Value Dialog
             oCharacteristicDialog.setValue(selectedCharacteristicId);
-            
+
             // Close the Characteristic ID selection dialog if it exists
             if (this._oCharacteristicDropDownDialog) {
                 this._oCharacteristicDropDownDialog.close(); // Ensure that the dialog exists before trying to close it
@@ -835,8 +991,8 @@ sap.ui.define([
                 console.error("Characteristic DropDown Dialog is not defined");
             }
         },
- 
-        onCancelChareectcisValueDialogDropDown: function() {//---------value help dailog for chareactericsvalue--(fragmnet close)----------
+
+        onCancelChareectcisValueDialogDropDown: function () {//---------value help dailog for chareactericsvalue--(fragmnet close)----------
             // Check if the dialog exists before attempting to close it
             if (this._oCharacteristicDropDownDialog) {
                 // Clear the search field
@@ -846,7 +1002,7 @@ sap.ui.define([
                 } else {
                     console.error("Search Field not found");
                 }
-        
+
                 // Clear the filter on the list
                 var oList = sap.ui.getCore().byId("characteristicIdList");
                 if (oList) {
@@ -859,36 +1015,36 @@ sap.ui.define([
                 } else {
                     console.error("List control not found in dialog");
                 }
-        
+
                 // Close the dialog
                 this._oCharacteristicDropDownDialog.close();
-                
+
             } else {
                 console.error("Characteristic Value Dialog is not defined");
             }
         },
-       
-        
-        
+
+
+
         onCharacteristicSearch: function (oEvent) {//-------value help search filed for chareacetrictsvalue------------
             // Get the search value
             var sValue = oEvent.getParameter("newValue");
-        
+
             // Get the dialog and list controls
             var oDialog = sap.ui.getCore().byId("characterictsValueDropDownDialog");
             var oList = sap.ui.getCore().byId("characteristicIdList");
-        
+
             // Check if the controls are found
             if (oDialog && oList) {
                 var oBinding = oList.getBinding("items");
-        
+
                 if (oBinding) {
                     // Create a filter based on the search value
                     var oFilter;
                     if (sValue) {
                         // Convert the search value to an integer if possible
                         var iValue = parseInt(sValue, 10);
-        
+
                         // Create a filter based on the numeric value
                         if (!isNaN(iValue)) {
                             oFilter = new sap.ui.model.Filter("characteristicID", sap.ui.model.FilterOperator.EQ, iValue);
@@ -900,7 +1056,7 @@ sap.ui.define([
                         // If the search value is empty, show all items
                         oFilter = [];
                     }
-        
+
                     // Apply the filter
                     oBinding.filter(oFilter);
                 } else {
@@ -913,71 +1069,109 @@ sap.ui.define([
 
 
 
-
-
-
-
-        onSaveProductClassIds: function () { //-----------create product class and fragmnet (create product class with fragment)----------
+        onSaveProductClassIds: function () {//---------create product class (withfragmnet and with node js)------------------
             var oView = this.getView();
-            var oModel = oView.getModel();
-        //    var sProductClassID = oView.byId("productsClassIdInput").getValue();
-        //     var sClassID = oView.byId("classProductIdInput").getValue();
-        //     var sProductID = oView.byId("productClassIdInput").getValue();
-                // var sProductClassID = Fragment.byId("productClassInputDialog", "productsClassIdInput").getValue();
-                var sClassID = Fragment.byId("productClassInputDialog", "classProductIdInput").getValue();
-                var sProductID = Fragment.byId("productClassInputDialog", "productClassIdInput").getValue();
-                
+            var oModel = oView.getModel(); // This is the OData v2 model
         
-            if (!sClassID ||!sProductID ) {
-                MessageToast.show("Please enter Product Class ID and Name");
+            // Use Fragment.byId to get input fields inside the fragment
+            var sProductClassClassID =  Fragment.byId("productClassInputDialog", "classProductIdInput").getValue();
+            var sProductClassProductID =Fragment.byId("productClassInputDialog", "productClassIdInput").getValue();
+        
+            // Check if the required fields are filled
+            if (!sProductClassClassID || !sProductClassProductID) {
+                MessageToast.show("Please enter Product Class ID and Product Class Name");
                 return;
             }
         
-            // Check for existing Product Classes
-            oModel.read("/PRODUCTCLASS", {
+            // Call backend custom function 'createProductClass'
+            oModel.callFunction("/createProductClass", {
+                method: "GET", // Use POST if creating or modifying data
+                urlParameters: {
+                    classID_classID: sProductClassClassID,
+                    productID_productID: sProductClassProductID
+                },
                 success: function (oData) {
-                    var aExistingProductClasses = oData.results || [];
-                    var bDuplicateID = aExistingProductClasses.some(function (oProductClass) {
-                        // return oProductClass.productID_productID === sProductID;
-                        return oProductClass.productID_productID === sProductID && oProductClass.classID_classID === sClassID;
-                    });
-        
-                    if (bDuplicateID) {
-                        MessageToast.show("Product-Class ID already exists. Please choose a different ID.");
-                        return;
-                    }
-        
-                    // Create the new Product Class
-                    var oProductClass = {
-                        // productClassID: parseInt(sProductClassID, 10),
-                        classID_classID: sClassID ,
-                        productID_productID: sProductID,
-                    };
-        
-                    oModel.create("/PRODUCTCLASS", oProductClass, {
-                        success: function () {
-                            MessageToast.show("Product Class created successfully");
-                            oModel.refresh(); // Refresh model to update the table
-        
-                            // Close the fragment dialog
-                            this._oProductClassFragment.then(function (oDialog) {
-                                oDialog.close();
-                                this._resetProductClassForm();
-                            }.bind(this));
-                        }.bind(this),
-                        error: function (oError) {
-                            MessageToast.show("Error creating Product Class. Check the console for details.");
-                            console.error("Error creating Product Class:", oError);
-                        }
-                    });
+                    MessageToast.show("Product Class created successfully");
+                    oModel.refresh(); // Refresh model to update the table
+                    // Close the fragment dialog
+                    this._oProductClassFragment.then(function (oDialog) {
+                        oDialog.close();
+                        this._resetProductClassForm(); // Reset the form after closing
+                    }.bind(this));
                 }.bind(this),
                 error: function (oError) {
-                    MessageToast.show("Error fetching existing Product Classes data");
-                    console.error("Error fetching existing Product Classes data:", oError);
+                    var oErrorResponse = JSON.parse(oError.responseText);
+                    var sErrorMessage = oErrorResponse.error.message.value || "Error creating Product Class.";
+                    MessageToast.show(sErrorMessage);
+                    console.error("Error creating Product Class:", oError);
                 }
             });
         },
         
+
+
+
+        // onSaveProductClassIds: function () { //-----------create product class and fragmnet (create product class with fragment without Node Js)----------
+        //     var oView = this.getView();
+        //     var oModel = oView.getModel();
+        //     //    var sProductClassID = oView.byId("productsClassIdInput").getValue();
+        //     //     var sClassID = oView.byId("classProductIdInput").getValue();
+        //     //     var sProductID = oView.byId("productClassIdInput").getValue();
+        //     // var sProductClassID = Fragment.byId("productClassInputDialog", "productsClassIdInput").getValue();
+        //     var sClassID = Fragment.byId("productClassInputDialog", "classProductIdInput").getValue();
+        //     var sProductID = Fragment.byId("productClassInputDialog", "productClassIdInput").getValue();
+
+
+        //     if (!sClassID || !sProductID) {
+        //         MessageToast.show("Please enter Product Class ID and Name");
+        //         return;
+        //     }
+
+        //     // Check for existing Product Classes
+        //     oModel.read("/PRODUCTCLASS", {
+        //         success: function (oData) {
+        //             var aExistingProductClasses = oData.results || [];
+        //             var bDuplicateID = aExistingProductClasses.some(function (oProductClass) {
+        //                 return oProductClass.productID_productID === sProductID;
+        //                 // return oProductClass.productID_productID === sProductID && oProductClass.classID_classID === sClassID;
+        //             });
+
+        //             if (bDuplicateID) {
+        //                 MessageToast.show("Product-Class ID already exists. Please choose a different ID.");
+        //                 return;
+        //             }
+
+        //             // Create the new Product Class
+        //             var oProductClass = {
+        //                 // productClassID: parseInt(sProductClassID, 10),
+        //                 classID_classID: sClassID,
+        //                 productID_productID: sProductID,
+        //             };
+
+        //             oModel.create("/PRODUCTCLASS", oProductClass, {
+        //                 success: function () {
+        //                     MessageToast.show("Product Class created successfully");
+        //                     oModel.refresh(); // Refresh model to update the table
+
+        //                     // Close the fragment dialog
+        //                     this._oProductClassFragment.then(function (oDialog) {
+        //                         oDialog.close();
+        //                         this._resetProductClassForm();
+        //                     }.bind(this));
+        //                 }.bind(this),
+        //                 error: function (oError) {
+        //                     MessageToast.show("Error creating Product Class. Check the console for details.");
+        //                     console.error("Error creating Product Class:", oError);
+        //                 }
+        //             });
+        //         }.bind(this),
+        //         error: function (oError) {
+        //             MessageToast.show("Error fetching existing Product Classes data");
+        //             console.error("Error fetching existing Product Classes data:", oError);
+        //         }
+        //     });
+        // },
+
         onCreateProductClass: function () { //--------product class fragemnt open----------
             if (!this._oProductClassFragment) {
                 this._oProductClassFragment = Fragment.load({
@@ -993,7 +1187,7 @@ sap.ui.define([
                 oDialog.open();
             });
         },
-        
+
         onCancelProductClassDialog: function () { //-----product class fragment close-----
             this._oProductClassFragment.then(function (oDialog) {
                 oDialog.close();
@@ -1001,15 +1195,15 @@ sap.ui.define([
                 this.getView().setBusy(false);
             }.bind(this));
         },
-        
+
         _resetProductClassForm: function () {     //-----reset productclass dialog-----------
             // var oView = this.getView();
             // oView.byId("productsClassIdInput").setValue("");
             // oView.byId("classProductIdInput").setValue("");
             // oView.byId("productClassIdInput").setValue("");
             //    Fragment.byId("productClassInputDialog", "productsClassIdInput").setValue("");
-                Fragment.byId("productClassInputDialog", "classProductIdInput").setValue("");
-                Fragment.byId("productClassInputDialog", "productClassIdInput").setValue("");
+            Fragment.byId("productClassInputDialog", "classProductIdInput").setValue("");
+            Fragment.byId("productClassInputDialog", "productClassIdInput").setValue("");
         },
 
         //---------------------- Create Product Class without fragmnet-------------
@@ -1056,23 +1250,23 @@ sap.ui.define([
 
         // ---------------sstart of delete functionality---------------------
 
-        onClassValueHelpRequest: function() {//----------value help for product class(fragment open for CLASS field)------
+        onClassValueHelpRequest: function () {//----------value help for product class(fragment open for CLASS field)------
             if (!this._oClassDialog) {
                 this._oClassDialog = sap.ui.xmlfragment("com.productclassdatamaintenanceapplication.dropDownFragments.productClassClassDropDownFragmnet", this);
                 this.getView().addDependent(this._oClassDialog);
             }
             this._oClassDialog.open();
         },
-        
-        onProductValueHelpRequest: function() { //---------value help for productclass(fragment open for PRODUCT field)
+
+        onProductValueHelpRequest: function () { //---------value help for productclass(fragment open for PRODUCT field)
             if (!this._oProductDialog) {
                 this._oProductDialog = sap.ui.xmlfragment("com.productclassdatamaintenanceapplication.dropDownFragments.productClassProductDropDownFrgamnet", this);
                 this.getView().addDependent(this._oProductDialog);
             }
             this._oProductDialog.open();
         },
-        
-        onClassIdSelectCharValue: function(oEvent) { //----------value help for product class(onClassIdSelectCharValue logic for CLASS field)-----------
+
+        onClassIdSelectCharValue: function (oEvent) { //----------value help for product class(onClassIdSelectCharValue logic for CLASS field)-----------
             var selectedClassId = oEvent.getParameter("listItem").getTitle();
             var oClassInput = sap.ui.core.Fragment.byId("productClassInputDialog", "classProductIdInput");
             oClassInput.setValue(selectedClassId);
@@ -1080,8 +1274,8 @@ sap.ui.define([
                 this._oClassDialog.close();
             }
         },
-        
-        onProductIdSelectCharValue: function(oEvent) { //-----------value help for product class(onProductIdSelectCharValue logic for CLASS field)--------
+
+        onProductIdSelectCharValue: function (oEvent) { //-----------value help for product class(onProductIdSelectCharValue logic for CLASS field)--------
             var selectedProductId = oEvent.getParameter("listItem").getTitle();
             var oProductInput = sap.ui.core.Fragment.byId("productClassInputDialog", "productClassIdInput");
             oProductInput.setValue(selectedProductId);
@@ -1089,8 +1283,8 @@ sap.ui.define([
                 this._oProductDialog.close();
             }
         },
-        
-        onCancelCharValueClassDialogDropDown: function() { //--------value help chareacterictsvalue for class fragment close------------------
+
+        onCancelCharValueClassDialogDropDown: function () { //--------value help chareacterictsvalue for class fragment close------------------
             // Check if the dialog exists before attempting to close it
             if (this._oClassDialog) {
                 // Clear the search field
@@ -1100,7 +1294,7 @@ sap.ui.define([
                 } else {
                     console.error("Search Field for Class ID not found");
                 }
-        
+
                 // Clear the filter on the list
                 var oList = sap.ui.getCore().byId("classProductIdList");
                 if (oList) {
@@ -1113,16 +1307,16 @@ sap.ui.define([
                 } else {
                     console.error("List control for Class ID not found in dialog");
                 }
-        
+
                 // Close the dialog
                 this._oClassDialog.close();
             } else {
                 console.error("Class Dialog is not defined");
             }
         },
-        
-        
-        onCancelCharProductDialogDropDown: function() { //--------value help chareacterictsvalue for product fragment close------------------
+
+
+        onCancelCharProductDialogDropDown: function () { //--------value help chareacterictsvalue for product fragment close------------------
             // Check if the dialog exists before attempting to close it
             if (this._oProductDialog) {
                 // Clear the search field
@@ -1132,7 +1326,7 @@ sap.ui.define([
                 } else {
                     console.error("Search Field for Product ID not found");
                 }
-        
+
                 // Clear the filter on the list
                 var oList = sap.ui.getCore().byId("productIdList");
                 if (oList) {
@@ -1145,35 +1339,35 @@ sap.ui.define([
                 } else {
                     console.error("List control for Product ID not found in dialog");
                 }
-        
+
                 // Close the dialog
                 this._oProductDialog.close();
             } else {
                 console.error("Product Dialog is not defined");
             }
         },
-        
 
 
-        onProductClassClassSearch: function(oEvent) { //---------value help for product class for search filed(class field)-----
+
+        onProductClassClassSearch: function (oEvent) { //---------value help for product class for search filed(class field)-----
             // Get the search value
             var sValue = oEvent.getParameter("newValue");
-        
+
             // Get the dialog and list controls
             var oDialog = sap.ui.getCore().byId("classIdSelectDialog");
             var oList = sap.ui.getCore().byId("classProductIdList");
-        
+
             // Check if the controls are found
             if (oDialog && oList) {
                 var oBinding = oList.getBinding("items");
-        
+
                 if (oBinding) {
                     // Create a filter based on the search value
                     var oFilter;
                     if (sValue) {
                         // Convert the search value to an integer if possible
                         var iValue = parseInt(sValue, 10);
-        
+
                         // Create a filter based on the numeric value
                         if (!isNaN(iValue)) {
                             oFilter = new sap.ui.model.Filter("classID", sap.ui.model.FilterOperator.EQ, iValue);
@@ -1185,7 +1379,7 @@ sap.ui.define([
                         // If the search value is empty, show all items
                         oFilter = [];
                     }
-        
+
                     // Apply the filter
                     oBinding.filter(oFilter);
                 } else {
@@ -1195,26 +1389,26 @@ sap.ui.define([
                 console.error("Dialog or List control not found");
             }
         },
-        
-        onProductClassProductSearch: function(oEvent) {//-----value help search filed for productclassproduct field--------(product field)
+
+        onProductClassProductSearch: function (oEvent) {//-----value help search filed for productclassproduct field--------(product field)
             // Get the search value
             var sValue = oEvent.getParameter("newValue");
-        
+
             // Get the dialog and list controls
             var oDialog = sap.ui.getCore().byId("productIdSelectDialog");
             var oList = sap.ui.getCore().byId("productIdList");
-        
+
             // Check if the controls are found
             if (oDialog && oList) {
                 var oBinding = oList.getBinding("items");
-        
+
                 if (oBinding) {
                     // Create a filter based on the search value
                     var oFilter;
                     if (sValue) {
                         // Convert the search value to an integer if possible
                         var iValue = parseInt(sValue, 10);
-        
+
                         // Create a filter based on the numeric value
                         if (!isNaN(iValue)) {
                             oFilter = new sap.ui.model.Filter("productID", sap.ui.model.FilterOperator.EQ, iValue);
@@ -1226,7 +1420,7 @@ sap.ui.define([
                         // If the search value is empty, show all items
                         oFilter = [];
                     }
-        
+
                     // Apply the filter
                     oBinding.filter(oFilter);
                 } else {
@@ -1236,164 +1430,164 @@ sap.ui.define([
                 console.error("Dialog or List control not found");
             }
         },
-        
-        
-        
 
-       
-        
+
+
+
+
+
 
 
 
 
         // -------------search field functiloaity for chareactericts,chareactericsvalue and for product class---------------
-          
 
-       
-        
-        onDeleteClass: function(oEvent) {//----------delete functionality for class and for other entites------------
+
+
+
+        onDeleteClass: function (oEvent) {//----------delete functionality for class and for other/ALL entites------------
             var oSource = oEvent.getSource();
             var oContext = oSource.getBindingContext();
             var classID = oContext.getProperty("classID");
-        
+
             var oModel = this.getView().getModel('productclassmodel');
-            
+
             // Enable batch processing
             oModel.setUseBatch(true);
             oModel.setDeferredGroups(["deletionGroup"]);
-        
+
             sap.m.MessageBox.confirm("Are you sure you want to delete Class ID: " + classID + "?", {
                 title: "Confirm Deletion",
-                onClose: function(oAction) {
+                onClose: function (oAction) {
                     if (oAction === sap.m.MessageBox.Action.OK) {
-                        
+
                         // Fetch Characteristic entities
                         oModel.read("/CHARACTERISTICS", {
-                            success: function(oData) {
+                            success: function (oData) {
                                 if (!oData || !oData.results) {
                                     console.error("No data returned from Characteristic service.");
                                     return;
                                 }
-        
+
                                 // Filter characteristics based on the classID
-                                var aCharacteristics = oData.results.filter(function(item) {
+                                var aCharacteristics = oData.results.filter(function (item) {
                                     return item.classID_classID === classID;
                                 });
-        
-                                var aCharacteristicIDs = aCharacteristics.map(function(item) {
+
+                                var aCharacteristicIDs = aCharacteristics.map(function (item) {
                                     return item.characteristicID;
                                 });
-        
+
                                 // Fetch CharacteristicValue entities
                                 oModel.read("/CHARACTERISTICSVALUE", {
-                                    success: function(oData) {
+                                    success: function (oData) {
                                         if (!oData || !oData.results) {
                                             console.error("No data returned from CharacteristicValue service.");
                                             return;
                                         }
-        
+
                                         // Filter characteristic values based on the characteristic IDs
-                                        var aCharacteristicValues = oData.results.filter(function(item) {
+                                        var aCharacteristicValues = oData.results.filter(function (item) {
                                             return aCharacteristicIDs.includes(item.characteristicID_characteristicID);
                                         });
-        
+
                                         // Add delete operations for CharacteristicValue to batch
-                                        aCharacteristicValues.forEach(function(item) {
+                                        aCharacteristicValues.forEach(function (item) {
                                             // console.log("Deleting CharacteristicValue with ID: ", item.characteristicID_characteristicID, item.value);
                                             oModel.remove("/CHARACTERISTICSVALUE(characteristicID_characteristicID='" + item.characteristicID_characteristicID + "')", {
                                                 groupId: "deletionGroup"
                                             });
                                         });
-        
+
                                         // Add delete operations for Characteristic to batch
-                                        aCharacteristics.forEach(function(item) {
+                                        aCharacteristics.forEach(function (item) {
                                             console.log("Deleting Characteristic with ID: ", item.characteristicID);
                                             oModel.remove("/CHARACTERISTICS('" + item.characteristicID + "')", {
                                                 groupId: "deletionGroup"
                                             });
                                         });
-        
+
                                         // Proceed to delete ProductClass, Product, and Class entities
                                         // Fetch ProductClass entities
                                         oModel.read("/PRODUCTCLASS", {
-                                            success: function(oData) {
+                                            success: function (oData) {
                                                 if (!oData || !oData.results) {
                                                     console.error("No data returned from ProductClass service.");
                                                     return;
                                                 }
-        
-                                                var aProductClasses = oData.results.filter(function(item) {
+
+                                                var aProductClasses = oData.results.filter(function (item) {
                                                     return item.classID_classID === classID;
                                                 });
-        
-                                                var aProductIDs = aProductClasses.map(function(item) {
+
+                                                var aProductIDs = aProductClasses.map(function (item) {
                                                     return item.productID_productID;
                                                 });
-        
+
                                                 // Add delete operations for ProductClass to batch
-                                                aProductClasses.forEach(function(item) {
+                                                aProductClasses.forEach(function (item) {
                                                     console.log("Deleting ProductClass with productID: ", item.productID_productID, " classID: ", item.classID_classID);
                                                     oModel.remove("/PRODUCTCLASS(productID_productID='" + item.productID_productID + "',classID_classID='" + item.classID_classID + "')", {
                                                         groupId: "deletionGroup"
                                                     });
                                                 });
-        
+
                                                 // Fetch Product entities
                                                 oModel.read("/PRODUCT", {
-                                                    success: function(oData) {
+                                                    success: function (oData) {
                                                         if (!oData || !oData.results) {
                                                             console.error("No data returned from Product service.");
                                                             return;
                                                         }
-        
-                                                        var aProducts = oData.results.filter(function(item) {
+
+                                                        var aProducts = oData.results.filter(function (item) {
                                                             return aProductIDs.includes(item.productID);
                                                         });
-        
+
                                                         // Add delete operations for Product to batch
-                                                        aProducts.forEach(function(item) {
+                                                        aProducts.forEach(function (item) {
                                                             console.log("Deleting Product with ID: ", item.productID);
                                                             oModel.remove("/PRODUCT('" + item.productID + "')", {
                                                                 groupId: "deletionGroup"
                                                             });
                                                         });
-        
+
                                                         // After deleting all related records, delete the Class entity
                                                         console.log("Deleting Class with ID: ", classID);
                                                         oModel.remove("/CLASS('" + classID + "')", {
                                                             groupId: "deletionGroup"
                                                         });
-        
+
                                                         // Submit the batch request
                                                         oModel.submitChanges({
                                                             groupId: "deletionGroup",
-                                                            success: function(oData) {
+                                                            success: function (oData) {
                                                                 console.log("Batch delete successful:", oData);
                                                                 sap.m.MessageToast.show("Records in other entities related to " + classID + " and the class itself were deleted successfully.");
                                                                 oModel.refresh(true);
                                                             },
-                                                            error: function(oError) {
+                                                            error: function (oError) {
                                                                 console.error("Batch delete failed:", oError);
                                                                 sap.m.MessageToast.show("Failed to delete some records.");
                                                             }
                                                         });
                                                     },
-                                                    error: function() {
+                                                    error: function () {
                                                         sap.m.MessageToast.show("Failed to fetch Product entities.");
                                                     }
                                                 });
                                             },
-                                            error: function() {
+                                            error: function () {
                                                 sap.m.MessageToast.show("Failed to fetch ProductClass entities.");
                                             }
                                         });
                                     },
-                                    error: function() {
+                                    error: function () {
                                         sap.m.MessageToast.show("Failed to fetch CharacteristicValue entities.");
                                     }
                                 });
                             },
-                            error: function() {
+                            error: function () {
                                 sap.m.MessageToast.show("Failed to fetch Characteristic entities.");
                             }
                         });
@@ -1401,7 +1595,7 @@ sap.ui.define([
                 }.bind(this)
             });
         },
-      
+
         // onDeleteClass: function (oEvent) {   //  ---delete functionality for class-----------
         //     var oButton = oEvent.getSource();
         //     var oTable = oButton.getParent().getParent(); // Assuming the delete button is inside a row in the table
@@ -1494,7 +1688,7 @@ sap.ui.define([
             var oItem = oTable.getBindingContext().getObject(); // Get the characteristic object
             var oModel = this.getOwnerComponent().getModel("productclassmodel");
             var sPath = "/CHARACTERISTICSVALUE('" + oItem.characteristicID_characteristicID + "')";
-               // Construct the path with both keys: characteristicID_characteristicID and value
+            // Construct the path with both keys: characteristicID_characteristicID and value
             //  var sPath = "/CHARACTERISTICSVALUE(characteristicID_characteristicID='" + oItem.characteristicID_characteristicID + "',value='" + oItem.value + "')";
             sap.m.MessageBox.confirm("Are you sure you want to delete this characteristicvalue?", {
                 actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
@@ -1524,7 +1718,7 @@ sap.ui.define([
             var oModel = this.getOwnerComponent().getModel("productclassmodel");
             // var sPath = "/PRODUCTCLASS('" + oItem.productID_productID + "')";
             // Construct the path with both keys: productID_productID and classID_classID
-           var sPath = "/PRODUCTCLASS(productID_productID='" + oItem.productID_productID + "',classID_classID='" + oItem.classID_classID + "')";
+            var sPath = "/PRODUCTCLASS(productID_productID='" + oItem.productID_productID + "',classID_classID='" + oItem.classID_classID + "')";
             sap.m.MessageBox.confirm("Are you sure you want to delete this productclass?", {
                 actions: [sap.m.MessageBox.Action.OK, sap.m.MessageBox.Action.CANCEL],
                 onClose: function (sAction) {
@@ -1555,15 +1749,15 @@ sap.ui.define([
         // -----------update fuunctionality start------------
 
         // -------class update fucnctionality--------------
-         
-       
+
+
         onEditClass: function (oEvent) { //------class edit (with fragemnt)
             var oView = this.getView();
             var oModel = oView.getModel();
             var oContext = oEvent.getSource().getBindingContext(); // Get the selected row's context
-            
+
             var sClassID = oContext.getProperty("classID");
-            
+
             oModel.read("/CLASS('" + sClassID + "')", {
                 success: function (oData) {
                     if (!this._classUpdateDialog) {
@@ -1572,7 +1766,7 @@ sap.ui.define([
                             name: "com.productclassdatamaintenanceapplication.updateFragments.ClassUpdateFragment",
                             controller: this
                         }).then(function (oDialog) {
-                            this._classUpdateDialog = Promise.resolve(oDialog); 
+                            this._classUpdateDialog = Promise.resolve(oDialog);
                             oView.addDependent(oDialog);
                             oDialog.open();
                             this._setDialogData(oDialog, oData); // Set data when dialog is first loaded
@@ -1590,7 +1784,7 @@ sap.ui.define([
                 }
             });
         },
-        
+
         _setDialogData: function (oDialog, oData) {
             Fragment.byId("classEditDialog", "classIdEditInput").setValue(oData.classID);
             Fragment.byId("classEditDialog", "classNameEditInput").setValue(oData.className);
@@ -1599,34 +1793,34 @@ sap.ui.define([
 
         onUpdateClass: function () {
             var oDialog = this._classUpdateDialog;
-        
+
             if (!oDialog) {
                 MessageToast.show("Dialog is not available.");
                 return;
             }
-        
+
             oDialog.then(function (dialog) {
-                var sClassID =  Fragment.byId("classEditDialog", "classIdEditInput").getValue();
+                var sClassID = Fragment.byId("classEditDialog", "classIdEditInput").getValue();
                 var sClassName = Fragment.byId("classEditDialog", "classNameEditInput").getValue();
-        
+
                 if (!sClassID || !sClassName) {
                     MessageToast.show("Please enter all required fields.");
                     return;
                 }
-        
+
                 var oUpdatedClass = {
                     classID: sClassID,
                     className: sClassName
                 };
-        
+
                 var oModel = this.getView().getModel();
-        
+
                 oModel.update("/CLASS('" + sClassID + "')", oUpdatedClass, {
                     success: function () {
                         MessageToast.show("Class updated successfully");
                         oModel.refresh();
                         dialog.close();
-                        
+
                         // this._classUpdateDialog.destroy();
                     }.bind(this),
                     error: function (oError) {
@@ -1636,15 +1830,15 @@ sap.ui.define([
                 });
             }.bind(this));
         },
-        
+
         onCancelClassUpdateDialog: function () {
             var oDialog = this._classUpdateDialog;
-        
+
             if (!oDialog) {
                 MessageToast.show("Dialog is not available.");
                 return;
             }
-        
+
             oDialog.then(function (dialog) {
                 dialog.close();
                 // this._classUpdateDialog.destroy(); 
@@ -1711,9 +1905,9 @@ sap.ui.define([
             var oView = this.getView();
             var oModel = oView.getModel();
             var oContext = oEvent.getSource().getBindingContext(); // Get the selected row's context
-            
+
             var sProductID = oContext.getProperty("productID");
-            
+
             oModel.read("/PRODUCT('" + sProductID + "')", {
                 success: function (oData) {
                     if (!this._productUpdateDialog) {
@@ -1722,7 +1916,7 @@ sap.ui.define([
                             name: "com.productclassdatamaintenanceapplication.updateFragments.productUpdateFragment",
                             controller: this
                         }).then(function (oDialog) {
-                            this._productUpdateDialog = Promise.resolve(oDialog); 
+                            this._productUpdateDialog = Promise.resolve(oDialog);
                             oView.addDependent(oDialog);
                             oDialog.open();
                             this._setProductDialogData(oDialog, oData); // Set data when dialog is first loaded
@@ -1740,40 +1934,40 @@ sap.ui.define([
                 }
             });
         },
-        
+
         _setProductDialogData: function (oDialog, oData) {
             Fragment.byId("productEditDialog", "productIdUpdateInput").setValue(oData.productID);
             Fragment.byId("productEditDialog", "productNameUpdateInput").setValue(oData.productName);
             Fragment.byId("productEditDialog", "productTypeUpdateInput").setValue(oData.type);
             Fragment.byId("productEditDialog", "productIdUpdateInput").setEnabled(false); // Disable ID field for editing
         },
-        
+
         onSaveUpdateProducts: function () {
             var oDialog = this._productUpdateDialog;
-        
+
             if (!oDialog) {
                 MessageToast.show("Dialog is not available.");
                 return;
             }
-        
+
             oDialog.then(function (dialog) {
                 var sProductID = Fragment.byId("productEditDialog", "productIdUpdateInput").getValue();
                 var sProductName = Fragment.byId("productEditDialog", "productNameUpdateInput").getValue();
                 var sProductType = Fragment.byId("productEditDialog", "productTypeUpdateInput").getValue();
-        
+
                 if (!sProductID || !sProductName || !sProductType) {
                     MessageToast.show("Please enter all required fields.");
                     return;
                 }
-        
+
                 var oUpdatedProduct = {
-                    productID:sProductID,
+                    productID: sProductID,
                     productName: sProductName,
                     type: sProductType
                 };
-        
+
                 var oModel = this.getView().getModel();
-        
+
                 oModel.update("/PRODUCT('" + sProductID + "')", oUpdatedProduct, {
                     success: function () {
                         MessageToast.show("Product updated successfully");
@@ -1787,20 +1981,20 @@ sap.ui.define([
                 });
             }.bind(this));
         },
-        
+
         onCancelUpdateProductDialog: function () {
             var oDialog = this._productUpdateDialog;
-        
+
             if (!oDialog) {
                 MessageToast.show("Dialog is not available.");
                 return;
             }
-        
+
             oDialog.then(function (dialog) {
                 dialog.close();
             }.bind(this));
         },
-    
+
         // onEditProduct: function (oEvent) { //-----product edit (without fragemnt)
         //     // Get the selected item
         //     var oSelectedItem = oEvent.getSource().getParent().getParent();
@@ -1869,9 +2063,9 @@ sap.ui.define([
             var oView = this.getView();
             var oModel = oView.getModel();
             var oContext = oEvent.getSource().getBindingContext(); // Get the selected row's context
-            
+
             var sCharacteristicID = oContext.getProperty("characteristicID");
-            
+
             oModel.read("/CHARACTERISTICS('" + sCharacteristicID + "')", {
                 success: function (oData) {
                     if (!this._characteristicUpdateDialog) {
@@ -1880,7 +2074,7 @@ sap.ui.define([
                             name: "com.productclassdatamaintenanceapplication.updateFragments.characteristicsUpdateFragmnet",
                             controller: this
                         }).then(function (oDialog) {
-                            this._characteristicUpdateDialog = Promise.resolve(oDialog); 
+                            this._characteristicUpdateDialog = Promise.resolve(oDialog);
                             oView.addDependent(oDialog);
                             oDialog.open();
                             this._setCharacteristicDialogData(oDialog, oData); // Set data when dialog is first loaded
@@ -1898,7 +2092,7 @@ sap.ui.define([
                 }
             });
         },
-        
+
         _setCharacteristicDialogData: function (oDialog, oData) {
             Fragment.byId("charecetricsInputUpdateDialog", "characteristicIdUpdateInput").setValue(oData.characteristicID);
             Fragment.byId("charecetricsInputUpdateDialog", "characteristicClassIdUpdateInput").setSelectedKey(oData.classID_classID);
@@ -1906,33 +2100,33 @@ sap.ui.define([
             Fragment.byId("charecetricsInputUpdateDialog", "characteristicIdUpdateInput").setEnabled(false); // Disable ID field for editing
             Fragment.byId("charecetricsInputUpdateDialog", "characteristicClassIdUpdateInput").setEnabled(false);
         },
-        
+
         onSaveCharacteristicsUpdateDialog: function () {
             var oDialog = this._characteristicUpdateDialog;
-        
+
             if (!oDialog) {
                 MessageToast.show("Dialog is not available.");
                 return;
             }
-        
+
             oDialog.then(function (dialog) {
                 var sCharacteristicID = Fragment.byId("charecetricsInputUpdateDialog", "characteristicIdUpdateInput").getValue();
                 var sClassID = Fragment.byId("charecetricsInputUpdateDialog", "characteristicClassIdUpdateInput").getSelectedKey();
                 var sCharacteristicName = Fragment.byId("charecetricsInputUpdateDialog", "characteristicNameUpdateInput").getValue();
-        
+
                 if (!sCharacteristicID || !sClassID || !sCharacteristicName) {
                     MessageToast.show("Please enter all required fields.");
                     return;
                 }
-        
+
                 var oUpdatedCharacteristic = {
                     characteristicID: sCharacteristicID,
                     classID_classID: sClassID,
                     characteristicName: sCharacteristicName
                 };
-        
+
                 var oModel = this.getView().getModel();
-        
+
                 oModel.update("/CHARACTERISTICS('" + sCharacteristicID + "')", oUpdatedCharacteristic, {
                     success: function () {
                         MessageToast.show("Characteristic updated successfully");
@@ -1946,20 +2140,20 @@ sap.ui.define([
                 });
             }.bind(this));
         },
-        
+
         onCancelChareectcisDialogUpdate: function () {
             var oDialog = this._characteristicUpdateDialog;
-        
+
             if (!oDialog) {
                 MessageToast.show("Dialog is not available.");
                 return;
             }
-        
+
             oDialog.then(function (dialog) {
                 dialog.close();
             }.bind(this));
         },
-      
+
         // onEditCharacteristic: function (oEvent) { //--------charecetrics edit(without fragment)----------------
         //     // Get the selected item
         //     var oSelectedItem = oEvent.getSource().getParent().getParent();
@@ -2021,21 +2215,21 @@ sap.ui.define([
 
 
         // ---------edit charecetrics value fucntilonality-----------
-      
 
 
-      
-      
-      
+
+
+
+
         onEditCharacteristicValue: function (oEvent) { //--------charecetricsvalue edit (with fragemnt)------------
             var oView = this.getView();
             var oModel = oView.getModel();
             var oContext = oEvent.getSource().getBindingContext(); // Get selected row's context
-        
+
             var sCharacteristicID = oContext.getProperty("characteristicID_characteristicID"); // Composite key part
             // var sValue = oContext.getProperty("value"); // Composite key part
-             // Construct the OData URL using both parts of the composite key
-           var sPath = `/CHARACTERISTICSVALUE(characteristicID_characteristicID='${sCharacteristicID}')`;
+            // Construct the OData URL using both parts of the composite key
+            var sPath = `/CHARACTERISTICSVALUE(characteristicID_characteristicID='${sCharacteristicID}')`;
             oModel.read(sPath, {
                 success: function (oData) {
                     if (!this._characteristicValueUpdateDialog) {
@@ -2062,7 +2256,7 @@ sap.ui.define([
                 }
             });
         },
-        
+
         _setCharacteristicValueDialogData: function (oDialog, oData) {
             // Fragment.byId("characterictsValueInputUpdataeDialog", "characteristicValueIdUpdateInput").setValue(oData.characteristicValueID);
             Fragment.byId("characterictsValueInputUpdataeDialog", "characteristicValueUpdateInput").setValue(oData.value);
@@ -2071,26 +2265,26 @@ sap.ui.define([
             // Fragment.byId("characterictsValueInputUpdataeDialog", "characteristicValueIdUpdateInput").setEnabled(false); // Disable ID field for editing
             Fragment.byId("characterictsValueInputUpdataeDialog", "characteristicsIdUpdateInput").setEnabled(false);
         },
-        
+
         onSaveCharacteristicValuesUpdate: function () {
             var oDialog = this._characteristicValueUpdateDialog;
-        
+
             if (!oDialog) {
                 MessageToast.show("Dialog is not available.");
                 return;
             }
-        
+
             oDialog.then(function (dialog) {
                 // var sCharacteristicValueID = Fragment.byId("characterictsValueInputUpdataeDialog", "characteristicValueIdUpdateInput").getValue();
                 var sValue = Fragment.byId("characterictsValueInputUpdataeDialog", "characteristicValueUpdateInput").getValue();
                 var sValueDescription = Fragment.byId("characterictsValueInputUpdataeDialog", "characteristicValueDesUpdateInput").getValue();
                 var sCharacteristicID = Fragment.byId("characterictsValueInputUpdataeDialog", "characteristicsIdUpdateInput").getSelectedKey();
-        
-                if ( !sValue || !sValueDescription || !sCharacteristicID) {
+
+                if (!sValue || !sValueDescription || !sCharacteristicID) {
                     MessageToast.show("Please enter all required fields.");
                     return;
                 }
-        
+
                 var oUpdatedCharacteristicValue = {
                     // characteristicValueID: parseInt(sCharacteristicValueID, 10),
                     value: sValue,
@@ -2099,7 +2293,7 @@ sap.ui.define([
                 };
                 var sPath = `/CHARACTERISTICSVALUE(characteristicID_characteristicID='${sCharacteristicID}')`;
                 var oModel = this.getView().getModel();
-        
+
                 oModel.update(sPath, oUpdatedCharacteristicValue, {
                     success: function () {
                         MessageToast.show("Characteristic Value updated successfully");
@@ -2113,21 +2307,21 @@ sap.ui.define([
                 });
             }.bind(this));
         },
-        
+
         onCancelChareectcisValueDialogUpdate: function () {
             var oDialog = this._characteristicValueUpdateDialog;
-        
+
             if (!oDialog) {
                 MessageToast.show("Dialog is not available.");
                 return;
             }
-        
+
             oDialog.then(function (dialog) {
                 dialog.close();
             }.bind(this));
         },
-        
-      
+
+
         // onEditCharacteristicValue: function (oEvent) { //--------charectricts value edit (without fargemnt)--------------
         //     // Get the selected item
         //     var oSelectedItem = oEvent.getSource().getParent().getParent();
@@ -2184,18 +2378,18 @@ sap.ui.define([
         //     this._oCharacteristicValueTable.setVisible(true);
         //     this._oEditCharacteristicValueContainer.setVisible(false);
         // },
-// ----------edit functionality end's----------------
+        // ----------edit functionality end's----------------
 
 
 
         // --------nav back to main view-----------
-     
-     
-     
-     
-     
-     
-     
+
+
+
+
+
+
+
         addProductOnNavBack: function () {
             var oHistory = History.getInstance();
             var sPreviousHash = oHistory.getPreviousHash();

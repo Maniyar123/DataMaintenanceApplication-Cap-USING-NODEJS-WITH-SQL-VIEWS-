@@ -1,9 +1,9 @@
 const cds = require("@sap/cds");
 
 module.exports = srv => {
-
+// ---------------------CRAETE FUNATIONALITY(START)------------------------
     // Create Class
-    srv.on("saveClasses", async (req) => {
+    srv.on("createClass", async (req) => {
         const { classID, className } = req.data;
         
         if (!classID || !className) {
@@ -11,15 +11,16 @@ module.exports = srv => {
         }
 
         try {
-            await cds.run(INSERT.into("CLASS").entries({ classID, className }));
+            await cds.run(INSERT.into("PRODUCTDETAILSDATACLASS_CLASS").entries({ classID, className }));
             return "Class created successfully";
         } catch (err) {
+            console.error("Error details:", err); // Log the error details for debugging
             req.error(500, "Error creating Class");
         }
     });
 
     // Create Product
-    srv.on("saveProducts", async (req) => {
+    srv.on("createProduct", async (req) => {
         const { productID, productName, type } = req.data;
 
         if (!productID || !productName || !type) {
@@ -27,7 +28,7 @@ module.exports = srv => {
         }
 
         try {
-            await cds.run(INSERT.into("PRODUCT").entries({ productID, productName, type }));
+            await cds.run(INSERT.into("PRODUCTDETAILSDATACLASS_PRODUCT").entries({ productID, productName, type }));
             return "Product created successfully";
         } catch (err) {
             req.error(500, "Error creating Product");
@@ -35,7 +36,7 @@ module.exports = srv => {
     });
 
     // Create Characteristic
-    srv.on("saveCharacteristics", async (req) => {
+    srv.on("createCharacteristics", async (req) => {
         const { characteristicID, classID_classID, characteristicName } = req.data;
 
         if (!characteristicID || !classID_classID || !characteristicName) {
@@ -43,7 +44,7 @@ module.exports = srv => {
         }
 
         try {
-            await cds.run(INSERT.into("CHARACTERISTICS").entries({ characteristicID, classID_classID, characteristicName }));
+            await cds.run(INSERT.into("PRODUCTDETAILSDATACLASS_CHARACTERISTIC").entries({ characteristicID, classID_classID, characteristicName }));
             return "Characteristic created successfully";
         } catch (err) {
             req.error(500, "Error creating Characteristic");
@@ -51,39 +52,43 @@ module.exports = srv => {
     });
 
     // Create Characteristic Value
-    srv.on("saveCharacteristicValues", async (req) => {
-        const { characteristicValueID, value, valueDescription, characteristicID_characteristicID } = req.data;
+    srv.on("createCharacteristicValues", async (req) => {
+        const { characteristicID_characteristicID, value, valueDescription  } = req.data;
 
-        if (!characteristicValueID || !value || !valueDescription || !characteristicID_characteristicID) {
+        if (!characteristicID_characteristicID ||!value || !valueDescription ) {
             return req.error(400, "Please enter Characteristic ID, Value, Characteristic Value ID and Value Description");
         }
 
         try {
-            await cds.run(INSERT.into("CHARACTERISTICSVALUE").entries({
-                characteristicValueID,
+            await cds.run(INSERT.into("PRODUCTDETAILSDATACLASS_CHARACTERISTICVALUE").entries({
+               
+                characteristicID_characteristicID,
                 value,
-                valueDescription,
-                characteristicID_characteristicID
+                valueDescription
             }));
             return "Characteristic Value created successfully";
         } catch (err) {
+            console.error("Error details:", err); // Log the error details for debugging
             req.error(500, "Error creating Characteristic Value");
         }
     });
 
     // Create Product Class
-    srv.on("saveProductClassIds", async (req) => {
-        const { productClassID, classID_classID, productID_productID } = req.data;
+    srv.on("createProductClass", async (req) => {
+        const {  classID_classID, productID_productID } = req.data;
 
-        if (!productClassID || !classID_classID || !productID_productID) {
+        if ( !classID_classID || !productID_productID) {
             return req.error(400, "Please enter Product Class ID, Class ID, and Product ID");
         }
 
         try {
-            await cds.run(INSERT.into("PRODUCTCLASS").entries({ productClassID, classID_classID, productID_productID }));
+            await cds.run(INSERT.into("PRODUCTDETAILSDATACLASS_PRODUCTCLASS").entries({  classID_classID, productID_productID }));
             return "Product Class created successfully";
         } catch (err) {
             req.error(500, "Error creating Product Class");
         }
     });
+    // ------------------CREATE FUNCTIONALITY (END)------------------
+
+    
 };

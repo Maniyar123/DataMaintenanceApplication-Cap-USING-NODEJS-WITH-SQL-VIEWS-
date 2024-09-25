@@ -35,15 +35,24 @@ context productdetailsdataclass {
 
 @cds.persistence.exists
 @cds.persistence.table
-entity PRODUCTCALCLASSVIEWS { //---------entity for productclass hdb view----------
+entity PRODUCTCALCLASSVIEWS { //---------entity for productclass cal view----------
     PRODUCTNAME        : String(100);
-    PRODUCTID          : Integer;
+    key PRODUCTID          : String;
     TYPE               : String(50);
     CHARACTERISTICNAME : String(100);
     VALUE              : String(100);
     VALUEDESCRIPTION   : String(255);
-    CLASSID_CLASSID    : Integer;
+   key CLASSID_CLASSID    : Integer;
  }
+ @cds.persistence.exists
+@cds.persistence.table
+entity PRODUCTIDCLASSIDVIEW { //---------entity for productclass cal view----------
+   
+   key PRODUCTID          : String;
+    PRODUCTNAME        :String;
+   key CLASSID_CLASSID    : String;
+ }
+
  
 // @cds.persistence.exists
 // @cds.persistence.table

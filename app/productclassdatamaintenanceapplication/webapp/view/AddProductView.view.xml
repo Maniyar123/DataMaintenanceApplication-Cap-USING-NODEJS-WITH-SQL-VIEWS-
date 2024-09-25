@@ -246,6 +246,9 @@
                                         <Text text="Characteristic ID" />
                                     </Column> -->
                                     <Column>
+                                        <Text text="Characteristic ID" />
+                                    </Column>
+                                    <Column>
                                         <Text text="Value" />
                                     </Column>
                                     <Column>
@@ -253,9 +256,7 @@
                                     </Column>
                                    
 
-                                    <Column>
-                                        <Text text="Characteristic ID" />
-                                    </Column>
+                                    
                                      <Column>
                                         <Text text="Actions" />
                                     </Column>
@@ -265,9 +266,9 @@
                                         <cells>
                                             <!-- <Text text="{characteristicID_characteristicID}" /> -->
                                             <!-- <Text text="{characteristicValueID}" /> -->
+                                            <Text text="{characteristicID_characteristicID}" />
                                             <Text text="{value}" />
                                             <Text text="{valueDescription}" />
-                                            <Text text="{characteristicID_characteristicID}" />
 
                                             <HBox>
                                                 <Button icon="sap-icon://edit" press="onEditCharacteristicValue"  class="sapUiSmallMarginEnd" type="Success"/>

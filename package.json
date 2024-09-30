@@ -31,7 +31,8 @@
     "deploy": "cf deploy mta_archives/archive.mtar --retries 1",
     "watch-productdetailsapplication": "cds watch --open productdetailsapplication/webapp/index.html?sap-ui-xx-viewCache=false",
     "watch-maintenanceapplication": "cds watch --open maintenanceapplication/webapp/index.html?sap-ui-xx-viewCache=false",
-    "watch-productclassdatamaintenanceapplication": "cds watch --open productclassdatamaintenanceapplication/webapp/index.html?sap-ui-xx-viewCache=false"
+    "watch-productclassdatamaintenanceapplication": "cds watch --open productclassdatamaintenanceapplication/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-productclassuniqueidmaintenanceapplication": "cds watch --open productclassuniqueidmaintenanceapplication/webapp/index.html?sap-ui-xx-viewCache=false"
   },
   "cds": {
     "requires": {

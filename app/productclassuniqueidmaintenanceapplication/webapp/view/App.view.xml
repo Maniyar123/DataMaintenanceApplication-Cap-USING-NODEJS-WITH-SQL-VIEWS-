@@ -1,0 +1,16 @@
+<mvc:View xmlns:m="sap.m" controllerName="com.productclassuniqueidmaintenanceapplication.controller.App"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+     xmlns="sap.f" height="100%" >
+    
+    <FlexibleColumnLayout 
+        id="fcl"
+        
+        >
+        <beginColumnPages>
+            <mvc:XMLView id="beginView" async="true" viewName="com.productclassuniqueidmaintenanceapplication.view.ListView" />
+        </beginColumnPages>
+
+        </FlexibleColumnLayout>
+      
+</mvc:View>

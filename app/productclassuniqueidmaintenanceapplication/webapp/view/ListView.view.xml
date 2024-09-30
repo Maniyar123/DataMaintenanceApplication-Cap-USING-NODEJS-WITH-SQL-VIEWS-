@@ -1,0 +1,71 @@
+<mvc:View controllerName="com.productclassuniqueidmaintenanceapplication.controller.ListView"
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+    xmlns="sap.m">
+    <!-- Page to display the Product Table -->
+    <Page
+        id="productPage"
+        title="Product List">
+          <!-- Filter Bar -->
+        <VBox class="sapUiMediumMargin">
+            <HBox>
+                <SearchField
+                    id="searchField"
+                    width="100%"
+                    placeholder="Search by Product Name"
+                    liveChange="onSearch"
+                />
+                <Button
+                    text="Filter"
+                    press="onFilter"
+                    class="sapUiSmallMarginStart"
+                />
+            </HBox>
+        </VBox>
+        <!-- Product Table -->
+        <Table
+            id="productTable"
+            inset="true"
+            items="{/product}" 
+            
+            >
+            
+            <!-- Columns Definitions -->
+            <columns>
+                <Column>
+                    <Text text="Product ID" />
+                </Column>
+                <Column>
+                    <Text text="Product Name" />
+                </Column>
+                <Column>
+                    <Text text="Description" />
+                </Column>
+                <Column>
+                    <Text text="Status" />
+                </Column>
+                <Column>
+                    <Text text="Valid From" />
+                </Column>
+                <Column>
+                    <Text text="Valid To" />
+                </Column>
+            </columns>
+
+            <!-- Template for Table Rows -->
+            <items>
+                <ColumnListItem type="Navigation" press="onRowSelected">
+                    <cells>
+                        <ObjectIdentifier title="{productID}"/>
+                        <Text text="{productName}" />
+                        <Text text="{description}" />
+                        <Text text="{status}" />
+                        <Text text="{validFrom}" />
+                        <Text text="{validTo}" />
+                    </cells>
+                </ColumnListItem>
+            </items>
+
+        </Table>
+
+    </Page>
+</mvc:View>

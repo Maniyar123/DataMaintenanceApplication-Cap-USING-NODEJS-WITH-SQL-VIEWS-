@@ -1,0 +1,47 @@
+<mvc:View controllerName="com.productclassuniqueidmaintenanceapplication.controller.Detail"
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+    xmlns="sap.m">
+    <Table
+            id="productClassTable"
+            inset="true"
+            items="{productDetails>/}"
+            >
+            
+            <columns>
+                <Column>
+                    <Text text="Product ID" />
+                </Column>
+                <Column>
+                    <Text text="Description" />
+                </Column>
+                <Column>
+                    <Text text="Class ID" />
+                </Column>
+                <Column>
+                    <Text text="Characteristic ID" />
+                </Column>
+                <Column>
+                    <Text text="Characteristic Name" />
+                </Column>
+                <Column>
+                    <Text text="Value" />
+                </Column>
+                
+            </columns>
+
+            <items>
+                <ColumnListItem press="onDetailItemPress">
+                    <cells>
+                        <Text text="{productDetails>PRODUCTID}" />
+                        <Text text="{productDetails>DESCRIPTION}" />
+                        <Text text="{productDetails>CLASSID}" />
+                        <Text text="{productDetails>CHARACTERISTICID}" />
+                        <Text text="{productDetails>CHARACTERISTICNAME}" />
+                        <Text text="{productDetails>VALUE}" />
+                    </cells>
+                </ColumnListItem>
+            </items>
+
+        </Table>
+
+</mvc:View>

@@ -26,6 +26,7 @@ sap.ui.define(
         }).then(function (detailView) {
           this.oFlexibleColumnLayout.addMidColumnPage(detailView);
           this.oFlexibleColumnLayout.setLayout(LayoutType.TwoColumnsMidExpanded);
+          // this.bus.subscribe("flexible", "setDetailPage", this._onProductIDReceived, this);
         }.bind(this));
       },
       // Helper function to manage the lazy loading of views

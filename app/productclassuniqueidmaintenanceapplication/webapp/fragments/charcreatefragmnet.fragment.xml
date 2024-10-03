@@ -1,0 +1,19 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Dialog
+        id="characteristicCreateDialog"
+        title="Create Characteristic"
+       >
+        <content>
+            <VBox class="sapUiMediumMargin">
+                <Input id="inputCharacteristicName" placeholder="Characteristic Name" />
+                <Input id="inputClassID" placeholder="Class ID" />
+                <Input id="inputValue" placeholder="Value" />
+            </VBox>
+        </content>
+        <beginButton>
+            <Button
+                text="Create"
+                press="onCreateCharacteristic" />
+        </beginButton>
+    </Dialog>
+</core:FragmentDefinition>

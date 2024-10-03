@@ -19,6 +19,15 @@
                     press="onFilter"
                     class="sapUiSmallMarginStart"
                 />
+                
+                 <!-- Create Button -->
+
+                <Button
+                    text="Create"
+                    press="onCreate"
+                    icon="sap-icon://add"
+                    class="sapUiSmallMarginStart"
+                />
             </HBox>
         </VBox>
         <!-- Product Table -->
@@ -28,6 +37,7 @@
             items="{/product}" 
             
             >
+             
             
             <!-- Columns Definitions -->
             <columns>

@@ -1,0 +1,71 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Dialog
+        id="createProductDialog"
+        title="Create Product"
+        stretch="true"
+        draggable="true" contentHeight="230px">
+        
+        <content>
+            <VBox class="sapUiSmallMargin">
+                <Label
+                    labelFor="inputProductName"
+                    text="Product Name" 
+                    design="Bold"/>
+                <Input
+                    id="inputProductName"
+                    
+                     />
+                
+                <Label
+                    labelFor="inputDescription"
+                    text="Description" 
+                    design="Bold"/>
+                <Input
+                    id="inputDescription"
+                     />
+                
+                <Label
+                    labelFor="inputStatus"
+                    text="Status" 
+                    design="Bold"/>
+                <Select
+                    id="inputStatus"
+                    >
+                    <items>
+                        <core:Item key="active" text="Active" />
+                        <core:Item key="inactive" text="Inactive" />
+                    </items>
+                </Select>
+                
+                <Label
+                    labelFor="inputValidFrom"
+                    text="Valid From (YYYY-MM-DD)"
+                    design="Bold" />
+                <Input
+                    id="inputValidFrom"
+                    tooltip="Valid From (YYYY-MM-DD)"
+                     />
+                
+                <Label
+                    labelFor="inputValidTo"
+                    text="Valid To (YYYY-MM-DD)"
+                    design="Bold" />
+                <Input
+                    id="inputValidTo"
+                    tooltip="Valid To (YYYY-MM-DD)"
+                     />
+            </VBox>
+        </content>
+        
+        <beginButton>
+            <Button
+                text="Create"
+                press="onCreateProduct" />
+        </beginButton>
+        <endButton>
+            <Button
+                text="Cancel"
+                press="onCloseCreateProductDialog" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

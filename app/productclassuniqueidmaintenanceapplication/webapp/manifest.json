@@ -43,7 +43,7 @@
     }
   },
   "sap.ui5": {
-    "flexEnabled": true,
+    "flexEnabled": false,
     "dependencies": {
       "minUI5Version": "1.128.1",
       "libs": {
@@ -69,6 +69,12 @@
           "operationMode": "Server",
           "autoExpandSelect": true,
           "earlyRequests": true
+        }
+      },
+      "globalModel": {
+        "type": "sap.ui.model.json.JSONModel",
+        "settings": {
+         
         }
       }
     },

@@ -1,0 +1,14 @@
+<mvc:View controllerName="com.demoexceldownload.controller.View1"
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+    xmlns="sap.m">
+     <Page title="Excel Download Example">
+        <content>
+            <VBox
+                class="sapUiSmallMargin">
+                <Button
+                    text="Download Excel"
+                    press=".onDownloadExcel" />
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

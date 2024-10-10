@@ -1,52 +1,61 @@
 <mvc:View controllerName="com.productclassuniqueidmaintenanceapplication.controller.ListView"
     xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
     xmlns="sap.m">
+
     <!-- Page to display the Product Table -->
     <Page
         id="productPage"
         title="Product List">
-          <!-- Filter Bar -->
+          
+        <!-- Container for Input Fields -->
         <VBox class="sapUiMediumMargin">
             <HBox>
+
+                <!-- Search Field -->
                 <SearchField
                     id="searchField"
                     width="100%"
-                    placeholder="Search by Product Name"
-                    liveChange="onSearch"
+                    placeholder="Search Unique Id /Desc"
+                    liveChange="onUniqueIDSearch" 
+                    
                 />
-                <Button
-                    text="Filter"
-                    press="onFilter"
+
+                <!-- Product Name Input with Value Help -->
+                <Input
+                    id="productNameField"
+                    value="{/selectedProduct/productName}"   
+                    placeholder="Select Product"
+                    showValueHelp="true"
+                    valueHelpRequest="onValueHelpProduct"
                     class="sapUiSmallMarginStart"
+                    width="100%"
                 />
                 
-                 <!-- Create Button -->
-
+                <!-- Create Button -->
                 <Button
                     text="Create"
                     press="onCreate"
                     icon="sap-icon://add"
                     class="sapUiSmallMarginStart"
+                    type="Success"
                 />
+
             </HBox>
         </VBox>
+
         <!-- Product Table -->
         <Table
             id="productTable"
             inset="true"
-            items="{/product}" 
-            
-            >
-             
+            items="{/product}"
+           >
             
             <!-- Columns Definitions -->
             <columns>
                 <Column>
-                    <Text text="Product ID" />
+                    <Text text="Unique ID" />
                 </Column>
-                <Column>
-                    <Text text="Product Name" />
-                </Column>
+               
                 <Column>
                     <Text text="Description" />
                 </Column>
@@ -59,21 +68,32 @@
                 <Column>
                     <Text text="Valid To" />
                 </Column>
+                <Column>
+                    <Text text="Actions" />
+                </Column>
             </columns>
 
             <!-- Template for Table Rows -->
-            <items>
-                <ColumnListItem type="Navigation" press="onRowSelected">
-                    <cells>
-                        <ObjectIdentifier title="{productID}"/>
-                        <Text text="{productName}" />
-                        <Text text="{description}" />
-                        <Text text="{status}" />
-                        <Text text="{validFrom}" />
-                        <Text text="{validTo}" />
-                    </cells>
-                </ColumnListItem>
-            </items>
+          <items>
+    <ColumnListItem type="Navigation" press="onRowSelected">
+        <cells>
+            <ObjectIdentifier title="{uniqueID}"/>
+           
+            <Text text="{description}" />
+            <Switch 
+                state="{= ${status} === 'Active' }" 
+                change="onSwitchChange" />
+            <Text text="{validFrom}" />
+            <Text text="{validTo}" />
+
+            <HBox>
+                <Button icon="sap-icon://edit" press="onEditProduct" type="Success"  class="sapUiSmallMarginEnd" />
+                <!-- <Button icon="sap-icon://delete" press="onDeleteProduct" type="Reject"/> -->
+            </HBox>
+        </cells>
+    </ColumnListItem>
+</items>
+
 
         </Table>
 

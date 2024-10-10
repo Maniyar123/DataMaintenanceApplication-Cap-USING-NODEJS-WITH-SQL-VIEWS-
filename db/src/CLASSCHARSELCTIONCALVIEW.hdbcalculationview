@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="CLASSCHARSELCTIONCALVIEW" applyPrivilegeType="NONE" dataCategory="DIMENSION" dimensionType="STANDARD" schemaVersion="3.0" hierarchyGeneration="SQL" outputViewType="Projection" cacheInvalidationPeriod="NONE" enforceSqlExecution="true" application="BAS">
+<descriptions defaultDescription="CLASSCHARSELCTIONCALVIEW"/>
+<localVariables/>
+<variableMappings/>
+<dataSources>
+  <DataSource id="CATALOGSERVICE3_CLASS">
+    <resourceUri>CATALOGSERVICE3_CLASS</resourceUri>
+  </DataSource>
+  <DataSource id="CATALOGSERVICE3_CHARACTERISTIC">
+    <resourceUri>CATALOGSERVICE3_CHARACTERISTIC</resourceUri>
+  </DataSource>
+</dataSources>
+<snapshotProcedures/>
+<calculationViews>
+  <calculationView xsi:type="Calculation:JoinView" id="Join_1" cardinality="C1_N" joinType="inner">
+    <viewAttributes>
+      <viewAttribute id="CLASSID"/>
+      <viewAttribute id="CLASSNAME"/>
+      <viewAttribute id="CHARACTERISTICID"/>
+      <viewAttribute id="CHARACTERISTICNAME"/>
+      <viewAttribute id="VALUE"/>
+      <viewAttribute id="CLASSID_CLASSID"/>
+      <viewAttribute hidden="true" id="JOIN$CLASSID$CLASSID_CLASSID"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="CATALOGSERVICE3_CLASS">
+      <mapping xsi:type="Calculation:AttributeMapping" target="CLASSID" source="CLASSID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="CLASSNAME" source="CLASSNAME"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$CLASSID$CLASSID_CLASSID" source="CLASSID"/>
+    </input>
+    <input node="CATALOGSERVICE3_CHARACTERISTIC">
+      <mapping xsi:type="Calculation:AttributeMapping" target="CHARACTERISTICID" source="CHARACTERISTICID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="CHARACTERISTICNAME" source="CHARACTERISTICNAME"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="VALUE" source="VALUE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="CLASSID_CLASSID" source="CLASSID_CLASSID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$CLASSID$CLASSID_CLASSID" source="CLASSID_CLASSID"/>
+    </input>
+    <joinAttribute name="JOIN$CLASSID$CLASSID_CLASSID"/>
+  </calculationView>
+</calculationViews>
+
+<logicalModel id="Join_1">
+  <attributes>
+    <attribute id="CLASSNAME" order="1" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="CLASSNAME"/>
+      <keyMapping columnObjectName="Join_1" columnName="CLASSNAME"/>
+    </attribute>
+    <attribute id="CLASSID" order="2" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="CLASSID"/>
+      <keyMapping columnObjectName="Join_1" columnName="CLASSID"/>
+    </attribute>
+    <attribute id="CHARACTERISTICID" order="3" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="CHARACTERISTICID"/>
+      <keyMapping columnObjectName="Join_1" columnName="CHARACTERISTICID"/>
+    </attribute>
+    <attribute id="CHARACTERISTICNAME" order="4" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="CHARACTERISTICNAME"/>
+      <keyMapping columnObjectName="Join_1" columnName="CHARACTERISTICNAME"/>
+    </attribute>
+    <attribute id="VALUE" order="5" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="VALUE"/>
+      <keyMapping columnObjectName="Join_1" columnName="VALUE"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures/>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+    
+  
+    <shape expanded="true" modelObjectName="Join_1" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="100" y="198"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape modelObjectName="CATALOGSERVICE3_CLASS" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="20" y="30"/>
+      <rectangleSize width="228.02734375"/>
+    </shape>
+    <shape modelObjectName="CATALOGSERVICE3_CHARACTERISTIC" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="320" y="30"/>
+      <rectangleSize width="294.021484375"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>

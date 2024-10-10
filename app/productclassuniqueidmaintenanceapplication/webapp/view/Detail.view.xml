@@ -9,17 +9,13 @@
             
             <columns>
                 <Column>
-                    <Text text="Product ID" />
+                    <Text text="Unique ID" />
                 </Column>
                 <Column>
                     <Text text="Description" />
                 </Column>
-                <Column>
-                    <Text text="Class ID" />
-                </Column>
-                <Column>
-                    <Text text="Characteristic ID" />
-                </Column>
+                
+                
                 <Column>
                     <Text text="Characteristic Name" />
                 </Column>
@@ -32,10 +28,9 @@
             <items>
                 <ColumnListItem press="onDetailItemPress">
                     <cells>
-                        <Text text="{productDetails>PRODUCTID}" />
+                        <Text text="{productDetails>UNIQUEID}" />
                         <Text text="{productDetails>DESCRIPTION}" />
-                        <Text text="{productDetails>CLASSID}" />
-                        <Text text="{productDetails>CHARACTERISTICID}" />
+                       
                         <Text text="{productDetails>CHARACTERISTICNAME}" />
                         <Text text="{productDetails>VALUE}" />
                     </cells>

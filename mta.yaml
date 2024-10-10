@@ -81,6 +81,10 @@ modules:
       - comproductclassuniqueidmaintenanceapplication.zip
       name: comproductclassuniqueidmaintenanceapplication
       target-path: resources/
+    - artifacts:
+      - comdemoexceldownload.zip
+      name: comdemoexceldownload
+      target-path: resources/
 - name: comcarproductapplicationproductsapplication
   type: html5
   path: app/productsapplication
@@ -134,6 +138,16 @@ modules:
 - name: comproductclassuniqueidmaintenanceapplication
   type: html5
   path: app/productclassuniqueidmaintenanceapplication
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: comdemoexceldownload
+  type: html5
+  path: app/demoexceldownload
   build-parameters:
     build-result: dist
     builder: custom

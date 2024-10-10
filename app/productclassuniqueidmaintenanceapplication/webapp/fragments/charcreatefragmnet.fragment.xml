@@ -1,19 +1,43 @@
 <core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
-    <Dialog
-        id="characteristicCreateDialog"
-        title="Create Characteristic"
-       >
-        <content>
-            <VBox class="sapUiMediumMargin">
-                <Input id="inputCharacteristicName" placeholder="Characteristic Name" />
-                <Input id="inputClassID" placeholder="Class ID" />
-                <Input id="inputValue" placeholder="Value" />
-            </VBox>
-        </content>
-        <beginButton>
-            <Button
-                text="Create"
-                press="onCreateCharacteristic" />
-        </beginButton>
-    </Dialog>
+    <VBox class="sapUiMediumMargin">
+        <!-- Title and Add Button -->
+        <HBox justifyContent="SpaceBetween" class="sapUiSmallMarginBottom">
+            <!-- Title for the table -->
+            <Title text="Characteristics Table" level="H1" />
+            
+            <!-- Add Button (Plus Icon) -->
+            <Button 
+                icon="sap-icon://add" 
+                type="Transparent" 
+                press="onAddCharacteristic" 
+                tooltip="Add New Characteristic" />
+        </HBox>
+
+        <!-- Table for Characteristic Name and Value -->
+        <Table id="characteristicTable" inset="false">
+            <columns>
+                <!-- Characteristic Name Column -->
+                <Column>
+                    <Text text="Characteristic Name" />
+                </Column>
+
+                <!-- Value Column -->
+                <Column>
+                    <Text text="Value" />
+                </Column>
+            </columns>
+
+            <items>
+                <ColumnListItem>
+                    <cells>
+                        <!-- Bind the Characteristic Name -->
+                        <Text text="{CharacteristicName}" />
+
+                        <!-- Bind the Value -->
+                        <Text text="{Value}" />
+                    </cells>
+                </ColumnListItem>
+            </items>
+        </Table>
+    </VBox>
 </core:FragmentDefinition>

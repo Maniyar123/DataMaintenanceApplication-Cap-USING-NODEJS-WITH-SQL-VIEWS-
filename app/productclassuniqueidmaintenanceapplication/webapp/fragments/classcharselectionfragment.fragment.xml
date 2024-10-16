@@ -1,17 +1,18 @@
-<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns:m="sap.m">
-    <m:Dialog id="charDialog" title="Characteristics" resizable="true" draggable="true" contentWidth="600px" contentHeight="400px">
-        <!-- Search Bar for filtering characteristics -->
-        <m:SearchField width="100%" placeholder="Class/Char Name, Char Value" liveChange="onFilterCharacteristics" />
-        
-        <!-- Vertical Box to Hold Dynamic Panels for Each Class -->
-        <m:VBox id="charVBox">
-            <!-- Panels for each class will be dynamically created here in the controller -->
-        </m:VBox>
-        
-        <!-- Submit and Close Buttons in the footer bar -->
-        <m:Bar >
-            <m:Button text="Submit" type="Accept" press="onSubmitCharDialog" />
-            <m:Button text="Close" type="Reject" press="onCloseCharDialog" />
-        </m:Bar>
-    </m:Dialog>
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+ <Dialog
+        id="classDialog"
+        title="Class and Characteristic Selection"
+        afterOpen="onBeforeOpen"
+        draggable="true">
+        <VBox id="myVBox" class="sapUiSmallMargin">
+            <!-- Panels will be dynamically added here -->
+        </VBox>
+        <buttons>
+        <Button  text="Submit" press="onSubmitClassCharVal"></Button>
+            <Button
+                text="Close"
+                press="onCloseClassCharValDialog"/>
+
+        </buttons>
+    </Dialog>
 </core:FragmentDefinition>

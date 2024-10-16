@@ -2,17 +2,25 @@ sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/ui/core/Fragment",
     "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator"
+    "sap/ui/model/FilterOperator",
+    "sap/m/Panel",
+    "sap/m/List",
+    "sap/m/MessageToast",
+    "sap/m/StandardListItem"
 ],
-    function (Controller, Fragment, Filter, FilterOperator) {
+    function (Controller, Fragment, Filter, FilterOperator, Panel, List, MessageToast, StandardListItem) {
         "use strict";
         var that;
+        let oLastSelectedRadioButton = null; // Initialize a variable to keep track of the currently selected radio button
+
         return Controller.extend("com.productclassuniqueidmaintenanceapplication.controller.ListView", {
             onInit: function () {
                 that = this;
                 var oModel = this.getOwnerComponent().getModel("cat3model");
                 this.getView().setModel(oModel);
                 this.bus = this.getOwnerComponent().getEventBus();
+                this._isDataLoaded = false; // Flag to track data loading status
+
                 // oModel.setProperty("/sId", null); // Initialize the sId property
 
                 // Fetch the product data from the OData service
@@ -98,7 +106,7 @@ sap.ui.define([
                 // Close the dialog after selection
                 this._valueHelpDialog.close();
             },
-            onValueHelpDialogClose:function(){
+            onValueHelpDialogClose: function () {
                 this._valueHelpDialog.close();
             },
 
@@ -138,12 +146,12 @@ sap.ui.define([
                 // Get the product data from the table (assuming it's bound to a model)
                 const oTable = this.byId("productTable"); // Use the ID of your table
                 const oSelectedItem = oTable.getItems()[0]; // Get the first item in the table (assuming filtered data)
-            
+
                 // Get the binding context of the selected item (filtered product)
                 const oContext = oSelectedItem.getBindingContext();
                 const productID = oContext.getProperty("productID");   // Retrieve productID
                 const productName = oContext.getProperty("productName"); // Retrieve productName
-            
+
                 // Open the create product dialog
                 if (!this._pCreateProductDialog) {
                     this._pCreateProductDialog = Fragment.load({
@@ -155,33 +163,64 @@ sap.ui.define([
                         return oDialog;
                     }.bind(this));
                 }
-            
+
                 this._pCreateProductDialog.then(function (oDialog) {
                     // Set the product name and ID in the fragment input fields
                     const oInputProductName = Fragment.byId("createProductDialog", "inputProductName");
                     if (oInputProductName) {
                         oInputProductName.setValue(productName); // Autofill product name
                     }
-            
+
                     const oInputProductID = Fragment.byId("createProductDialog", "inputProductID");
                     if (oInputProductID) {
                         oInputProductID.setValue(productID); // Autofill product ID if needed
                     }
-            
+
                     oDialog.open();
                 });
             }
             ,
-            
-            
-            
+
+
+
+            // onCloseCreateProductDialog: function () {
+            //     // Close the dialog
+            //     this._pCreateProductDialog.then(function (oDialog) {
+            //         oDialog.close();
+            //         // Reset the input fields after closing
+            //         this._resetProductForm();
+
+            //         // Hide the characteristic form
+            //         var oCharacteristicVBox = Fragment.byId("createProductDialog", "characteristicFormVBox");
+            //         if (oCharacteristicVBox) {
+            //             oCharacteristicVBox.setVisible(false); // Hide the characteristic form
+            //         } else {
+            //             console.error("VBox with id 'characteristicFormVBox' is not found.");
+            //         }
+
+            //         // Reset the button text back to "Add Characteristic"
+            //         var oAddButton = Fragment.byId("createProductDialog", "addCharacteristicButton");
+            //         if (oAddButton) {
+            //             oAddButton.setText("Add Characteristic");
+            //             oAddButton.setIcon("sap-icon://add"); // Optionally reset the icon
+            //         }
+                   
+
+
+            //         // Ensure busy state is reset
+            //         this.getView().setBusy(false);
+            //     }.bind(this)); // Ensure 'this' is correctly bound
+            // },
+
+          
             onCloseCreateProductDialog: function () {
                 // Close the dialog
                 this._pCreateProductDialog.then(function (oDialog) {
                     oDialog.close();
+            
                     // Reset the input fields after closing
                     this._resetProductForm();
-
+            
                     // Hide the characteristic form
                     var oCharacteristicVBox = Fragment.byId("createProductDialog", "characteristicFormVBox");
                     if (oCharacteristicVBox) {
@@ -189,22 +228,40 @@ sap.ui.define([
                     } else {
                         console.error("VBox with id 'characteristicFormVBox' is not found.");
                     }
-
+            
                     // Reset the button text back to "Add Characteristic"
                     var oAddButton = Fragment.byId("createProductDialog", "addCharacteristicButton");
                     if (oAddButton) {
                         oAddButton.setText("Add Characteristic");
                         oAddButton.setIcon("sap-icon://add"); // Optionally reset the icon
                     }
-
+            
+                    // Clear the data in the characteristic table
+                    var oCharacteristicTable =sap.ui.getCore().byId("characteristicTable");
+                    if (oCharacteristicTable) {
+                        // Get the model associated with the table
+                        var oModel = oCharacteristicTable.getModel();
+                        if (oModel instanceof sap.ui.model.json.JSONModel) {
+                            // Clear the data bound to the table
+                            oModel.setProperty("/CHARACTERISTICS_DATA", []); // Clear the data
+                        } else {
+                            console.error("The model associated with the characteristic table is not a JSONModel.");
+                        }
+                    } else {
+                        console.error("Characteristic table with id 'characteristicTable' is not found.");
+                    }
+            
                     // Ensure busy state is reset
                     this.getView().setBusy(false);
                 }.bind(this)); // Ensure 'this' is correctly bound
             },
+            
+            
+         
+         
+            
+            
 
-
-
-           
 
             _resetProductForm: function () {
                 // Reset input fields in the fragment
@@ -214,6 +271,7 @@ sap.ui.define([
                 Fragment.byId("createProductDialog", "inputStatus").setSelectedKey(""); // Reset status selection
                 Fragment.byId("createProductDialog", "inputValidFrom").setValue("");
                 Fragment.byId("createProductDialog", "inputValidTo").setValue("");
+
             },
 
             onCreateProductChar: function () {
@@ -263,7 +321,7 @@ sap.ui.define([
             onAddCharacteristicForm: function () {
                 // Retrieve the VBox where the fragment will be added
                 var oVBox = Fragment.byId("createProductDialog", "characteristicFormVBox");
-
+              
                 // Ensure the VBox is found
                 if (!oVBox) {
                     console.error("VBox with id 'characteristicFormVBox' is not found.");
@@ -272,8 +330,9 @@ sap.ui.define([
 
                 // Load the characteristic creation fragment dynamically
                 if (!this._oCharacteristicCreateFragment) {
+                   
                     this._oCharacteristicCreateFragment = sap.ui.xmlfragment("com.productclassuniqueidmaintenanceapplication.fragments.charcreatefragmnet", this);
-
+                        
                     // Add the fragment content to the VBox using addItem() instead of addContent()
                     oVBox.addItem(this._oCharacteristicCreateFragment);
                 }
@@ -283,6 +342,7 @@ sap.ui.define([
                 if (oAddButton) {
                     oAddButton.setText("Save");
                     oAddButton.setIcon("sap-icon://save"); // Optionally change the icon to a save icon
+                   
                 } else {
                     console.error("Button with id 'addCharacteristicButton' is not found.");
                 }
@@ -388,75 +448,75 @@ sap.ui.define([
 
 
 
-            onAddCharacteristic: function () {
-                // Load the CheckBox fragment if not already loaded
-                if (!this._checkboxDialog) {
-                    this._checkboxDialog = Fragment.load({
-                        id: 'checkboxDialog',
-                        name: "com.productclassuniqueidmaintenanceapplication.fragments.classcharselectionfragment",
-                        controller: this
-                    }).then(function (oDialog) {
-                        this.getView().addDependent(oDialog);
-                        return oDialog;
-                    }.bind(this));
-                }
+            // onAddCharacteristic: function () {
+            //     // Load the CheckBox fragment if not already loaded
+            //     if (!this._checkboxDialog) {
+            //         this._checkboxDialog = Fragment.load({
+            //             id: 'checkboxDialog',
+            //             name: "com.productclassuniqueidmaintenanceapplication.fragments.classcharselectionfragment",
+            //             controller: this
+            //         }).then(function (oDialog) {
+            //             this.getView().addDependent(oDialog);
+            //             return oDialog;
+            //         }.bind(this));
+            //     }
 
-                // Open the CheckBox dialog and fetch hierarchical data
-                this._checkboxDialog.then(function (oDialog) {
-                    var oModel = this.getView().getModel("cat3model");
+            //     // Open the CheckBox dialog and fetch hierarchical data
+            //     this._checkboxDialog.then(function (oDialog) {
+            //         var oModel = this.getView().getModel("cat3model");
 
-                    // Fetch the data from the OData entity set
-                    oModel.read("/classcharselectioncalview", {
-                        success: function (oData) {
-                            var aHierarchicalData = oData.results;
+            //         // Fetch the data from the OData entity set
+            //         oModel.read("/classcharselectioncalview", {
+            //             success: function (oData) {
+            //                 var aHierarchicalData = oData.results;
 
-                            // Process hierarchical data into class, characteristics, and values
-                            var hierarchicalData = [];
-                            var classMap = {};
+            //                 // Process hierarchical data into class, characteristics, and values
+            //                 var hierarchicalData = [];
+            //                 var classMap = {};
 
-                            // Loop through the fetched data and organize it into hierarchical structure
-                            aHierarchicalData.forEach(row => {
-                                if (!classMap[row.CLASSID]) {
-                                    classMap[row.CLASSID] = {
-                                        className: row.CLASSNAME,
-                                        characteristics: []
-                                    };
-                                    hierarchicalData.push(classMap[row.CLASSID]);
-                                }
+            //                 // Loop through the fetched data and organize it into hierarchical structure
+            //                 aHierarchicalData.forEach(row => {
+            //                     if (!classMap[row.CLASSID]) {
+            //                         classMap[row.CLASSID] = {
+            //                             className: row.CLASSNAME,
+            //                             characteristics: []
+            //                         };
+            //                         hierarchicalData.push(classMap[row.CLASSID]);
+            //                     }
 
-                                const classObj = classMap[row.CLASSID];
+            //                     const classObj = classMap[row.CLASSID];
 
-                                // Find or create the characteristic under the class
-                                let characteristic = classObj.characteristics.find(c => c.characteristicName === row.CHARACTERISTICNAME);
+            //                     // Find or create the characteristic under the class
+            //                     let characteristic = classObj.characteristics.find(c => c.characteristicName === row.CHARACTERISTICNAME);
 
-                                if (!characteristic) {
-                                    characteristic = {
-                                        characteristicName: row.CHARACTERISTICNAME,
-                                        values: row.VALUE ? [row.VALUE] : []
-                                    };
-                                    classObj.characteristics.push(characteristic);
-                                } else if (row.VALUE) {
-                                    characteristic.values.push(row.VALUE);
-                                }
-                            });
+            //                     if (!characteristic) {
+            //                         characteristic = {
+            //                             characteristicName: row.CHARACTERISTICNAME,
+            //                             values: row.VALUE ? [row.VALUE] : []
+            //                         };
+            //                         classObj.characteristics.push(characteristic);
+            //                     } else if (row.VALUE) {
+            //                         characteristic.values.push(row.VALUE);
+            //                     }
+            //                 });
 
-                            // Set the hierarchical data to the model for the TreeTable
-                            var oHierarchicalDataModel = new sap.ui.model.json.JSONModel(hierarchicalData);
-                            var oTreeTable = Fragment.byId("checkboxDialog", "hierarchicalDataTreeTable");
-                            oTreeTable.setModel(oHierarchicalDataModel, "hierarchicalDataModel");
+            //                 // Set the hierarchical data to the model for the TreeTable
+            //                 var oHierarchicalDataModel = new sap.ui.model.json.JSONModel(hierarchicalData);
+            //                 var oTreeTable = Fragment.byId("checkboxDialog", "hierarchicalDataTreeTable");
+            //                 oTreeTable.setModel(oHierarchicalDataModel, "hierarchicalDataModel");
 
-                            // Open the dialog
-                            oDialog.open();
-                        }.bind(this),
-                        error: function (error) {
-                            sap.m.MessageToast.show("Error fetching hierarchical data");
-                            console.error("Error fetching hierarchical data:", error);
-                        }
-                    });
-                }.bind(this)).catch(function (oError) {
-                    console.error("Error loading fragment: ", oError);
-                });
-            },
+            //                 // Open the dialog
+            //                 oDialog.open();
+            //             }.bind(this),
+            //             error: function (error) {
+            //                 sap.m.MessageToast.show("Error fetching hierarchical data");
+            //                 console.error("Error fetching hierarchical data:", error);
+            //             }
+            //         });
+            //     }.bind(this)).catch(function (oError) {
+            //         console.error("Error loading fragment: ", oError);
+            //     });
+            // },
 
             // ------search field-------------
             onUniqueIDSearch: function (oEvent) {
@@ -491,12 +551,887 @@ sap.ui.define([
 
 
 
+            // // Load data method
+            // loadData: function () {
+            //     // Create OData model with your service URL
+            //     var oModel = this.getOwnerComponent().getModel("cat3model");
+
+            //     // Fetch the data using OData model
+            //     oModel.read("/classcharselectioncalview", {
+            //         success: this.onDataLoaded.bind(this),  // Call onDataLoaded when data is fetched
+            //         error: function (oError) {
+            //             // Handle error
+            //             MessageToast.show("Error loading data");
+            //         }
+            //     });
+            // },
+
+            // // onDataLoaded: function (oData) {
+            // //     // Ensure the fragment is initialized before accessing it
+            // //     if (!this.oFragment) {
+            // //         console.error("Fragment is not initialized!");
+            // //         return;
+            // //     }
+            // //     console.log(this.oFragment);
+
+            // //     // Access the VBox using its ID
+            // //     var oVBox = sap.ui.getCore().byId("myVBox"); // Adjust the ID as necessary
+
+            // //     if (!oVBox) {
+            // //         console.error("VBox not found in the fragment!");
+            // //         return;
+            // //     }
+
+            // //     // Clear existing content to avoid duplicates
+            // //     oVBox.removeAllItems();
+
+            // //     // Group and transform the data into the desired structure
+            // //     const aTransformedData = this._transformData(oData.results);
+
+            // //     // Dynamically create panels based on the transformed data
+            // //     aTransformedData.forEach((oClass) => {
+            // //         // Create a new panel for each class
+            // //         const oPanel = new sap.m.Panel({
+            // //             headerText: oClass.CLASSNAME,
+            // //             expandable: true,
+            // //             expanded: false, // Initially collapsed
+            // //             expand: function (oEvent) {
+            // //                 const oPanel = oEvent.getSource();
+            // //                 const isExpanded = oEvent.getParameter("expand");
+
+            // //                 // Check if the panel has already been populated with content
+            // //                 if (isExpanded && oPanel.getContent().length === 0) {
+            // //                     // Create a container for characteristic panels
+            // //                     const oCharVBox = new sap.m.VBox({
+            // //                         renderType: "Bare"
+            // //                     });
+
+            // //                     // Add a panel for each characteristic inside the class
+            // //                     oClass.nodes.forEach((oCharacteristic) => {
+            // //                         const oCharacteristicPanel = new sap.m.Panel({
+            // //                             headerText: oCharacteristic.CHARACTERISTICNAME,
+            // //                             expandable: true,
+            // //                             expanded: false, // Initially collapsed
+            // //                             expand: function (oCharEvent) {
+            // //                                 const oCharPanel = oCharEvent.getSource();
+            // //                                 const isCharExpanded = oCharEvent.getParameter("expand");
+
+            // //                                 // Only add values when the panel is expanded and no content exists yet
+            // //                                 if (isCharExpanded && oCharPanel.getContent().length === 0) {
+            // //                                     // Create a container for the value radio buttons
+            // //                                     const oInnerVBox = new sap.m.VBox({
+            // //                                         renderType: "Bare"
+            // //                                     });
+
+            // //                                     // Add radio buttons for each value of the characteristic
+            // //                                     oCharacteristic.nodes.forEach((oValue) => {
+            // //                                         const oValueRadioButton = new sap.m.RadioButton({
+            // //                                             text: oValue.VALUE,
+            // //                                             groupName: oClass.CLASSID, // Ensure unique groups
+            // //                                             select: this.onSelect.bind(this)
+            // //                                         });
+
+            // //                                         // Add value radio button to the inner VBox
+            // //                                         oInnerVBox.addItem(oValueRadioButton);
+            // //                                     });
+
+            // //                                     // Add the inner VBox to the characteristic panel
+            // //                                     oCharPanel.addContent(oInnerVBox);
+            // //                                 }
+            // //                             }.bind(this)
+            // //                         });
+
+            // //                         // Add the characteristic panel to the characteristic VBox
+            // //                         oCharVBox.addItem(oCharacteristicPanel);
+            // //                     });
+
+            // //                     // Add the characteristic VBox to the class panel
+            // //                     oPanel.addContent(oCharVBox);
+            // //                 }
+            // //             }.bind(this)
+            // //         });
+
+            // //         // Add the class panel to the VBox
+            // //         oVBox.addItem(oPanel);
+            // //     });
+
+            // //     // Optionally refresh the dialog to show new content
+            // //     this.oFragment.rerender();
+            // // },
+
+            // onDataLoaded: function (oData) {
+            //     var oModel = this.getOwnerComponent().getModel("cat3model");
+            
+            //     // Ensure the fragment is initialized before accessing it
+            //     if (!this.oFragment) {
+            //         console.error("Fragment is not initialized!");
+            //         return;
+            //     }
+            
+            //     // Access the VBox using its ID
+            //     var oVBox = sap.ui.getCore().byId("myVBox"); // Adjust the ID as necessary
+            
+            //     if (!oVBox) {
+            //         console.error("VBox not found in the fragment!");
+            //         return;
+            //     }
+            
+            //     // Clear existing content to avoid duplicates
+            //     oVBox.removeAllItems();
+            
+            //     // Group and transform the data into the desired structure
+            //     const aTransformedData = this._transformData(oData.results);
+            
+            //     // Check if transformed data is valid
+            //     if (!Array.isArray(aTransformedData)) {
+            //         console.error("Transformed data is not an array or is invalid.");
+            //         return;
+            //     }
+            
+            //     // Dynamically create panels based on the transformed data
+            //     aTransformedData.forEach((oClass) => {
+            //         // Create a new panel for each class
+            //         const oPanel = new sap.m.Panel({
+            //             headerText: oClass.CLASSNAME,
+            //             expandable: true,
+            //             expanded: false, // Initially collapsed
+            //             expand: function (oEvent) {
+            //                 const oPanel = oEvent.getSource();
+            //                 const isExpanded = oEvent.getParameter("expand");
+            
+            //                 // Check if the panel has already been populated with content
+            //                 if (isExpanded && oPanel.getContent().length === 0) {
+            //                     // Create a container for characteristic panels
+            //                     const oCharVBox = new sap.m.VBox({
+            //                         renderType: "Bare"
+            //                     });
+            
+            //                     // Add a panel for each characteristic inside the class
+            //                     oClass.nodes.forEach((oCharacteristic) => {
+            //                         // Create a new characteristic panel
+            //                         const oCharacteristicPanel = new sap.m.Panel({
+            //                             headerText: oCharacteristic.CHARACTERISTICNAME,
+            //                             expandable: true,
+            //                             expanded: false, // Initially collapsed
+            //                             expand: function (oCharEvent) {
+            //                                 const oCharPanel = oCharEvent.getSource();
+            //                                 const isCharExpanded = oCharEvent.getParameter("expand");
+            
+            //                                 // Only add values when the panel is expanded and no content exists yet
+            //                                 if (isCharExpanded && oCharPanel.getContent().length === 0) {
+            //                                     // Create a container for the value radio buttons
+            //                                     const oInnerVBox = new sap.m.VBox({
+            //                                         renderType: "Bare"
+            //                                     });
+            
+            //                                     // Add radio buttons for each value of the characteristic
+            //                                     oCharacteristic.nodes.forEach((oValue) => {
+            //                                         const oValueRadioButton = new sap.m.RadioButton({
+            //                                             text: oValue.VALUE,
+            //                                             groupName: oClass.CLASSID, // Ensure unique groups
+            //                                             select: this.onSelect.bind(this)
+            //                                         });
+            
+            //                                         // Add value radio button to the inner VBox
+            //                                         oInnerVBox.addItem(oValueRadioButton);
+            //                                     });
+            
+            //                                     // Add the inner VBox to the characteristic panel
+            //                                     oCharPanel.addContent(oInnerVBox);
+            //                                 }
+            //                             }.bind(this)
+            //                         });
+            
+            //                         // Set the characteristicId as a data attribute
+            //                         const characteristicID = oCharacteristic.CHARACTERISTICID;
+            //                         if (characteristicID) {
+            //                             oCharacteristicPanel.data("characteristicId", characteristicID); // Set the characteristicId
+            //                             oCharacteristicPanel.setBindingContext(new sap.ui.model.Context(oModel, "/classcharselectioncalview/" + characteristicID));
+            //                         }
+            
+            //                         // Log to ensure binding context is set
+            //                         console.log("Characteristic Panel Binding Context:", oCharacteristicPanel.getBindingContext());
+            //                         console.log("Characteristic ID:", oCharacteristicPanel.data("characteristicId")); // Log the characteristicId
+            
+            //                         // Add the characteristic panel to the characteristic VBox
+            //                         oCharVBox.addItem(oCharacteristicPanel);
+            //                     });
+            
+            //                     // Add the characteristic VBox to the class panel
+            //                     oPanel.addContent(oCharVBox);
+            //                 }
+            //             }.bind(this)
+            //         });
+            
+            //         // Add the class panel to the VBox
+            //         oVBox.addItem(oPanel);
+            //     });
+            
+            //     // Optionally refresh the dialog to show new content
+            //     this.oFragment.rerender();
+            // },
+            
+            
+
+
+            // _transformData: function (aData) {
+            //     const oGroupedData = {};
+
+            //     aData.forEach((oItem) => {
+            //         // Group by class
+            //         if (!oGroupedData[oItem.CLASSID]) {
+            //             oGroupedData[oItem.CLASSID] = {
+            //                 CLASSID: oItem.CLASSID,
+            //                 CLASSNAME: oItem.CLASSNAME,
+            //                 nodes: []
+            //             };
+            //         }
+
+            //         // Group by characteristic within the class
+            //         const aCharacteristics = oGroupedData[oItem.CLASSID].nodes;
+            //         let oCharacteristic = aCharacteristics.find(char => char.CHARACTERISTICID === oItem.CHARACTERISTICID);
+
+            //         if (!oCharacteristic) {
+            //             oCharacteristic = {
+            //                 CHARACTERISTICID: oItem.CHARACTERISTICID,
+            //                 CHARACTERISTICNAME: oItem.CHARACTERISTICNAME,
+            //                 nodes: []
+            //             };
+            //             aCharacteristics.push(oCharacteristic);
+            //         }
+
+            //         // Add value to the characteristic
+            //         oCharacteristic.nodes.push({
+            //             VALUE: oItem.VALUE
+            //         });
+            //     });
+
+            //     // Convert grouped data object into an array
+            //     return Object.values(oGroupedData);
+            // },
+
+            // onSelect: function (oEvent) {
+            //     const sSelectedValue = oEvent.getSource().getText();
+            //     MessageToast.show("Selected: " + sSelectedValue);
+            // },
+
+           
+
+            loadData: function () {
+                // Create OData model with your service URL
+                var oModel = this.getOwnerComponent().getModel("cat3model");
+            
+                // Fetch the data using OData model
+                oModel.read("/classcharselectioncalview", {
+                    success: this.onDataLoaded.bind(this),  // Call onDataLoaded when data is fetched
+                    error: function (oError) {
+                        // Handle error
+                        MessageToast.show("Error loading data");
+                    }
+                });
+            },
+            
+            onDataLoaded: function (oData) {
+                var oModel = this.getOwnerComponent().getModel("cat3model");
+            
+                if (!this.oFragment) {
+                    console.error("Fragment is not initialized!");
+                    return;
+                }
+            
+                var oVBox = sap.ui.getCore().byId("myVBox");
+            
+                if (!oVBox) {
+                    console.error("VBox not found in the fragment!");
+                    return;
+                }
+            
+                oVBox.removeAllItems();
+                const aTransformedData = this._transformData(oData.results);
+            
+                if (!Array.isArray(aTransformedData)) {
+                    console.error("Transformed data is not an array or is invalid.");
+                    return;
+                }
+            
+                aTransformedData.forEach((oClass) => {
+                    const oPanel = new sap.m.Panel({
+                        headerText: oClass.CLASSNAME,
+                        expandable: true,
+                        expanded: false,
+                        expand: function (oEvent) {
+                            const oPanel = oEvent.getSource();
+                            const isExpanded = oEvent.getParameter("expand");
+            
+                            if (isExpanded && oPanel.getContent().length === 0) {
+                                const oCharVBox = new sap.m.VBox({
+                                    renderType: "Bare"
+                                });
+            
+                                oClass.nodes.forEach((oCharacteristic) => {
+                                    const oCharacteristicPanel = new sap.m.Panel({
+                                        headerText: oCharacteristic.CHARACTERISTICNAME,
+                                        expandable: true,
+                                        expanded: false,
+                                        expand: function (oCharEvent) {
+                                            const oCharPanel = oCharEvent.getSource();
+                                            const isCharExpanded = oCharEvent.getParameter("expand");
+            
+                                            if (isCharExpanded && oCharPanel.getContent().length === 0) {
+                                                const oInnerVBox = new sap.m.VBox({
+                                                    renderType: "Bare"
+                                                });
+            
+                                                oCharacteristic.nodes.forEach((oValue) => {
+                                                    const oValueRadioButton = new sap.m.RadioButton({
+                                                        text: oValue.VALUE,
+                                                        groupName: oClass.CLASSID, // Ensure unique groups
+                                                        select: this.onSelect.bind(this),
+                                                    });
+            
+                                                    oInnerVBox.addItem(oValueRadioButton);
+                                                });
+            
+                                                oCharPanel.addContent(oInnerVBox);
+                                            }
+                                        }.bind(this)
+                                    });
+            
+                                    oCharacteristicPanel.data("characteristicId", oCharacteristic.CHARACTERISTICID);
+                                    oCharVBox.addItem(oCharacteristicPanel);
+                                });
+            
+                                oPanel.addContent(oCharVBox);
+                            }
+                        }.bind(this)
+                    });
+            
+                    oVBox.addItem(oPanel);
+                });
+            
+                this.oFragment.rerender();
+            },
+            
+            _transformData: function (aData) {
+                const oGroupedData = {};
+            
+                aData.forEach((oItem) => {
+                    // Group by class
+                    if (!oGroupedData[oItem.CLASSID]) {
+                        oGroupedData[oItem.CLASSID] = {
+                            CLASSID: oItem.CLASSID,
+                            CLASSNAME: oItem.CLASSNAME,
+                            nodes: []
+                        };
+                    }
+            
+                    // Group by characteristic within the class
+                    const aCharacteristics = oGroupedData[oItem.CLASSID].nodes;
+                    let oCharacteristic = aCharacteristics.find(char => char.CHARACTERISTICID === oItem.CHARACTERISTICID);
+            
+                    if (!oCharacteristic) {
+                        oCharacteristic = {
+                            CHARACTERISTICID: oItem.CHARACTERISTICID,
+                            CHARACTERISTICNAME: oItem.CHARACTERISTICNAME,
+                            nodes: []
+                        };
+                        aCharacteristics.push(oCharacteristic);
+                    }
+            
+                    // Add value to the characteristic
+                    oCharacteristic.nodes.push({
+                        VALUE: oItem.VALUE
+                    });
+                });
+            
+                // Convert grouped data object into an array
+                return Object.values(oGroupedData);
+            },
+            
+            onSelect: function (oEvent) {
+                const oSelectedButton = oEvent.getSource();
+                
+                // Check if the clicked radio button is the last selected one
+                if (oLastSelectedRadioButton === oSelectedButton) {
+                    // Deselect the radio button
+                    oSelectedButton.setSelected(false);
+                    oLastSelectedRadioButton = null; // Reset the last selected radio button
+                    MessageToast.show("Deselected: " + oSelectedButton.getText());
+                } else {
+                    // Deselect the last selected radio button, if it exists
+                    if (oLastSelectedRadioButton) {
+                        oLastSelectedRadioButton.setSelected(false);
+                    }
+                    // Select the clicked radio button
+                    oSelectedButton.setSelected(true);
+                    oLastSelectedRadioButton = oSelectedButton; // Update the last selected radio button
+                    MessageToast.show("Selected: " + oSelectedButton.getText());
+                }
+            },
+            
+               
+
+
+
+            onAddCharacteristic: function () {
+                // Check if the fragment is already loaded
+                if (!this.oFragment) {
+                    // Load the fragment and bind the controller to maintain context
+                    this.oFragment = sap.ui.xmlfragment("com.productclassuniqueidmaintenanceapplication.fragments.classcharselectionfragment", this);
+                    this.getView().addDependent(this.oFragment);
+
+                    // Attach afterOpen event to load data after the dialog is opened
+                    this.oFragment.attachAfterOpen(this.loadData.bind(this));
+                }
+
+                // Open the dialog
+                this.oFragment.open();
+            },
+            // onAddCharacteristic: function () {
+            //     // Check if the fragment is already loaded
+            //     if (!this.oFragment) {
+            //         // Load the fragment and bind the controller to maintain context
+            //         this.oFragment = sap.ui.xmlfragment("com.productclassuniqueidmaintenanceapplication.fragments.classcharselectionfragment", this);
+            //         this.getView().addDependent(this.oFragment);
+
+            //         // Attach afterOpen event to load data after the dialog is opened
+            //         this.oFragment.attachAfterOpen(this.loadData.bind(this));
+            //     }
+
+            //     // Open the dialog
+            //     this.oFragment.open();
+
+            //     // Get the existing characteristics from the model
+            //     var oTable = sap.ui.getCore().byId("characteristicTable");
+            //     var oModel = oTable.getModel();
+
+            //     if (!(oModel instanceof sap.ui.model.json.JSONModel)) {
+            //         sap.m.MessageToast.show("Table model not found.");
+            //         return;
+            //     }
+
+            //     // Get existing characteristics from the model
+            //     var existingData = oModel.getData().CHARACTERISTICS_DATA || [];
+
+            //     // Load the new data (this can come from an external source, user input, etc.)
+            //     // In this example, let's assume `newData` is an array of characteristics that you're adding
+            //     var newData = [ /* new characteristics data here */];
+
+            //     // Filter out duplicates based on ID
+            //     var characteristicIds = new Set(existingData.map(characteristic => characteristic.ID)); // Collect IDs of existing characteristics
+
+            //     newData.forEach((newCharacteristic) => {
+            //         if (!characteristicIds.has(newCharacteristic.ID)) {
+            //             // If the characteristic ID does not exist, add it to the existing data
+            //             existingData.push(newCharacteristic);
+            //             characteristicIds.add(newCharacteristic.ID); // Add the new ID to the set
+            //         }
+            //     });
+
+            //     // Update the model with the combined data (existing + new, no duplicates)
+            //     oModel.setData({
+            //         CHARACTERISTICS: existingData
+            //     });
+
+            //     console.log("Updated characteristics:", existingData);
+            // },
+
+            // ------classcharvalue frgament close functionality-------------
+
+            onCloseClassCharValDialog: function () {
+                this.oFragment.close();
+            },
+
+            // ----------classcharvalue fragment submit button---------------------
+
+
+
+            // onSubmitClassCharVal: function () {
+            //     var oVBox = sap.ui.getCore().byId("myVBox"); // Adjust the ID as necessary
+
+            //     if (!oVBox) {
+            //         console.error("VBox not found!");
+            //         return;
+            //     }
+
+            //     const aPanelData = [];
+
+            //     oVBox.getItems().forEach((oPanel) => {
+            //         const panelData = {
+            //             CLASSNAME: oPanel.getHeaderText(),
+            //             CHARACTERISTICS: []
+            //         };
+
+            //         const oInnerVBox = oPanel.getContent()[0]; // Get the inner VBox that holds characteristics
+
+            //         oInnerVBox.getItems().forEach((oCharacteristicPanel) => {
+            //             const characteristicName = oCharacteristicPanel.getHeaderText();
+            //             const selectedValues = [];
+
+            //             // Iterate through the contents of the characteristic panel
+            //             oCharacteristicPanel.getContent().forEach((oControl) => {
+            //                 // If the control is a VBox, iterate through its items
+            //                 if (oControl instanceof sap.m.VBox) {
+            //                     oControl.getItems().forEach((oSubControl) => {
+            //                         if (oSubControl instanceof sap.m.RadioButton) {
+            //                             console.log("Radio Button Text:", oSubControl.getText());
+            //                             console.log("Is Selected:", oSubControl.getSelected());
+
+            //                             // If the radio button is selected, push its text
+            //                             if (oSubControl.getSelected()) {
+            //                                 selectedValues.push(oSubControl.getText());
+            //                             }
+            //                         }
+            //                     });
+            //                 }
+            //             });
+
+            //             // Log selected values for each characteristic
+            //             console.log("Selected Values for", characteristicName, ":", selectedValues);
+
+            //             panelData.CHARACTERISTICS.push({
+            //                 NAME: characteristicName,
+            //                 SELECTED_VALUES: selectedValues
+            //             });
+            //         });
+
+            //         aPanelData.push(panelData);
+            //     });
+
+            //     console.log("Complete Panel Data:", aPanelData);
+            //     return aPanelData; // Return or use the selected values as needed
+            // },
+            // onSubmitClassCharVal: function () {
+            //     var oVBox = sap.ui.getCore().byId("myVBox"); // Adjust the ID as necessary
+            //     if (!oVBox) {
+            //         console.error("VBox not found!");
+            //         return;
+            //     }
+
+            //     const aPanelData = []; // Reset the data array
+            //     let hasSelection = false; // Flag to check if any selection is made
+
+            //     // Iterate through each panel (representing a class)
+            //     oVBox.getItems().forEach((oPanel) => {
+            //         const selectedClassName = oPanel.getHeaderText(); // Get the class name
+            //         const panelData = {
+            //             CLASSNAME: selectedClassName,
+            //             CHARACTERISTICS_DATA: []
+            //         };
+
+            //         const oInnerVBox = oPanel.getContent()[0]; // Get the inner VBox that holds characteristics
+
+            //         if (!oInnerVBox || !oInnerVBox.getItems || oInnerVBox.getItems().length === 0) {
+            //             return; // Skip this panel if no characteristics are found
+            //         }
+
+            //         // Iterate through each characteristic panel
+            //         oInnerVBox.getItems().forEach((oCharacteristicPanel) => {
+            //             const characteristicName = oCharacteristicPanel.getHeaderText();
+
+            //             const selectedValues = [];
+
+            //             // Iterate through the content of the characteristic panel (e.g., radio buttons)
+            //             oCharacteristicPanel.getContent().forEach((oControl) => {
+            //                 if (oControl instanceof sap.m.VBox) {
+            //                     oControl.getItems().forEach((oSubControl) => {
+            //                         if (oSubControl instanceof sap.m.RadioButton) {
+            //                             // If a radio button is selected, add its text to selectedValues
+            //                             if (oSubControl.getSelected()) {
+            //                                 selectedValues.push(oSubControl.getText());
+            //                                 hasSelection = true; // Set the flag if a selection is made
+            //                             }
+            //                         }
+            //                     });
+            //                 }
+            //             });
+
+            //             // If any values were selected for the characteristic, add it to the panel data
+            //             if (selectedValues.length > 0) {
+            //                 panelData.CHARACTERISTICS_DATA.push({
+            //                     NAME: characteristicName,
+            //                     SELECTED_VALUES: selectedValues
+            //                 });
+            //             }
+            //         });
+
+            //         // Only push the panel data if something is selected
+            //         if (panelData.CHARACTERISTICS_DATA.length > 0) {
+            //             aPanelData.push(panelData);
+            //         }
+            //     });
+
+            //     // If no characteristics or values are selected, show a message and stop processing
+            //     if (!hasSelection) {
+            //         sap.m.MessageToast.show("Please select at least one class and its values.");
+            //         return;
+            //     }
+
+            //     // Now bind the selected data to the table in the fragment
+            //     var oCharacteristicTable = sap.ui.getCore().byId("characteristicTable");
+            //     if (oCharacteristicTable) {
+            //         // Check if the table has a JSONModel attached, if not, create one
+            //         var oModel = oCharacteristicTable.getModel();
+            //         if (!(oModel instanceof sap.ui.model.json.JSONModel)) {
+            //             oModel = new sap.ui.model.json.JSONModel(); // Create a new JSONModel
+            //             oCharacteristicTable.setModel(oModel);
+            //         }
+
+            //         // Get existing data from the model, or initialize to an empty array
+            //         var existingData = oModel.getData().CHARACTERISTICS_DATA || [];
+
+            //         // Append the new selected data to the existing data
+            //         var newData = existingData.concat(aPanelData.flatMap((panel) => panel.CHARACTERISTICS_DATA));
+
+            //         // Update the model data with the combined (existing + new) values
+            //         oModel.setData({
+            //             CHARACTERISTICS_DATA: newData
+            //         });
+            //     }
+
+            //     this.oFragment.close();
+            //     console.log("Selected Class Data:", aPanelData);
+            // }, 
+            // onSubmitClassCharVal: function () {
+            //     var oVBox = sap.ui.getCore().byId("myVBox"); // Adjust the ID as necessary
+            //     if (!oVBox) {
+            //         console.error("VBox not found!");
+            //         return;
+            //     }
+            
+            //     const aPanelData = []; // Reset the data array
+            //     let hasSelection = false; // Flag to check if any selection is made
+            
+            //     // Iterate through each panel (representing a class)
+            //     oVBox.getItems().forEach((oPanel) => {
+            //         const selectedClassName = oPanel.getHeaderText(); // Get the class name
+            //         const panelData = {
+            //             CLASSNAME: selectedClassName,
+            //             CHARACTERISTICS_DATA: []
+            //         };
+            
+            //         const oInnerVBox = oPanel.getContent()[0]; // Get the inner VBox that holds characteristics
+            
+            //         if (!oInnerVBox || !oInnerVBox.getItems || oInnerVBox.getItems().length === 0) {
+            //             return; // Skip this panel if no characteristics are found
+            //         }
+            
+            //         // Iterate through each characteristic panel
+            //         oInnerVBox.getItems().forEach((oCharacteristicPanel) => {
+            //             const characteristicName = oCharacteristicPanel.getHeaderText();
+            //             const characteristicId = oCharacteristicPanel.data("characteristicId"); // Retrieve characteristicId
+            
+            //             console.log("Characteristic ID:", characteristicId); // Log the characteristicId
+            
+            //             const selectedValues = [];
+            
+            //             // Iterate through the content of the characteristic panel (e.g., radio buttons)
+            //             oCharacteristicPanel.getContent().forEach((oControl) => {
+            //                 if (oControl instanceof sap.m.VBox) {
+            //                     oControl.getItems().forEach((oSubControl) => {
+            //                         if (oSubControl instanceof sap.m.RadioButton) {
+            //                             // If a radio button is selected, add its text to selectedValues
+            //                             if (oSubControl.getSelected()) {
+            //                                 selectedValues.push(oSubControl.getText());
+            //                                 hasSelection = true; // Set the flag if a selection is made
+            //                             }
+            //                         }
+            //                     });
+            //                 }
+            //             });
+            
+            //             // If any values were selected for the characteristic, add it to the panel data
+            //             if (selectedValues.length > 0) {
+            //                 panelData.CHARACTERISTICS_DATA.push({
+            //                     ID: characteristicId, // Include the characteristicId here
+            //                     NAME: characteristicName,
+            //                     SELECTED_VALUES: selectedValues
+            //                 });
+            //             }
+            //         });
+            
+            //         // Only push the panel data if something is selected
+            //         if (panelData.CHARACTERISTICS_DATA.length > 0) {
+            //             aPanelData.push(panelData);
+            //         }
+            //     });
+            
+            //     // If no characteristics or values are selected, show a message and stop processing
+            //     if (!hasSelection) {
+            //         sap.m.MessageToast.show("Please select at least one class and its values.");
+            //         return;
+            //     }
+            
+            //     // Now bind the selected data to the table in the fragment
+            //     var oCharacteristicTable = sap.ui.getCore().byId("characteristicTable");
+            //     if (oCharacteristicTable) {
+            //         // Check if the table has a JSONModel attached, if not, create one
+            //         var oModel = oCharacteristicTable.getModel();
+            //         if (!(oModel instanceof sap.ui.model.json.JSONModel)) {
+            //             oModel = new sap.ui.model.json.JSONModel(); // Create a new JSONModel
+            //             oCharacteristicTable.setModel(oModel);
+            //         }
+            
+            //         // Get existing data from the model, or initialize to an empty array
+            //         var existingData = oModel.getData().CHARACTERISTICS_DATA || [];
+            
+            //         // Append the new selected data to the existing data
+            //         var newData = existingData.concat(aPanelData.flatMap((panel) => panel.CHARACTERISTICS_DATA));
+            
+            //         // Update the model data with the combined (existing + new) values
+            //         oModel.setData({
+            //             CHARACTERISTICS_DATA: newData
+            //         });
+            //     }
+            
+            //     this.oFragment.close();
+            //     console.log("Selected Class Data:", aPanelData);
+            // },
+            
+            
+            onSubmitClassCharVal: function () {
+                var oVBox = sap.ui.getCore().byId("myVBox"); // Adjust the ID as necessary
+                if (!oVBox) {
+                    console.error("VBox not found!");
+                    return;
+                }
+            
+                const aPanelData = []; // Reset the data array
+                let hasSelection = false; // Flag to check if any selection is made
+            
+                // Iterate through each panel (representing a class)
+                oVBox.getItems().forEach((oPanel) => {
+                    const selectedClassName = oPanel.getHeaderText(); // Get the class name
+                    const panelData = {
+                        CLASSNAME: selectedClassName,
+                        CHARACTERISTICS_DATA: []
+                    };
+            
+                    const oInnerVBox = oPanel.getContent()[0]; // Get the inner VBox that holds characteristics
+            
+                    if (!oInnerVBox || !oInnerVBox.getItems || oInnerVBox.getItems().length === 0) {
+                        return; // Skip this panel if no characteristics are found
+                    }
+            
+                    // Iterate through each characteristic panel
+                    oInnerVBox.getItems().forEach((oCharacteristicPanel) => {
+                        const characteristicName = oCharacteristicPanel.getHeaderText();
+                        const characteristicId = oCharacteristicPanel.data("characteristicId"); // Retrieve characteristicId
+            
+                        console.log("Characteristic ID:", characteristicId); // Log the characteristicId
+            
+                        const selectedValues = [];
+            
+                        // Iterate through the content of the characteristic panel (e.g., radio buttons)
+                        oCharacteristicPanel.getContent().forEach((oControl) => {
+                            if (oControl instanceof sap.m.VBox) {
+                                oControl.getItems().forEach((oSubControl) => {
+                                    if (oSubControl instanceof sap.m.RadioButton) {
+                                        // If a radio button is selected, add its text to selectedValues
+                                        if (oSubControl.getSelected()) {
+                                            selectedValues.push(oSubControl.getText());
+                                            hasSelection = true; // Set the flag if a selection is made
+                                        }
+                                    }
+                                });
+                            }
+                        });
+            
+                        // If any values were selected for the characteristic, add it to the panel data
+                        if (selectedValues.length > 0) {
+                            panelData.CHARACTERISTICS_DATA.push({
+                                ID: characteristicId, // Include the characteristicId here
+                                NAME: characteristicName,
+                                SELECTED_VALUES: selectedValues
+                            });
+                        }
+                    });
+            
+                    // Only push the panel data if something is selected
+                    if (panelData.CHARACTERISTICS_DATA.length > 0) {
+                        aPanelData.push(panelData);
+                    }
+                });
+            
+                // If no characteristics or values are selected, show a message and stop processing
+                if (!hasSelection) {
+                    sap.m.MessageToast.show("Please select at least one class and its values.");
+                    return;
+                }
+            
+                // Now bind the selected data to the table in the fragment
+                var oCharacteristicTable = sap.ui.getCore().byId("characteristicTable");
+                if (oCharacteristicTable) {
+                    // Check if the table has a JSONModel attached, if not, create one
+                    var oModel = oCharacteristicTable.getModel();
+                    if (!(oModel instanceof sap.ui.model.json.JSONModel)) {
+                        oModel = new sap.ui.model.json.JSONModel(); // Create a new JSONModel
+                        oCharacteristicTable.setModel(oModel);
+                    }
+            
+                    // Get existing data from the model, or initialize to an empty array
+                    var existingData = oModel.getData().CHARACTERISTICS_DATA || [];
+            
+                    // Create a set of existing characteristic IDs for quick lookup
+                    const existingCharacteristicIds = new Set(existingData.map(item => item.ID));
+            
+                    // Filter new data to avoid duplicates based on characteristic ID
+                    const newCharacteristics = [];
+                    const duplicateNames = []; // Array to hold names of characteristics that already exist
+                     
+                    aPanelData.forEach(panel => {
+                        panel.CHARACTERISTICS_DATA.forEach(characteristic => {
+                            if (!existingCharacteristicIds.has(characteristic.ID)) {
+                                newCharacteristics.push(characteristic);
+                            } else {
+                                duplicateNames.push(characteristic.NAME); // Add to duplicate names
+                            }
+                        });
+                    });
+            
+                    // Show message if no new characteristics are added
+                    if (newCharacteristics.length === 0 && duplicateNames.length > 0) {
+                        const message = ` "${duplicateNames.join(', ')}" already exist`;
+                        sap.m.MessageToast.show(message);
+                    } else {
+                        // Append the new selected data to the existing data
+                        var updatedData = existingData.concat(newCharacteristics);
+            
+                        // Update the model data with the combined (existing + new) values
+                        oModel.setData({
+                            CHARACTERISTICS_DATA: updatedData
+                        });
+                    }
+                }
+            
+                this.oFragment.close();
+                console.log("Selected Class Data:", aPanelData);
+            },
+            
+            
+            
+            
+            
+            
+            
 
 
 
 
 
 
+
+
+
+
+
+
+
+            // ------------create product with new charactericts and new unique id(save button)------------------
+
+            onSave: function () {
+
+            }
 
 
         });

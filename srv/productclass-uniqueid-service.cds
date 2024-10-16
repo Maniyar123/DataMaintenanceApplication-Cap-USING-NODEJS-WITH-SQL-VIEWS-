@@ -10,5 +10,5 @@ entity productclassunicalview as projection on PRODUTCLASSUNICALVIEW;
 entity classcharselectioncalview as projection on CLASSCHARSELCTIONCALVIEW;
 entity DemoExcelProduct as projection on productclassunique.DemoProduct;
  // Define the custom action
-    action DownloadExcel() returns String;
+     action DownloadExcel(base64Data: String) returns String;  // Ensure the action is defined
 }

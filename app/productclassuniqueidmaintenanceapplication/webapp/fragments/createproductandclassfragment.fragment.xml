@@ -38,7 +38,7 @@
         </content>
 
         <beginButton>
-            <Button icon="sap-icon://add" text="Add Characteristic" press="onAddCharacteristicForm" id="addCharacteristicButton"/>
+            <Button icon="sap-icon://add" text="Add Characteristic" press="onButtonPress" id="addCharacteristicButton"/>
         </beginButton>
         <endButton>
             <Button text="Cancel" press="onCloseCreateProductDialog"/>

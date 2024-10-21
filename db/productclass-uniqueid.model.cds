@@ -8,7 +8,7 @@ entity Class {
 }
 
 entity Product {
-     key uniqueID : UUID;    // Auto-generated UUID
+     key uniqueID : Integer;    // Auto-generated 
      productID    : String;     //  ID for the product
     productName   : String;     // Name of the product
     description   : String;     // Product description
@@ -39,7 +39,7 @@ entity DemoProduct {
 @cds.persistence.exists
 @cds.persistence.table
 entity PRODUTCLASSUNICALVIEW {
-  key  UNIQUEID:String;
+  key  UNIQUEID:Integer;
     DESCRIPTION:String;
     CHARACTERISTICNAME:String;
     VALUE:String;

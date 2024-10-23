@@ -12,11 +12,12 @@ sap.ui.define(
       onInit: function () {
         this.bus = this.getOwnerComponent().getEventBus();
         this.bus.subscribe("flexible", "setDetailPage", this.setDetailPage, this);
+      
         this.oFlexibleColumnLayout = this.byId("fcl");
       },
       onExit: function () {
         this.bus.unsubscribe("flexible", "setDetailPage", this.setDetailPage, this);
-
+       
       },
       // Lazy loader for the mid page - only on demand (when the user clicks)
       setDetailPage: function () {
@@ -29,6 +30,7 @@ sap.ui.define(
           // this.bus.subscribe("flexible", "setDetailPage", this._onProductIDReceived, this);
         }.bind(this));
       },
+     
       // Helper function to manage the lazy loading of views
       _loadView: function (options) {
         var mViews = this._mViews = this._mViews || Object.create(null);

@@ -4,7 +4,7 @@
         id="editProductDialog"
         title="Update Product"
         draggable="true"
-        contentHeight="600px"
+        contentHeight="420px"
         contentWidth="500px"> 
 
         <content>

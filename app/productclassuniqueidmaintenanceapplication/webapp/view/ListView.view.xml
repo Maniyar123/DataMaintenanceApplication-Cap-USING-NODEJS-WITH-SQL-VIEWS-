@@ -77,9 +77,10 @@
                             <ObjectIdentifier title="{uniqueID}" />
                             <Text text="{description}" />
                             <Switch 
-                                state="{= ${status} === 'Active' }" 
+                                state="{= ${status}.toLowerCase() === 'active' }" 
                                 change="onSwitchChange" />
-                            <Text text="{validFrom}" />
+                                 
+                                 <Text text="{validFrom}" />
                             <Text text="{validTo}" />
                             <HBox>
                                 <Button icon="sap-icon://edit" press="onEditProductListView" type="Success" class="sapUiSmallMarginEnd" />

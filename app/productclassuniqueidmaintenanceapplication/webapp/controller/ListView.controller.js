@@ -16,16 +16,58 @@ sap.ui.define([
 
         return Controller.extend("com.productclassuniqueidmaintenanceapplication.controller.ListView", {
 
-            onInit: function () {// -------------in oninit functioanlity by defult i had set one product to the table-------------------
-                that = this;
+            // onInit: function () {// -------------in oninit functioanlity by defult i had set one product to the table(without active and inactive status functioanlity)-------------------
+            //     that = this;
+            //     var oModel = this.getOwnerComponent().getModel("cat3model");
+            //     this.getView().setModel(oModel);
+            //     this.bus = this.getOwnerComponent().getEventBus();
+            //     this._isDataLoaded = false; // Flag to track data loading status
+            //     this.selectedProductID = null;
+
+            //     // oModel.setProperty("/sId", null); // Initialize the sId property
+
+            //     // Fetch the product data from the OData service
+            //     oModel.read("/product", {
+            //         success: function (oData) {
+            //             // Check if there are any products returned
+            //             if (oData.results && oData.results.length > 0) {
+            //                 // Set the first product as the default product
+            //                 var defaultProduct = {
+            //                     productName: oData.results[0].productName,  // First product name
+            //                     productID: oData.results[0].productID       // First product ID
+            //                 };
+
+            //                 // Set the default product to the model
+            //                 oModel.setProperty("/selectedProduct", defaultProduct);
+
+            //                 // Set the value of the Input field to the product name
+            //                 that.getView().byId("productNameField").setValue(defaultProduct.productName);
+
+            //                 // Optionally, you can also filter the table by this product ID
+            //                 that._filterTableByProduct(defaultProduct.productID);
+            //                 console.log("Product Statuses:", oData.results.map(product => product.status));
+            //             } else {
+            //                 // Handle the case where no products are returned
+            //                 console.warn("No products found.");
+            //             }
+            //         },
+            //         error: function (oError) {
+            //             console.error("Error fetching product data: ", oError);
+            //         }
+            //     });
+            // },
+            
+            onInit: function () { // -------------in oninit functioanlity by defult i had set one product to the table(---with active and inactive status functioanlity----)-------------------
+                // Define 'that' for referencing the controller context
+                var that = this;
+                
+                // Get the OData model
                 var oModel = this.getOwnerComponent().getModel("cat3model");
                 this.getView().setModel(oModel);
                 this.bus = this.getOwnerComponent().getEventBus();
                 this._isDataLoaded = false; // Flag to track data loading status
                 this.selectedProductID = null;
-
-                // oModel.setProperty("/sId", null); // Initialize the sId property
-
+                
                 // Fetch the product data from the OData service
                 oModel.read("/product", {
                     success: function (oData) {
@@ -36,15 +78,21 @@ sap.ui.define([
                                 productName: oData.results[0].productName,  // First product name
                                 productID: oData.results[0].productID       // First product ID
                             };
-
+            
                             // Set the default product to the model
                             oModel.setProperty("/selectedProduct", defaultProduct);
-
+            
                             // Set the value of the Input field to the product name
                             that.getView().byId("productNameField").setValue(defaultProduct.productName);
-
-                            // Optionally, you can also filter the table by this product ID
+            
+                            // Optionally, filter the table by this product ID
                             that._filterTableByProduct(defaultProduct.productID);
+            
+                            // Log the product statuses for debugging
+                            console.log("Product Statuses:", oData.results.map(product => product.status));
+            
+                            // Here, you can also ensure the table is populated with the product data
+                            oModel.setProperty("/product", oData.results); // Assuming you have the correct binding for the product entity
                         } else {
                             // Handle the case where no products are returned
                             console.warn("No products found.");
@@ -55,6 +103,9 @@ sap.ui.define([
                     }
                 });
             },
+            
+
+            
             _filterTableByProduct: function (productID) { // ----Filter the Table Based on the Selected Product----
                 var oTable = this.getView().byId("productTable");
                 var oBinding = oTable.getBinding("items");
@@ -291,21 +342,50 @@ sap.ui.define([
 
 
 
-            onRowSelected: function (oEvent) {//-----------listview table onrowselect fucntiolaity--------------
+            onRowSelected: function (oEvent) { //---------onRowSelected with active and inactive functionality-----------
+                // Get the selected item from the event
                 var oSelectedItem = oEvent.getSource();
                 var oContext = oSelectedItem.getBindingContext();
-                var suniqueID = oContext.getProperty("uniqueID");  // Assuming the binding path has "productID"
-
-
-                // Publish the Product ID via EventBus
+                
+                // Ensure the binding context is valid
+                if (!oContext) {
+                    MessageBox.error("No product context found.");
+                    return;
+                }
+            
+                // Get the unique ID and status of the selected product
+                var suniqueID = oContext.getProperty("uniqueID"); // Assuming the binding path has "uniqueID"
+                var status = oContext.getProperty("status"); // Adjust according to your model property
+            
+                // Check if the product is inactive
+                if (status === "inactive") {
+                    MessageBox.warning("Cannot view details for inactive product: " + suniqueID + ".");
+                    // Prevent navigation if the product is inactive
+                    return;
+                }
+            
+                // Publish the Product ID via EventBus if the product is active
                 var oEventBus = this.getOwnerComponent().getEventBus();
                 console.log("Publishing event with uniqueID: ", suniqueID);
                 var oGModel = this.getOwnerComponent().getModel("globalModel");
                 oGModel.setProperty("/uniqueID", suniqueID);
                 oEventBus.publish("flexible", "setDetailPage", { uniqueID: suniqueID });
-            },
+            },  
+         // onRowSelected: function (oEvent) {//-----------listview table onrowselect fucntiolaity(using og model and without active and inactive status functionality)--------------
+            //     var oSelectedItem = oEvent.getSource();
+            //     var oContext = oSelectedItem.getBindingContext();
+            //     var suniqueID = oContext.getProperty("uniqueID");  // Assuming the binding path has "productID"
 
-            // onRowSelected: function (oEvent) {------------(-------without using og model----------listview on rowselect)
+
+            //     // Publish the Product ID via EventBus
+            //     var oEventBus = this.getOwnerComponent().getEventBus();
+            //     console.log("Publishing event with uniqueID: ", suniqueID);
+            //     var oGModel = this.getOwnerComponent().getModel("globalModel");
+            //     oGModel.setProperty("/uniqueID", suniqueID);
+            //     oEventBus.publish("flexible", "setDetailPage", { uniqueID: suniqueID });
+            // },
+
+            // onRowSelected: function (oEvent) {------------(-------without using og model----------listview on rowselect)---------
             //     var oSelectedItem = oEvent.getSource();
             //     var oContext = oSelectedItem.getBindingContext();
             //     var sProductID = oContext.getProperty("productID");  // Assuming the binding path has "productID"
@@ -320,8 +400,6 @@ sap.ui.define([
             //         oEventBus.publish("flexible", "setDetailPage", { productID: sProductID });
             //     }.bind(this), 1000); // Adjust the delay as necessary
             // },
-
-
 
 
 
@@ -983,7 +1061,7 @@ sap.ui.define([
 
 
 
-            
+
 
             
             onDeleteProductListView: function (oEvent) { //---------delete fucntionality-----------------
@@ -1022,7 +1100,61 @@ sap.ui.define([
                         }
                     }
                 });
+            },
+
+
+
+
+            onSwitchChange: function (oEvent) { //-----------status functionality----------------
+                var oSwitch = oEvent.getSource(); // Get the Switch control that triggered the event
+            
+                // Get the binding context of the switch to access the uniqueID
+                var oBindingContext = oSwitch.getBindingContext(); // Uses default model
+            
+                // Ensure the binding context is valid
+                if (!oBindingContext) {
+                    MessageBox.error("No product context found.");
+                    return;
+                }
+            
+                // Retrieve the uniqueID from the binding context
+                var uniqueID = oBindingContext.getProperty("uniqueID"); // Ensure this matches the actual property name in your model
+            
+                // Get the OData model
+                var oModel = this.getOwnerComponent().getModel("cat3model");
+            
+                // Fetch the current status and toggle it
+                var currentStatus = oBindingContext.getProperty("status");
+                var newStatus = (currentStatus === "active") ? "inactive" : "active"; // Toggle status
+            
+                // Create the payload for the update
+                var payload = {
+                    status: newStatus
+                };
+            
+                // Construct the path to the specific product entity using uniqueID
+                var sPath = "/product(" + uniqueID + ")"; // Adjust this path according to your OData service structure
+            
+                // Update the status in the OData model
+                oModel.update(sPath, payload, {
+                    success: function () {
+                        // Show a success message based on the new status including the unique ID
+                        if (newStatus === "active") {
+                            MessageBox.success(" Product with Unique ID " + uniqueID + " is now active.");
+                        } else {
+                            MessageBox.success(" Product with Unique ID " + uniqueID + " is now inactive.");
+                        }
+                    },
+                    error: function () {
+                        MessageBox.error("Failed to update status for Product with Unique ID " + uniqueID + ".");
+                    }
+                });
             }
+            
+            
+            
+            
+            
             
 
 

@@ -16,7 +16,6 @@ sap.ui.define([
                 console.log("Subscribing to EventBus");
                 this.bus = this.getOwnerComponent().getEventBus();
                 this.bus.subscribe("flexible", "setDetailPage", this._onProductIDReceived, this);
-
                 
             },
             // ---new method to get the product data 

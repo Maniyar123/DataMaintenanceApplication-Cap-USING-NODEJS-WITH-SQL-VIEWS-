@@ -7,12 +7,12 @@
         <List
             id="valueHelpList"
             items="{
-                path: '/product'
+               path: 'uniqueProductModel>/product'
             }">
             <items>
                 <StandardListItem 
-                    title="{productName}" 
-                    description="{productID}"
+                    title="{uniqueProductModel>productName}" 
+                    description="{uniqueProductModel>productID}"
                     type="Active"
                     press="onSelectProduct"/>
             </items>

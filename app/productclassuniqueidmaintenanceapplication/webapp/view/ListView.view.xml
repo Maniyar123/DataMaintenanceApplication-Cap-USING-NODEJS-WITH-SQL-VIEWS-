@@ -1,101 +1,94 @@
 <mvc:View controllerName="com.productclassuniqueidmaintenanceapplication.controller.ListView"
     xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
-    xmlns="sap.m">
+    xmlns="sap.m"
+    xmlns:f="sap.f">
 
-    <!-- Page to display the Product Table -->
-    <Page
-        id="productPage"
-        title="Product List">
-          
-        <!-- Container for Input Fields -->
-        <VBox class="sapUiMediumMargin">
-            <HBox>
-
-                <!-- Search Field -->
-                <SearchField
-                    id="searchField"
-                    width="100%"
-                    placeholder="Search Unique Id /Desc"
-                    liveChange="onUniqueIDSearch" 
-                    
-                />
-
-                <!-- Product Name Input with Value Help -->
-                <Input
-                    id="productNameField"
-                    value="{/selectedProduct/productName}"   
-                    placeholder="Select Product"
-                    showValueHelp="true"
-                    valueHelpRequest="onValueHelpProduct"
-                    class="sapUiSmallMarginStart"
-                    width="100%"
-                />
-                
-                <!-- Create Button -->
-                <Button
-                    text="Create"
-                    press="onCreate"
-                    icon="sap-icon://add"
-                    class="sapUiSmallMarginStart"
-                    type="Success"
-                />
-
-            </HBox>
-        </VBox>
-
-        <!-- Product Table -->
-        <Table
-            id="productTable"
-            inset="true"
-            items="{/product}"
-           >
-            
-            <!-- Columns Definitions -->
-            <columns>
-                <Column>
-                    <Text text="Unique ID" />
-                </Column>
+    <f:DynamicPage id="dynamicPage">
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <Title text="Product Class Unique ID Maintenance" />
+                </f:heading>
                
-                <Column>
-                    <Text text="Description" />
-                </Column>
-                <Column>
-                    <Text text="Status" />
-                </Column>
-                <Column>
-                    <Text text="Valid From" />
-                </Column>
-                <Column>
-                    <Text text="Valid To" />
-                </Column>
-                <Column>
-                    <Text text="Actions" />
-                </Column>
-            </columns>
+            </f:DynamicPageTitle>
+        </f:title>
 
-            <!-- Template for Table Rows -->
-          <items>
-    <ColumnListItem type="Navigation" press="onRowSelected">
-        <cells>
-            <ObjectIdentifier title="{uniqueID}"/>
-           
-            <Text text="{description}" />
-            <Switch 
-                state="{= ${status} === 'Active' }" 
-                change="onSwitchChange" />
-            <Text text="{validFrom}" />
-            <Text text="{validTo}" />
+        <f:header>
+            <f:DynamicPageHeader>
+                <Toolbar class="productToolbar">
+                    <!-- Search Field -->
+                    <SearchField
+                        id="searchField"
+                        width="100%"
+                        placeholder="Search Unique ID / Description"
+                        liveChange="onUniqueIDSearch" />
 
-            <HBox>
-                <Button icon="sap-icon://edit" press="onEditProduct" type="Success"  class="sapUiSmallMarginEnd" />
-                <!-- <Button icon="sap-icon://delete" press="onDeleteProduct" type="Reject"/> -->
-            </HBox>
-        </cells>
-    </ColumnListItem>
-</items>
+                    <!-- Product Name Input with Value Help -->
+                    <Input
+                        id="productNameField"
+                        value="{/selectedProduct/productName}"
+                        placeholder="Select Product"
+                        showValueHelp="true"
+                        valueHelpRequest="onValueHelpProduct"
+                        class="sapUiSmallMarginStart"
+                        width="100%" />
 
+                    <!-- Create Button -->
+                    <Button
+                        text="Create"
+                        press="onCreate"
+                        icon="sap-icon://add"
+                        class="sapUiSmallMarginStart"
+                        type="Success" />
+                </Toolbar>
+            </f:DynamicPageHeader>
+        </f:header>
 
-        </Table>
-
-    </Page>
+        <f:content>
+            <Table id="productTable" inset="true" items="{/product}">
+                <headerToolbar>
+                    <Toolbar>
+                        <Title text="Product List" />
+                    </Toolbar>
+                </headerToolbar>
+                <columns>
+                    <Column>
+                        <Text text="Unique ID" />
+                    </Column>
+                    <Column>
+                        <Text text="Description" />
+                    </Column>
+                    <Column>
+                        <Text text="Status" />
+                    </Column>
+                    <Column>
+                        <Text text="Valid From" />
+                    </Column>
+                    <Column>
+                        <Text text="Valid To" />
+                    </Column>
+                    <Column>
+                        <Text text="Actions" />
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem type="Navigation" press="onRowSelected">
+                        <cells>
+                            <ObjectIdentifier title="{uniqueID}" />
+                            <Text text="{description}" />
+                            <Switch 
+                                state="{= ${status} === 'Active' }" 
+                                change="onSwitchChange" />
+                            <Text text="{validFrom}" />
+                            <Text text="{validTo}" />
+                            <HBox>
+                                <Button icon="sap-icon://edit" press="onEditProductListView" type="Success" class="sapUiSmallMarginEnd" />
+                                <Button icon="sap-icon://delete" press="onDeleteProductListView" type="Reject" class="sapUiSmallMarginEnd" />
+                            </HBox>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </f:content>
+    </f:DynamicPage>
 </mvc:View>

@@ -6,15 +6,17 @@ sap.ui.define([
     "sap/m/Panel",
     "sap/m/List",
     "sap/m/MessageToast",
-    "sap/m/StandardListItem"
+    "sap/m/StandardListItem",
+    "sap/m/MessageBox"
 ],
-    function (Controller, Fragment, Filter, FilterOperator, Panel, List, MessageToast, StandardListItem) {
+    function (Controller, Fragment, Filter, FilterOperator, Panel, List, MessageToast, StandardListItem,MessageBox) {
         "use strict";
         var that;
         let oLastSelectedRadioButton = null; // Initialize a variable to keep track of the currently selected radio button
 
         return Controller.extend("com.productclassuniqueidmaintenanceapplication.controller.ListView", {
-            onInit: function () {
+
+            onInit: function () {// -------------in oninit functioanlity by defult i had set one product to the table-------------------
                 that = this;
                 var oModel = this.getOwnerComponent().getModel("cat3model");
                 this.getView().setModel(oModel);
@@ -53,8 +55,7 @@ sap.ui.define([
                     }
                 });
             },
-            // ----Filter the Table Based on the Selected Product----
-            _filterTableByProduct: function (productID) {
+            _filterTableByProduct: function (productID) { // ----Filter the Table Based on the Selected Product----
                 var oTable = this.getView().byId("productTable");
                 var oBinding = oTable.getBinding("items");
 
@@ -63,27 +64,127 @@ sap.ui.define([
                 oBinding.filter(aFilters);
             },
 
-            // ----value help fragmnet-----------
-            onValueHelpProduct: function () {
-                this.selectedProductID = null;
-                // Create value help dialog if it doesn't exist
-                if (!this._valueHelpDialog) {
-                    this._valueHelpDialog = sap.ui.xmlfragment("com.productclassuniqueidmaintenanceapplication.fragments.productSelectFragmnet", this);
-                    this.getView().addDependent(this._valueHelpDialog);
 
 
+
+            onUniqueIDSearch: function (oEvent) { //----------search filed with filtartion based on( product id)------
+                // Get the value from the search field
+                var sQuery = oEvent.getParameter("newValue");
+
+                // Create an array of filters
+                var aFilters = [];
+                if (sQuery && sQuery.length > 0) {
+                    // Check if the query is numeric for uniqueID filtering
+                    if (!isNaN(sQuery)) {
+                        // If the query is numeric, apply an equality filter for uniqueID (assuming it's an integer)
+                        var oUniqueIDFilter = new Filter("uniqueID", FilterOperator.EQ, parseInt(sQuery, 10));
+                        aFilters.push(oUniqueIDFilter);
+                    } else {
+                        // Create a filter for description (string-based filtering)
+                        var oDescriptionFilter = new Filter("description", FilterOperator.Contains, sQuery);
+                        aFilters.push(oDescriptionFilter);
+                    }
                 }
 
-                // Open the dialog
-                this._valueHelpDialog.open();
+                // Get the table and its binding
+                var oTable = this.byId("productTable");
+                var oBinding = oTable.getBinding("items");
+
+                // Apply the filter
+                oBinding.filter(aFilters, "Application");
             },
-           
-            onSelectProduct: function (oEvent) {
+            // onUniqueIDSearch: function (oEvent) {//-------search field without filtartion----------
+            //     // Get the value from the search field
+            //     var sQuery = oEvent.getParameter("newValue");
+
+            //     // Create an array of filters
+            //     var aFilters = [];
+            //     if (sQuery && sQuery.length > 0) {
+            //         // Create a filter for uniqueID
+            //         var oUniqueIDFilter = new Filter("uniqueID", FilterOperator.Contains, sQuery);
+
+            //         // Create a filter for description
+            //         var oDescriptionFilter = new Filter("description", FilterOperator.Contains, sQuery);
+
+            //         // Combine filters using OR logic
+            //         var oCombinedFilter = new sap.ui.model.Filter({
+            //             filters: [oUniqueIDFilter, oDescriptionFilter],
+            //             and: false // 'false' means OR condition
+            //         });
+
+            //         aFilters.push(oCombinedFilter);
+            //     }
+
+            //     // Get the table and its binding
+            //     var oTable = this.byId("productTable");
+            //     var oBinding = oTable.getBinding("items");
+
+            //     // Apply the filter
+            //     oBinding.filter(aFilters, "Application");
+            // },
+
+
+
+
+
+            //    ---------value help input field filtering product based on productid------------
+            // ----value help fragment-----------
+
+
+
+
+            onValueHelpProduct: function () {//-----------value help fragmnet open functioality----------
+                var that = this; // Store reference to the controller for use inside callbacks
+                this.selectedProductID = null;
+
+                // Create value help dialog if it doesn't exist
+                if (!this._valueHelpDialog) {
+                    this._valueHelpDialog = sap.ui.xmlfragment(
+                        "com.productclassuniqueidmaintenanceapplication.fragments.productSelectFragmnet",
+                        this
+                    );
+                    this.getView().addDependent(this._valueHelpDialog);
+                }
+
+                // Fetch product data using the OData model's read method
+                var oModel = this.getView().getModel();
+                oModel.read("/product", {
+                    success: function (oData) {
+                        // Filter out duplicate products based on productID
+                        var oUniqueProductsMap = {};
+                        oData.results.forEach(function (product) {
+                            if (!oUniqueProductsMap[product.productID]) {
+                                oUniqueProductsMap[product.productID] = product;
+                            }
+                        });
+
+                        // Convert the unique product map back to an array
+                        var aUniqueProducts = Object.values(oUniqueProductsMap);
+
+                        // Set the unique products data to a local JSON model
+                        var oUniqueProductModel = new sap.ui.model.json.JSONModel();
+                        oUniqueProductModel.setData({ product: aUniqueProducts });
+
+                        // Bind the unique product data to the dialog's list
+                        that._valueHelpDialog.setModel(oUniqueProductModel, "uniqueProductModel");
+
+                        // Open the dialog
+                        that._valueHelpDialog.open();
+                    },
+                    error: function (oError) {
+                        // Handle error (e.g., show a message to the user)
+                        sap.m.MessageToast.show("Failed to fetch product data.");
+                    }
+                });
+            },
+
+            onSelectProduct: function (oEvent) { //   -------------onSelectProduct functionality for inside value help data selection----------------
                 // Get the selected item from the event
-                var oSelectedItem = oEvent.getSource();  // Use getSource()
+                var oSelectedItem = oEvent.getSource();
 
                 // Get the binding context of the selected item
-                var oContext = oSelectedItem.getBindingContext();
+                var oContext = oSelectedItem.getBindingContext("uniqueProductModel"); // Use uniqueProductModel context
+
                 if (!oContext) {
                     console.error("No binding context found for the selected item");
                     return;
@@ -111,22 +212,86 @@ sap.ui.define([
                     console.log("Selected Product ID:", this.selectedProductID);
                 }
 
-                // Call the existing method to filter the table
+                // Call the existing method to filter the table (assuming this method exists)
                 this._filterTableByProduct(sProductID);
 
                 // Close the dialog after selection
                 this._valueHelpDialog.close();
             },
 
-
-            onValueHelpDialogClose: function () {
+            onValueHelpDialogClose: function () { // ---------------value help close---------------------------
                 this._valueHelpDialog.close();
             },
+            // ----value help fragmnet-----------(------------value help fucntionality without filtering product--------------)
+            // onValueHelpProduct: function () {
+            //     this.selectedProductID = null;
+            //     // Create value help dialog if it doesn't exist
+            //     if (!this._valueHelpDialog) {
+            //         this._valueHelpDialog = sap.ui.xmlfragment("com.productclassuniqueidmaintenanceapplication.fragments.productSelectFragmnet", this);
+            //         this.getView().addDependent(this._valueHelpDialog);
+
+
+            //     }
+
+            //     // Open the dialog
+            //     this._valueHelpDialog.open();
+            // },
+            // onSelectProduct: function (oEvent) {
+            //     // Get the selected item from the event
+            //     var oSelectedItem = oEvent.getSource();  // Use getSource()
+
+            //     // Get the binding context of the selected item
+            //     var oContext = oSelectedItem.getBindingContext();
+            //     if (!oContext) {
+            //         console.error("No binding context found for the selected item");
+            //         return;
+            //     }
+
+            //     // Get the product data from the context
+            //     var oProduct = oContext.getObject(); // This will get the entire object for the selected item
+
+            //     // Check if the product object is valid
+            //     if (oProduct) {
+            //         var sProductName = oProduct.productName;  // Product name
+            //         var sProductID = oProduct.productID;      // Product ID
+
+            //         // Set the product name to the input field
+            //         this.getView().byId("productNameField").setValue(sProductName);
+
+            //         // Store the selected product ID in a controller property for later access
+            //         this.selectedProductID = sProductID; // Storing directly in the controller
+
+            //         // Optionally store the selected product ID in the model for further processing
+            //         var oModel = this.getView().getModel("cat3model");
+            //         oModel.setProperty("/selectedProduct/productID", sProductID);
+
+            //         // Log for debugging
+            //         console.log("Selected Product ID:", this.selectedProductID);
+            //     }
+
+            //     // Call the existing method to filter the table
+            //     this._filterTableByProduct(sProductID);
+
+            //     // Close the dialog after selection
+            //     this._valueHelpDialog.close();
+            // },
+
+
+            // onValueHelpDialogClose: function () {
+            //     this._valueHelpDialog.close();
+            // },
 
 
 
-            // This function will be triggered when a row in the table is clicked using global model(Og model)
-            onRowSelected: function (oEvent) {
+            // ----This function will be triggered when a row in the table is clicked using global model(Og model)-----onrowselect of list view
+
+
+
+
+
+
+
+            onRowSelected: function (oEvent) {//-----------listview table onrowselect fucntiolaity--------------
                 var oSelectedItem = oEvent.getSource();
                 var oContext = oSelectedItem.getBindingContext();
                 var suniqueID = oContext.getProperty("uniqueID");  // Assuming the binding path has "productID"
@@ -140,7 +305,7 @@ sap.ui.define([
                 oEventBus.publish("flexible", "setDetailPage", { uniqueID: suniqueID });
             },
 
-            // onRowSelected: function (oEvent) {
+            // onRowSelected: function (oEvent) {------------(-------without using og model----------listview on rowselect)
             //     var oSelectedItem = oEvent.getSource();
             //     var oContext = oSelectedItem.getBindingContext();
             //     var sProductID = oContext.getProperty("productID");  // Assuming the binding path has "productID"
@@ -155,7 +320,14 @@ sap.ui.define([
             //         oEventBus.publish("flexible", "setDetailPage", { productID: sProductID });
             //     }.bind(this), 1000); // Adjust the delay as necessary
             // },
-            onCreate: function () {
+
+
+
+
+
+
+
+            onCreate: function () { //-------------create button fucntionality in listview for creating product--------------
                 // Get the product data from the table (assuming it's bound to a model)
                 const oTable = this.byId("productTable"); // Use the ID of your table
                 const oSelectedItem = oTable.getItems()[0]; // Get the first item in the table (assuming filtered data)
@@ -191,42 +363,8 @@ sap.ui.define([
 
                     oDialog.open();
                 });
-            }
-            ,
-
-
-
-            // onCloseCreateProductDialog: function () {
-            //     // Close the dialog
-            //     this._pCreateProductDialog.then(function (oDialog) {
-            //         oDialog.close();
-            //         // Reset the input fields after closing
-            //         this._resetProductForm();
-
-            //         // Hide the characteristic form
-            //         var oCharacteristicVBox = Fragment.byId("createProductDialog", "characteristicFormVBox");
-            //         if (oCharacteristicVBox) {
-            //             oCharacteristicVBox.setVisible(false); // Hide the characteristic form
-            //         } else {
-            //             console.error("VBox with id 'characteristicFormVBox' is not found.");
-            //         }
-
-            //         // Reset the button text back to "Add Characteristic"
-            //         var oAddButton = Fragment.byId("createProductDialog", "addCharacteristicButton");
-            //         if (oAddButton) {
-            //             oAddButton.setText("Add Characteristic");
-            //             oAddButton.setIcon("sap-icon://add"); // Optionally reset the icon
-            //         }
-
-
-
-            //         // Ensure busy state is reset
-            //         this.getView().setBusy(false);
-            //     }.bind(this)); // Ensure 'this' is correctly bound
-            // },
-
-
-            onCloseCreateProductDialog: function () {
+            },
+            onCloseCreateProductDialog: function () { //------------closing the create button fragmnet after saveing the data ------------
                 // Close the dialog
                 this._pCreateProductDialog.then(function (oDialog) {
                     oDialog.close();
@@ -268,15 +406,7 @@ sap.ui.define([
                     this.getView().setBusy(false);
                 }.bind(this)); // Ensure 'this' is correctly bound
             },
-
-
-
-
-
-
-
-
-            _resetProductForm: function () {
+            _resetProductForm: function () {//-----------reset create button frgamnet after closing
                 // Reset input fields in the fragment
                 // Fragment.byId("createProductDialog", "inputProductId").setValue("");
                 Fragment.byId("createProductDialog", "inputProductName").setValue("");
@@ -287,7 +417,7 @@ sap.ui.define([
 
             },
 
-            onCreateProductChar: function () {
+            onCreateProductChar: function () {//-----------craete button frgamnet input field data saving in product entity by craeting new product with same produtid and diffrent unique id--------
                 var oView = this.getView();
                 var oModel = oView.getModel();
 
@@ -330,42 +460,7 @@ sap.ui.define([
                     }
                 });
             },
-
-            // onAddCharacteristicForm: function () {
-            //     // Retrieve the VBox where the fragment will be added
-            //     var oVBox = Fragment.byId("createProductDialog", "characteristicFormVBox");
-
-            //     // Ensure the VBox is found
-            //     if (!oVBox) {
-            //         console.error("VBox with id 'characteristicFormVBox' is not found.");
-            //         return;
-            //     }
-
-            //     // Load the characteristic creation fragment dynamically
-            //     if (!this._oCharacteristicCreateFragment) {
-
-            //         this._oCharacteristicCreateFragment = sap.ui.xmlfragment("com.productclassuniqueidmaintenanceapplication.fragments.charcreatefragmnet", this);
-
-            //         // Add the fragment content to the VBox using addItem() instead of addContent()
-            //         oVBox.addItem(this._oCharacteristicCreateFragment);
-            //     }
-
-            //     // Change the button text from "Add Characteristic" to "Save"
-            //     var oAddButton = Fragment.byId("createProductDialog", "addCharacteristicButton"); // Assuming the button has this ID
-            //     if (oAddButton) {
-            //         oAddButton.setText("Save");
-            //         oAddButton.setIcon("sap-icon://save"); // Optionally change the icon to a save icon
-
-            //     } else {
-            //         console.error("Button with id 'addCharacteristicButton' is not found.");
-            //     }
-
-            //     // Make the VBox visible to show the form
-            //     oVBox.setVisible(true);
-            // },
-
-
-            onButtonPress: function () {
+            onButtonPress: function () {//---------onButtonPress functionality is chnageing the buttons from Add charactericts to save ------
                 // Use Fragment.byId to reference the button inside the fragment
                 var oAddButton = Fragment.byId("createProductDialog", "addCharacteristicButton");
 
@@ -388,12 +483,10 @@ sap.ui.define([
                 } else if (sButtonText === "Save") {
                     // Perform Save logic
                     this._saveProductAndCharacteristics();
-                   
+
                 }
             },
-
-            // Function to show the characteristic form
-            _showCharacteristicForm: function () {
+            _showCharacteristicForm: function () {// --------Function to show the characteristic form when clciking the + icon -------
                 var oVBox = Fragment.byId("createProductDialog", "characteristicFormVBox");
 
                 // Load the characteristic creation fragment if not already loaded
@@ -408,34 +501,7 @@ sap.ui.define([
                 oVBox.setVisible(true);
             },
 
-            // Function to save the product and characteristic data
-            // _saveProductAndCharacteristics: function () {
-
-            //     var sProductID = this.selectedProductID;
-
-
-
-            //     // Collect product data from fragment
-            //     var sProductName = sap.ui.core.Fragment.byId("createProductDialog", "inputProductName").getValue();
-            //     var sDescription = sap.ui.core.Fragment.byId("createProductDialog", "inputDescription").getValue();
-            //     var sStatus = sap.ui.core.Fragment.byId("createProductDialog", "inputStatus").getSelectedKey();
-            //     var sValidFrom = sap.ui.core.Fragment.byId("createProductDialog", "inputValidFrom").getValue();
-            //     var sValidTo = sap.ui.core.Fragment.byId("createProductDialog", "inputValidTo").getValue();
-
-            //     // Create the product data object
-            //     var oProductData = {
-            //         productID: sProductID, // Get the product ID from the value help
-            //         productName: sProductName,
-            //         description: sDescription,
-            //         status: sStatus,
-            //         validFrom: sValidFrom,
-            //         validTo: sValidTo
-            //     };
-
-            //     // Save product data to the OData service
-            //     this._saveProduct(oProductData);
-            // },
-            _saveProductAndCharacteristics: function () {
+            _saveProductAndCharacteristics: function () { //------functionality for save button insid ethe create button frgamnet---to save the product data as well as charcatericst binding to the newly creating product with unique id in productclass entity---------
                 var sProductID = this.selectedProductID;
                 // Step 1: Get values from input fields
                 // const productID = this.getView().byId("productIDInput").getValue();
@@ -457,7 +523,7 @@ sap.ui.define([
                 this.addNewProduct(newProductData);
             },
 
-            addNewProduct: function (newProductData) {
+            addNewProduct: function (newProductData) { //---add new product by genrating unique id each time-----
                 const oModel = this.getView().getModel("cat3model"); // Get your OData model
                 const sPath = "/product"; // Your entity set path
 
@@ -510,32 +576,32 @@ sap.ui.define([
                     }
                 });
             },
-            _saveCharacteristics: function (createdProductID) {
+            _saveCharacteristics: function (createdProductID) {//------binding the charcatericts to the productclass entity with newly genrated product uniqueid-----
                 var oCharacteristicTable = sap.ui.getCore().byId("characteristicTable");
                 var aItems = oCharacteristicTable.getItems(); // Get all items (rows) from the table
-            
+
                 // Use the main model (assuming it's already set)
                 var oModel = this.getView().getModel("cat3model");
-            
+
                 aItems.forEach(function (oItem) {
                     var oCharacteristicData = oItem.getBindingContext().getObject(); // Directly get the object from the default binding context
-            
+
                     // Access CLASS_ID and ID directly
                     var classID = oCharacteristicData.CLASS_ID; // Assuming CLASS_ID is part of the characteristic data
                     var charID = oCharacteristicData.ID; // Assuming ID is also part of the characteristic data
-            
+
                     // Create an entry for productclass entity
                     var newProductClassEntry = {
                         uniqueID_uniqueID: createdProductID, // Bind with the created product's uniqueID
                         classID_classID: classID, // Bind the classID from the characteristic
                         // characteristicID: charID // Bind the characteristic ID if needed
                     };
-            
+
                     // Now create the entry in productclass entity set
                     oModel.create("/productclass", newProductClassEntry, {
                         success: function () {
                             sap.m.MessageToast.show("Class ID added to product successfully.");
-                            
+
                             // Close the dialog only after all characteristics have been processed
                             this.onCloseCreateProductDialog(); // Ensure 'this' is bound correctly
                         }.bind(this), // Bind 'this' to the success callback
@@ -546,595 +612,20 @@ sap.ui.define([
                     });
                 }, this); // Bind 'this' to the forEach loop
             },
-            
-            // Function to add a new product
+            onAddCharacteristic: function () {//--------------------when i click the add icon insid ethe create button frgamnet panels frgamnet will open there creating the ppanels  dynamically----------
+                // Check if the fragment is already loaded
+                if (!this.oFragment) {
+                    // Load the fragment and bind the controller to maintain context
+                    this.oFragment = sap.ui.xmlfragment("com.productclassuniqueidmaintenanceapplication.fragments.classcharselectionfragment", this);
+                    this.getView().addDependent(this.oFragment);
 
-
-            // _saveProduct: function (oProductData) {
-            //     var oModel = this.getView().getModel("cat3model"); // Assuming you're using ODataModel
-            //     oModel.create("/product", oProductData, {
-            //         success: function (oData) {
-            //             sap.m.MessageToast.show("Product saved successfully!");
-
-            //             // Here, oData should contain the auto-generated UUID (uniqueID)
-            //             var sUniqueID = oData.uniqueID; // Extract the auto-generated UUID
-
-            //             // Now save the characteristics linked to this product UUID
-            //             this._saveCharacteristics(sUniqueID); // Pass the uniqueID to saveCharacteristics
-            //         }.bind(this),
-            //         error: function () {
-            //             sap.m.MessageToast.show("Error saving product.");
-            //         }
-            //     });
-            // },
-
-            // _saveProduct: function (oProductData) {
-            //     var oModel = this.getView().getModel("cat3model"); // Assuming you're using ODataModel
-
-            //     // Automatically generate a UUID for uniqueID
-            //     oProductData.uniqueID = this._generateUUID(); // You can implement a UUID generator or use a library
-
-            //     // Now create the product with the new unique ID
-            //     oModel.create("/product", oProductData, {
-            //         success: function (oData) {
-            //             sap.m.MessageToast.show("Product saved successfully!");
-            //             // Optionally, save characteristics linked to this product
-            //             this._saveCharacteristics(oProductData.uniqueID); // Use the uniqueID for characteristic linkage
-            //         }.bind(this),
-            //         error: function () {
-            //             sap.m.MessageToast.show("Error saving product.");
-            //         }
-            //     });
-            // },
-
-
-
-
-            // _saveCharacteristics: function () {
-            //     var oCharacteristicTable = sap.ui.getCore().byId("characteristicTable");
-            //     var aItems = oCharacteristicTable.getItems();
-
-            //     var oModel = this.getView().getModel("cat3model");
-
-            //     // Loop through table items and collect characteristics data
-            //     aItems.forEach(function (oItem) {
-            //         var oContext = oItem.getBindingContext();
-            //         var oCharacteristicData = oContext.getObject();
-
-            //         // Create a new entry for each characteristic, linking it to the product's uniqueID
-            //         var oNewCharacteristicData = {
-            //             characteristicID: oCharacteristicData.ID,
-            //             characteristicName: oCharacteristicData.Name,
-            //             classID_classID: oCharacteristicData.CLASS_ID,  // Assuming classID is already selected
-            //              // value: oCharacteristicData.SELECTED_VALUES,
-            //              // Flatten the value: send the first selected value or a concatenated string
-            //              value: oCharacteristicData.SELECTED_VALUES.length > 0 ? oCharacteristicData.SELECTED_VALUES[0] : null,
-            //              // productID: sProductID // Link the characteristic to the product using the uniqueID
-            //         };
-
-            //         // Save the characteristic to the OData service
-            //         oModel.create("/characteristic", oNewCharacteristicData, {
-            //             success: function () {
-            //                 sap.m.MessageToast.show("Characteristic saved successfully!");
-            //             },
-            //             error: function () {
-            //                 sap.m.MessageToast.show("Error saving characteristic.");
-            //             }
-            //         });
-            //     });
-            // },
-            // _saveCharacteristics: function (classID) {
-            //     var oCharacteristicTable = sap.ui.getCore().byId("characteristicTable");
-            //     var aItems = oCharacteristicTable.getItems();
-
-            //     var oModel = this.getView().getModel("cat3model");
-
-            //     // Step 1: Fetch existing characteristics for the specified class
-            //     oModel.read("/characteristic?$filter=classID_classID eq '" + classID + "'", {
-            //         success: function (data) {
-            //             // Store existing characteristics in a set for quick lookup
-            //             var existingCharacteristicIDs = new Set(data.results.map(item => item.characteristicID));
-
-            //             // Step 2: Loop through table items and collect characteristics data
-            //             aItems.forEach(function (oItem) {
-            //                 var oContext = oItem.getBindingContext();
-            //                 var oCharacteristicData = oContext.getObject();
-
-            //                 // Prepare new characteristic data
-            //                 var oNewCharacteristicData = {
-            //                     characteristicID: oCharacteristicData.ID,
-            //                     characteristicName: oCharacteristicData.Name,
-            //                     classID_classID: classID,  // Use classID for linking
-            //                     value: oCharacteristicData.SELECTED_VALUES.length > 0 ? oCharacteristicData.SELECTED_VALUES[0] : null,
-            //                 };
-
-            //                 // Step 3: Check if the characteristic already exists for the class
-            //                 if (!existingCharacteristicIDs.has(oNewCharacteristicData.characteristicID)) {
-            //                     // If it doesn't exist, create the new characteristic
-            //                     oModel.create("/characteristic", oNewCharacteristicData, {
-            //                         success: function () {
-            //                             sap.m.MessageToast.show("Characteristic saved successfully!");
-            //                         },
-            //                         error: function () {
-            //                             sap.m.MessageToast.show("Error saving characteristic.");
-            //                         }
-            //                     });
-            //                 } else {
-            //                     // If it already exists, show a message
-            //                     sap.m.MessageToast.show("Characteristic already exists for this class: " + oNewCharacteristicData.characteristicID);
-            //                 }
-            //             });
-            //         },
-            //         error: function () {
-            //             sap.m.MessageToast.show("Error fetching existing characteristics for the class.");
-            //         }
-            //     });
-            // },
-
-
-            // onAddCharacteristic: function () {
-            //     // Load the CheckBox fragment if not already loaded
-            //     if (!this._checkboxDialog) {
-            //         this._checkboxDialog = Fragment.load({
-            //             id: 'checkboxDialog',
-            //             name: "com.productclassuniqueidmaintenanceapplication.fragments.classcharselectionfragment",
-            //             controller: this
-            //         }).then(function (oDialog) {
-            //             this.getView().addDependent(oDialog);
-            //             return oDialog;
-            //         }.bind(this));
-            //     }
-
-            //     // Open the CheckBox dialog and fetch hierarchical data
-            //     this._checkboxDialog.then(function (oDialog) {
-            //         var oModel = this.getView().getModel("cat3model");
-
-            //         // Fetch the data from the OData entity set
-            //         oModel.read("/classcharselectioncalview", {
-            //             success: function (oData) {
-            //                 var aHierarchicalData = oData.results; // Accessing the correct data structure
-
-            //                 // Process hierarchical data into class, characteristics, and values
-            //                 var hierarchicalData = [];
-            //                 var classMap = {};
-
-            //                 // Loop through the fetched data and organize it into hierarchical structure
-            //                 aHierarchicalData.forEach(row => {
-            //                     // Check if the class already exists in the map
-            //                     if (!classMap[row.CLASSID]) {
-            //                         classMap[row.CLASSID] = {
-            //                             className: row.CLASSNAME,
-            //                             classId: row.CLASSID,
-            //                             characteristics: []
-            //                         };
-            //                         hierarchicalData.push(classMap[row.CLASSID]);
-            //                     }
-
-            //                     const classObj = classMap[row.CLASSID];
-
-            //                     // Find or create the characteristic under the class
-            //                     let characteristic = classObj.characteristics.find(c => c.characteristicId === row.CHARACTERISTICID);
-
-            //                     if (!characteristic) {
-            //                         characteristic = {
-            //                             characteristicName: row.CHARACTERISTICNAME,
-            //                             characteristicId: row.CHARACTERISTICID,
-            //                             values: row.VALUE ? [row.VALUE] : []
-            //                         };
-            //                         classObj.characteristics.push(characteristic);
-            //                     } else if (row.VALUE) {
-            //                         characteristic.values.push(row.VALUE);
-            //                     }
-            //                 });
-
-            //                 // Convert processed data into the format needed for the TreeTable
-            //                 var aFilteredHierarchicalData = hierarchicalData.map(function (classObj) {
-            //                     return {
-            //                         className: classObj.className,
-            //                         characteristics: classObj.characteristics.map(function (charObj) {
-            //                             return {
-            //                                 characteristicName: charObj.characteristicName,
-            //                                 values: charObj.values.join(", ")
-            //                             };
-            //                         })
-            //                     };
-            //                 });
-
-            //                 // Set the filtered hierarchical data to the model for the TreeTable
-            //                 var oFilteredHierarchicalDataModel = new sap.ui.model.json.JSONModel(aFilteredHierarchicalData);
-            //                 var oTreeTable = Fragment.byId("checkboxDialog", "hierarchicalDataTreeTable");
-            //                 oTreeTable.setModel(oFilteredHierarchicalDataModel, "hierarchicalDataModel");
-
-            //                 // Open the dialog
-            //                 oDialog.open();
-            //             }.bind(this),
-            //             error: function (error) {
-            //                 sap.m.MessageToast.show("Error fetching hierarchical data");
-            //                 console.error("Error fetching hierarchical data:", error);
-            //             }
-            //         });
-            //     }.bind(this)).catch(function (oError) {
-            //         console.error("Error loading fragment: ", oError);
-            //     });
-            // },
-
-            // onAddCharacteristic: function () {
-            //     // Create and open the dialog if it does not exist
-            //     if (!this._oCheckBoxDialog) {
-            //         this._oCheckBoxDialog = sap.ui.xmlfragment("com.productclassuniqueidmaintenanceapplication.fragments.classcharselectionfragment", this);
-            //         this.getView().addDependent(this._oCheckBoxDialog);
-            //     }
-            //     this._oCheckBoxDialog.open();
-            // },
-
-
-
-            // onAddCharacteristic: function () {
-            //     // Load the CheckBox fragment if not already loaded
-            //     if (!this._checkboxDialog) {
-            //         this._checkboxDialog = Fragment.load({
-            //             id: 'checkboxDialog',
-            //             name: "com.productclassuniqueidmaintenanceapplication.fragments.classcharselectionfragment",
-            //             controller: this
-            //         }).then(function (oDialog) {
-            //             this.getView().addDependent(oDialog);
-            //             return oDialog;
-            //         }.bind(this));
-            //     }
-
-            //     // Open the CheckBox dialog and fetch hierarchical data
-            //     this._checkboxDialog.then(function (oDialog) {
-            //         var oModel = this.getView().getModel("cat3model");
-
-            //         // Fetch the data from the OData entity set
-            //         oModel.read("/classcharselectioncalview", {
-            //             success: function (oData) {
-            //                 var aHierarchicalData = oData.results;
-
-            //                 // Process hierarchical data into class, characteristics, and values
-            //                 var hierarchicalData = [];
-            //                 var classMap = {};
-
-            //                 // Loop through the fetched data and organize it into hierarchical structure
-            //                 aHierarchicalData.forEach(row => {
-            //                     if (!classMap[row.CLASSID]) {
-            //                         classMap[row.CLASSID] = {
-            //                             className: row.CLASSNAME,
-            //                             characteristics: []
-            //                         };
-            //                         hierarchicalData.push(classMap[row.CLASSID]);
-            //                     }
-
-            //                     const classObj = classMap[row.CLASSID];
-
-            //                     // Find or create the characteristic under the class
-            //                     let characteristic = classObj.characteristics.find(c => c.characteristicName === row.CHARACTERISTICNAME);
-
-            //                     if (!characteristic) {
-            //                         characteristic = {
-            //                             characteristicName: row.CHARACTERISTICNAME,
-            //                             values: row.VALUE ? [row.VALUE] : []
-            //                         };
-            //                         classObj.characteristics.push(characteristic);
-            //                     } else if (row.VALUE) {
-            //                         characteristic.values.push(row.VALUE);
-            //                     }
-            //                 });
-
-            //                 // Set the hierarchical data to the model for the TreeTable
-            //                 var oHierarchicalDataModel = new sap.ui.model.json.JSONModel(hierarchicalData);
-            //                 var oTreeTable = Fragment.byId("checkboxDialog", "hierarchicalDataTreeTable");
-            //                 oTreeTable.setModel(oHierarchicalDataModel, "hierarchicalDataModel");
-
-            //                 // Open the dialog
-            //                 oDialog.open();
-            //             }.bind(this),
-            //             error: function (error) {
-            //                 sap.m.MessageToast.show("Error fetching hierarchical data");
-            //                 console.error("Error fetching hierarchical data:", error);
-            //             }
-            //         });
-            //     }.bind(this)).catch(function (oError) {
-            //         console.error("Error loading fragment: ", oError);
-            //     });
-            // },
-
-            // ------search field-------------
-            onUniqueIDSearch: function (oEvent) {
-                // Get the value from the search field
-                var sQuery = oEvent.getParameter("newValue");
-
-                // Create an array of filters
-                var aFilters = [];
-                if (sQuery && sQuery.length > 0) {
-                    // Create a filter for uniqueID
-                    var oUniqueIDFilter = new Filter("uniqueID", FilterOperator.Contains, sQuery);
-
-                    // Create a filter for description
-                    var oDescriptionFilter = new Filter("description", FilterOperator.Contains, sQuery);
-
-                    // Combine filters using OR logic
-                    var oCombinedFilter = new sap.ui.model.Filter({
-                        filters: [oUniqueIDFilter, oDescriptionFilter],
-                        and: false // 'false' means OR condition
-                    });
-
-                    aFilters.push(oCombinedFilter);
+                    // Attach afterOpen event to load data after the dialog is opened
+                    this.oFragment.attachAfterOpen(this.loadData.bind(this));
                 }
 
-                // Get the table and its binding
-                var oTable = this.byId("productTable");
-                var oBinding = oTable.getBinding("items");
-
-                // Apply the filter
-                oBinding.filter(aFilters, "Application");
+                // Open the dialog
+                this.oFragment.open();
             },
-
-
-
-            // // Load data method
-            // loadData: function () {
-            //     // Create OData model with your service URL
-            //     var oModel = this.getOwnerComponent().getModel("cat3model");
-
-            //     // Fetch the data using OData model
-            //     oModel.read("/classcharselectioncalview", {
-            //         success: this.onDataLoaded.bind(this),  // Call onDataLoaded when data is fetched
-            //         error: function (oError) {
-            //             // Handle error
-            //             MessageToast.show("Error loading data");
-            //         }
-            //     });
-            // },
-
-            // // onDataLoaded: function (oData) {
-            // //     // Ensure the fragment is initialized before accessing it
-            // //     if (!this.oFragment) {
-            // //         console.error("Fragment is not initialized!");
-            // //         return;
-            // //     }
-            // //     console.log(this.oFragment);
-
-            // //     // Access the VBox using its ID
-            // //     var oVBox = sap.ui.getCore().byId("myVBox"); // Adjust the ID as necessary
-
-            // //     if (!oVBox) {
-            // //         console.error("VBox not found in the fragment!");
-            // //         return;
-            // //     }
-
-            // //     // Clear existing content to avoid duplicates
-            // //     oVBox.removeAllItems();
-
-            // //     // Group and transform the data into the desired structure
-            // //     const aTransformedData = this._transformData(oData.results);
-
-            // //     // Dynamically create panels based on the transformed data
-            // //     aTransformedData.forEach((oClass) => {
-            // //         // Create a new panel for each class
-            // //         const oPanel = new sap.m.Panel({
-            // //             headerText: oClass.CLASSNAME,
-            // //             expandable: true,
-            // //             expanded: false, // Initially collapsed
-            // //             expand: function (oEvent) {
-            // //                 const oPanel = oEvent.getSource();
-            // //                 const isExpanded = oEvent.getParameter("expand");
-
-            // //                 // Check if the panel has already been populated with content
-            // //                 if (isExpanded && oPanel.getContent().length === 0) {
-            // //                     // Create a container for characteristic panels
-            // //                     const oCharVBox = new sap.m.VBox({
-            // //                         renderType: "Bare"
-            // //                     });
-
-            // //                     // Add a panel for each characteristic inside the class
-            // //                     oClass.nodes.forEach((oCharacteristic) => {
-            // //                         const oCharacteristicPanel = new sap.m.Panel({
-            // //                             headerText: oCharacteristic.CHARACTERISTICNAME,
-            // //                             expandable: true,
-            // //                             expanded: false, // Initially collapsed
-            // //                             expand: function (oCharEvent) {
-            // //                                 const oCharPanel = oCharEvent.getSource();
-            // //                                 const isCharExpanded = oCharEvent.getParameter("expand");
-
-            // //                                 // Only add values when the panel is expanded and no content exists yet
-            // //                                 if (isCharExpanded && oCharPanel.getContent().length === 0) {
-            // //                                     // Create a container for the value radio buttons
-            // //                                     const oInnerVBox = new sap.m.VBox({
-            // //                                         renderType: "Bare"
-            // //                                     });
-
-            // //                                     // Add radio buttons for each value of the characteristic
-            // //                                     oCharacteristic.nodes.forEach((oValue) => {
-            // //                                         const oValueRadioButton = new sap.m.RadioButton({
-            // //                                             text: oValue.VALUE,
-            // //                                             groupName: oClass.CLASSID, // Ensure unique groups
-            // //                                             select: this.onSelect.bind(this)
-            // //                                         });
-
-            // //                                         // Add value radio button to the inner VBox
-            // //                                         oInnerVBox.addItem(oValueRadioButton);
-            // //                                     });
-
-            // //                                     // Add the inner VBox to the characteristic panel
-            // //                                     oCharPanel.addContent(oInnerVBox);
-            // //                                 }
-            // //                             }.bind(this)
-            // //                         });
-
-            // //                         // Add the characteristic panel to the characteristic VBox
-            // //                         oCharVBox.addItem(oCharacteristicPanel);
-            // //                     });
-
-            // //                     // Add the characteristic VBox to the class panel
-            // //                     oPanel.addContent(oCharVBox);
-            // //                 }
-            // //             }.bind(this)
-            // //         });
-
-            // //         // Add the class panel to the VBox
-            // //         oVBox.addItem(oPanel);
-            // //     });
-
-            // //     // Optionally refresh the dialog to show new content
-            // //     this.oFragment.rerender();
-            // // },
-
-            // onDataLoaded: function (oData) {
-            //     var oModel = this.getOwnerComponent().getModel("cat3model");
-
-            //     // Ensure the fragment is initialized before accessing it
-            //     if (!this.oFragment) {
-            //         console.error("Fragment is not initialized!");
-            //         return;
-            //     }
-
-            //     // Access the VBox using its ID
-            //     var oVBox = sap.ui.getCore().byId("myVBox"); // Adjust the ID as necessary
-
-            //     if (!oVBox) {
-            //         console.error("VBox not found in the fragment!");
-            //         return;
-            //     }
-
-            //     // Clear existing content to avoid duplicates
-            //     oVBox.removeAllItems();
-
-            //     // Group and transform the data into the desired structure
-            //     const aTransformedData = this._transformData(oData.results);
-
-            //     // Check if transformed data is valid
-            //     if (!Array.isArray(aTransformedData)) {
-            //         console.error("Transformed data is not an array or is invalid.");
-            //         return;
-            //     }
-
-            //     // Dynamically create panels based on the transformed data
-            //     aTransformedData.forEach((oClass) => {
-            //         // Create a new panel for each class
-            //         const oPanel = new sap.m.Panel({
-            //             headerText: oClass.CLASSNAME,
-            //             expandable: true,
-            //             expanded: false, // Initially collapsed
-            //             expand: function (oEvent) {
-            //                 const oPanel = oEvent.getSource();
-            //                 const isExpanded = oEvent.getParameter("expand");
-
-            //                 // Check if the panel has already been populated with content
-            //                 if (isExpanded && oPanel.getContent().length === 0) {
-            //                     // Create a container for characteristic panels
-            //                     const oCharVBox = new sap.m.VBox({
-            //                         renderType: "Bare"
-            //                     });
-
-            //                     // Add a panel for each characteristic inside the class
-            //                     oClass.nodes.forEach((oCharacteristic) => {
-            //                         // Create a new characteristic panel
-            //                         const oCharacteristicPanel = new sap.m.Panel({
-            //                             headerText: oCharacteristic.CHARACTERISTICNAME,
-            //                             expandable: true,
-            //                             expanded: false, // Initially collapsed
-            //                             expand: function (oCharEvent) {
-            //                                 const oCharPanel = oCharEvent.getSource();
-            //                                 const isCharExpanded = oCharEvent.getParameter("expand");
-
-            //                                 // Only add values when the panel is expanded and no content exists yet
-            //                                 if (isCharExpanded && oCharPanel.getContent().length === 0) {
-            //                                     // Create a container for the value radio buttons
-            //                                     const oInnerVBox = new sap.m.VBox({
-            //                                         renderType: "Bare"
-            //                                     });
-
-            //                                     // Add radio buttons for each value of the characteristic
-            //                                     oCharacteristic.nodes.forEach((oValue) => {
-            //                                         const oValueRadioButton = new sap.m.RadioButton({
-            //                                             text: oValue.VALUE,
-            //                                             groupName: oClass.CLASSID, // Ensure unique groups
-            //                                             select: this.onSelect.bind(this)
-            //                                         });
-
-            //                                         // Add value radio button to the inner VBox
-            //                                         oInnerVBox.addItem(oValueRadioButton);
-            //                                     });
-
-            //                                     // Add the inner VBox to the characteristic panel
-            //                                     oCharPanel.addContent(oInnerVBox);
-            //                                 }
-            //                             }.bind(this)
-            //                         });
-
-            //                         // Set the characteristicId as a data attribute
-            //                         const characteristicID = oCharacteristic.CHARACTERISTICID;
-            //                         if (characteristicID) {
-            //                             oCharacteristicPanel.data("characteristicId", characteristicID); // Set the characteristicId
-            //                             oCharacteristicPanel.setBindingContext(new sap.ui.model.Context(oModel, "/classcharselectioncalview/" + characteristicID));
-            //                         }
-
-            //                         // Log to ensure binding context is set
-            //                         console.log("Characteristic Panel Binding Context:", oCharacteristicPanel.getBindingContext());
-            //                         console.log("Characteristic ID:", oCharacteristicPanel.data("characteristicId")); // Log the characteristicId
-
-            //                         // Add the characteristic panel to the characteristic VBox
-            //                         oCharVBox.addItem(oCharacteristicPanel);
-            //                     });
-
-            //                     // Add the characteristic VBox to the class panel
-            //                     oPanel.addContent(oCharVBox);
-            //                 }
-            //             }.bind(this)
-            //         });
-
-            //         // Add the class panel to the VBox
-            //         oVBox.addItem(oPanel);
-            //     });
-
-            //     // Optionally refresh the dialog to show new content
-            //     this.oFragment.rerender();
-            // },
-
-            // _transformData: function (aData) {
-            //     const oGroupedData = {};
-
-            //     aData.forEach((oItem) => {
-            //         // Group by class
-            //         if (!oGroupedData[oItem.CLASSID]) {
-            //             oGroupedData[oItem.CLASSID] = {
-            //                 CLASSID: oItem.CLASSID,
-            //                 CLASSNAME: oItem.CLASSNAME,
-            //                 nodes: []
-            //             };
-            //         }
-
-            //         // Group by characteristic within the class
-            //         const aCharacteristics = oGroupedData[oItem.CLASSID].nodes;
-            //         let oCharacteristic = aCharacteristics.find(char => char.CHARACTERISTICID === oItem.CHARACTERISTICID);
-
-            //         if (!oCharacteristic) {
-            //             oCharacteristic = {
-            //                 CHARACTERISTICID: oItem.CHARACTERISTICID,
-            //                 CHARACTERISTICNAME: oItem.CHARACTERISTICNAME,
-            //                 nodes: []
-            //             };
-            //             aCharacteristics.push(oCharacteristic);
-            //         }
-
-            //         // Add value to the characteristic
-            //         oCharacteristic.nodes.push({
-            //             VALUE: oItem.VALUE
-            //         });
-            //     });
-
-            //     // Convert grouped data object into an array
-            //     return Object.values(oGroupedData);
-            // },
-
-            // onSelect: function (oEvent) {
-            //     const sSelectedValue = oEvent.getSource().getText();
-            //     MessageToast.show("Selected: " + sSelectedValue);
-            // },
-
-
-
             loadData: function () {
                 // Create OData model with your service URL
                 var oModel = this.getOwnerComponent().getModel("cat3model");
@@ -1293,327 +784,10 @@ sap.ui.define([
                 }
             },
 
-
-
-
-
-            onAddCharacteristic: function () {
-                // Check if the fragment is already loaded
-                if (!this.oFragment) {
-                    // Load the fragment and bind the controller to maintain context
-                    this.oFragment = sap.ui.xmlfragment("com.productclassuniqueidmaintenanceapplication.fragments.classcharselectionfragment", this);
-                    this.getView().addDependent(this.oFragment);
-
-                    // Attach afterOpen event to load data after the dialog is opened
-                    this.oFragment.attachAfterOpen(this.loadData.bind(this));
-                }
-
-                // Open the dialog
-                this.oFragment.open();
-            },
-            // onAddCharacteristic: function () {
-            //     // Check if the fragment is already loaded
-            //     if (!this.oFragment) {
-            //         // Load the fragment and bind the controller to maintain context
-            //         this.oFragment = sap.ui.xmlfragment("com.productclassuniqueidmaintenanceapplication.fragments.classcharselectionfragment", this);
-            //         this.getView().addDependent(this.oFragment);
-
-            //         // Attach afterOpen event to load data after the dialog is opened
-            //         this.oFragment.attachAfterOpen(this.loadData.bind(this));
-            //     }
-
-            //     // Open the dialog
-            //     this.oFragment.open();
-
-            //     // Get the existing characteristics from the model
-            //     var oTable = sap.ui.getCore().byId("characteristicTable");
-            //     var oModel = oTable.getModel();
-
-            //     if (!(oModel instanceof sap.ui.model.json.JSONModel)) {
-            //         sap.m.MessageToast.show("Table model not found.");
-            //         return;
-            //     }
-
-            //     // Get existing characteristics from the model
-            //     var existingData = oModel.getData().CHARACTERISTICS_DATA || [];
-
-            //     // Load the new data (this can come from an external source, user input, etc.)
-            //     // In this example, let's assume `newData` is an array of characteristics that you're adding
-            //     var newData = [ /* new characteristics data here */];
-
-            //     // Filter out duplicates based on ID
-            //     var characteristicIds = new Set(existingData.map(characteristic => characteristic.ID)); // Collect IDs of existing characteristics
-
-            //     newData.forEach((newCharacteristic) => {
-            //         if (!characteristicIds.has(newCharacteristic.ID)) {
-            //             // If the characteristic ID does not exist, add it to the existing data
-            //             existingData.push(newCharacteristic);
-            //             characteristicIds.add(newCharacteristic.ID); // Add the new ID to the set
-            //         }
-            //     });
-
-            //     // Update the model with the combined data (existing + new, no duplicates)
-            //     oModel.setData({
-            //         CHARACTERISTICS: existingData
-            //     });
-
-            //     console.log("Updated characteristics:", existingData);
-            // },
-
-            // ------classcharvalue frgament close functionality-------------
-
-            onCloseClassCharValDialog: function () {
+            onCloseClassCharValDialog: function () { // ------classcharvalue frgament close functionality-------------
                 this.oFragment.close();
             },
-
-            // ----------classcharvalue fragment submit button---------------------
-
-
-
-            // onSubmitClassCharVal: function () {
-            //     var oVBox = sap.ui.getCore().byId("myVBox"); // Adjust the ID as necessary
-
-            //     if (!oVBox) {
-            //         console.error("VBox not found!");
-            //         return;
-            //     }
-
-            //     const aPanelData = [];
-
-            //     oVBox.getItems().forEach((oPanel) => {
-            //         const panelData = {
-            //             CLASSNAME: oPanel.getHeaderText(),
-            //             CHARACTERISTICS: []
-            //         };
-
-            //         const oInnerVBox = oPanel.getContent()[0]; // Get the inner VBox that holds characteristics
-
-            //         oInnerVBox.getItems().forEach((oCharacteristicPanel) => {
-            //             const characteristicName = oCharacteristicPanel.getHeaderText();
-            //             const selectedValues = [];
-
-            //             // Iterate through the contents of the characteristic panel
-            //             oCharacteristicPanel.getContent().forEach((oControl) => {
-            //                 // If the control is a VBox, iterate through its items
-            //                 if (oControl instanceof sap.m.VBox) {
-            //                     oControl.getItems().forEach((oSubControl) => {
-            //                         if (oSubControl instanceof sap.m.RadioButton) {
-            //                             console.log("Radio Button Text:", oSubControl.getText());
-            //                             console.log("Is Selected:", oSubControl.getSelected());
-
-            //                             // If the radio button is selected, push its text
-            //                             if (oSubControl.getSelected()) {
-            //                                 selectedValues.push(oSubControl.getText());
-            //                             }
-            //                         }
-            //                     });
-            //                 }
-            //             });
-
-            //             // Log selected values for each characteristic
-            //             console.log("Selected Values for", characteristicName, ":", selectedValues);
-
-            //             panelData.CHARACTERISTICS.push({
-            //                 NAME: characteristicName,
-            //                 SELECTED_VALUES: selectedValues
-            //             });
-            //         });
-
-            //         aPanelData.push(panelData);
-            //     });
-
-            //     console.log("Complete Panel Data:", aPanelData);
-            //     return aPanelData; // Return or use the selected values as needed
-            // },
-            // onSubmitClassCharVal: function () {
-            //     var oVBox = sap.ui.getCore().byId("myVBox"); // Adjust the ID as necessary
-            //     if (!oVBox) {
-            //         console.error("VBox not found!");
-            //         return;
-            //     }
-
-            //     const aPanelData = []; // Reset the data array
-            //     let hasSelection = false; // Flag to check if any selection is made
-
-            //     // Iterate through each panel (representing a class)
-            //     oVBox.getItems().forEach((oPanel) => {
-            //         const selectedClassName = oPanel.getHeaderText(); // Get the class name
-            //         const panelData = {
-            //             CLASSNAME: selectedClassName,
-            //             CHARACTERISTICS_DATA: []
-            //         };
-
-            //         const oInnerVBox = oPanel.getContent()[0]; // Get the inner VBox that holds characteristics
-
-            //         if (!oInnerVBox || !oInnerVBox.getItems || oInnerVBox.getItems().length === 0) {
-            //             return; // Skip this panel if no characteristics are found
-            //         }
-
-            //         // Iterate through each characteristic panel
-            //         oInnerVBox.getItems().forEach((oCharacteristicPanel) => {
-            //             const characteristicName = oCharacteristicPanel.getHeaderText();
-
-            //             const selectedValues = [];
-
-            //             // Iterate through the content of the characteristic panel (e.g., radio buttons)
-            //             oCharacteristicPanel.getContent().forEach((oControl) => {
-            //                 if (oControl instanceof sap.m.VBox) {
-            //                     oControl.getItems().forEach((oSubControl) => {
-            //                         if (oSubControl instanceof sap.m.RadioButton) {
-            //                             // If a radio button is selected, add its text to selectedValues
-            //                             if (oSubControl.getSelected()) {
-            //                                 selectedValues.push(oSubControl.getText());
-            //                                 hasSelection = true; // Set the flag if a selection is made
-            //                             }
-            //                         }
-            //                     });
-            //                 }
-            //             });
-
-            //             // If any values were selected for the characteristic, add it to the panel data
-            //             if (selectedValues.length > 0) {
-            //                 panelData.CHARACTERISTICS_DATA.push({
-            //                     NAME: characteristicName,
-            //                     SELECTED_VALUES: selectedValues
-            //                 });
-            //             }
-            //         });
-
-            //         // Only push the panel data if something is selected
-            //         if (panelData.CHARACTERISTICS_DATA.length > 0) {
-            //             aPanelData.push(panelData);
-            //         }
-            //     });
-
-            //     // If no characteristics or values are selected, show a message and stop processing
-            //     if (!hasSelection) {
-            //         sap.m.MessageToast.show("Please select at least one class and its values.");
-            //         return;
-            //     }
-
-            //     // Now bind the selected data to the table in the fragment
-            //     var oCharacteristicTable = sap.ui.getCore().byId("characteristicTable");
-            //     if (oCharacteristicTable) {
-            //         // Check if the table has a JSONModel attached, if not, create one
-            //         var oModel = oCharacteristicTable.getModel();
-            //         if (!(oModel instanceof sap.ui.model.json.JSONModel)) {
-            //             oModel = new sap.ui.model.json.JSONModel(); // Create a new JSONModel
-            //             oCharacteristicTable.setModel(oModel);
-            //         }
-
-            //         // Get existing data from the model, or initialize to an empty array
-            //         var existingData = oModel.getData().CHARACTERISTICS_DATA || [];
-
-            //         // Append the new selected data to the existing data
-            //         var newData = existingData.concat(aPanelData.flatMap((panel) => panel.CHARACTERISTICS_DATA));
-
-            //         // Update the model data with the combined (existing + new) values
-            //         oModel.setData({
-            //             CHARACTERISTICS_DATA: newData
-            //         });
-            //     }
-
-            //     this.oFragment.close();
-            //     console.log("Selected Class Data:", aPanelData);
-            // }, 
-            // onSubmitClassCharVal: function () {
-            //     var oVBox = sap.ui.getCore().byId("myVBox"); // Adjust the ID as necessary
-            //     if (!oVBox) {
-            //         console.error("VBox not found!");
-            //         return;
-            //     }
-
-            //     const aPanelData = []; // Reset the data array
-            //     let hasSelection = false; // Flag to check if any selection is made
-
-            //     // Iterate through each panel (representing a class)
-            //     oVBox.getItems().forEach((oPanel) => {
-            //         const selectedClassName = oPanel.getHeaderText(); // Get the class name
-            //         const panelData = {
-            //             CLASSNAME: selectedClassName,
-            //             CHARACTERISTICS_DATA: []
-            //         };
-
-            //         const oInnerVBox = oPanel.getContent()[0]; // Get the inner VBox that holds characteristics
-
-            //         if (!oInnerVBox || !oInnerVBox.getItems || oInnerVBox.getItems().length === 0) {
-            //             return; // Skip this panel if no characteristics are found
-            //         }
-
-            //         // Iterate through each characteristic panel
-            //         oInnerVBox.getItems().forEach((oCharacteristicPanel) => {
-            //             const characteristicName = oCharacteristicPanel.getHeaderText();
-            //             const characteristicId = oCharacteristicPanel.data("characteristicId"); // Retrieve characteristicId
-
-            //             console.log("Characteristic ID:", characteristicId); // Log the characteristicId
-
-            //             const selectedValues = [];
-
-            //             // Iterate through the content of the characteristic panel (e.g., radio buttons)
-            //             oCharacteristicPanel.getContent().forEach((oControl) => {
-            //                 if (oControl instanceof sap.m.VBox) {
-            //                     oControl.getItems().forEach((oSubControl) => {
-            //                         if (oSubControl instanceof sap.m.RadioButton) {
-            //                             // If a radio button is selected, add its text to selectedValues
-            //                             if (oSubControl.getSelected()) {
-            //                                 selectedValues.push(oSubControl.getText());
-            //                                 hasSelection = true; // Set the flag if a selection is made
-            //                             }
-            //                         }
-            //                     });
-            //                 }
-            //             });
-
-            //             // If any values were selected for the characteristic, add it to the panel data
-            //             if (selectedValues.length > 0) {
-            //                 panelData.CHARACTERISTICS_DATA.push({
-            //                     ID: characteristicId, // Include the characteristicId here
-            //                     NAME: characteristicName,
-            //                     SELECTED_VALUES: selectedValues
-            //                 });
-            //             }
-            //         });
-
-            //         // Only push the panel data if something is selected
-            //         if (panelData.CHARACTERISTICS_DATA.length > 0) {
-            //             aPanelData.push(panelData);
-            //         }
-            //     });
-
-            //     // If no characteristics or values are selected, show a message and stop processing
-            //     if (!hasSelection) {
-            //         sap.m.MessageToast.show("Please select at least one class and its values.");
-            //         return;
-            //     }
-
-            //     // Now bind the selected data to the table in the fragment
-            //     var oCharacteristicTable = sap.ui.getCore().byId("characteristicTable");
-            //     if (oCharacteristicTable) {
-            //         // Check if the table has a JSONModel attached, if not, create one
-            //         var oModel = oCharacteristicTable.getModel();
-            //         if (!(oModel instanceof sap.ui.model.json.JSONModel)) {
-            //             oModel = new sap.ui.model.json.JSONModel(); // Create a new JSONModel
-            //             oCharacteristicTable.setModel(oModel);
-            //         }
-
-            //         // Get existing data from the model, or initialize to an empty array
-            //         var existingData = oModel.getData().CHARACTERISTICS_DATA || [];
-
-            //         // Append the new selected data to the existing data
-            //         var newData = existingData.concat(aPanelData.flatMap((panel) => panel.CHARACTERISTICS_DATA));
-
-            //         // Update the model data with the combined (existing + new) values
-            //         oModel.setData({
-            //             CHARACTERISTICS_DATA: newData
-            //         });
-            //     }
-
-            //     this.oFragment.close();
-            //     console.log("Selected Class Data:", aPanelData);
-            // },
-
-
-            onSubmitClassCharVal: function () {
+            onSubmitClassCharVal: function () { // ----------classcharvalue fragment submit button---------------------
                 var oVBox = sap.ui.getCore().byId("myVBox"); // Adjust the ID as necessary
                 if (!oVBox) {
                     console.error("VBox not found!");
@@ -1737,22 +911,119 @@ sap.ui.define([
 
 
 
+            
+            onEditProductListView: function (oEvent) { //------------update fucntionality-----------------
+                // Get the selected product data from the table row
+                var oSelectedItem = oEvent.getSource().getParent().getBindingContext().getObject();
+
+                // Check if the dialog is already created; if not, create it
+                if (!this._oUpdateDialog) {
+                    this._oUpdateDialog = sap.ui.xmlfragment("com.productclassuniqueidmaintenanceapplication.fragments.editProductFragment", this);
+                    this.getView().addDependent(this._oUpdateDialog);
+                }
+
+                // Populate the dialog inputs with the selected product data
+                sap.ui.getCore().byId("uniqueIDInputUpdate").setValue(oSelectedItem.uniqueID);
+                sap.ui.getCore().byId("productIDInputUpdate").setValue(oSelectedItem.productID);
+                sap.ui.getCore().byId("inputProductNameUpdate").setValue(oSelectedItem.productName);
+                sap.ui.getCore().byId("descriptionInputUpdate").setValue(oSelectedItem.description);
+                sap.ui.getCore().byId("statusSelectUpdate").setSelectedKey(oSelectedItem.status);
+                sap.ui.getCore().byId("validFromInputUpdate").setValue(oSelectedItem.validFrom);
+                sap.ui.getCore().byId("validToInputUpdate").setValue(oSelectedItem.validTo);
+
+                // Open the update dialog
+                this._oUpdateDialog.open();
+            },
+
+            onSaveUpdatedProduct: function () {
+                // Get the updated values from the fragment inputs
+                var oUpdatedProduct = {
+                    uniqueID: sap.ui.getCore().byId("uniqueIDInputUpdate").getValue(),
+                    productID: sap.ui.getCore().byId("productIDInputUpdate").getValue(),
+                    productName: sap.ui.getCore().byId("inputProductNameUpdate").getValue(),
+                    description: sap.ui.getCore().byId("descriptionInputUpdate").getValue(),
+                    status: sap.ui.getCore().byId("statusSelectUpdate").getSelectedKey(),
+
+                    // Parse and format the dates correctly (YYYY-MM-DD)
+                    validFrom: this._formatDate(sap.ui.getCore().byId("validFromInputUpdate").getValue()),
+                    validTo: this._formatDate(sap.ui.getCore().byId("validToInputUpdate").getValue())
+                };
+
+                // Perform the update operation via OData or any service here
+                var oModel = this.getView().getModel();
+                oModel.update("/product(" + oUpdatedProduct.uniqueID + ")", oUpdatedProduct, {
+                    success: function () {
+                        MessageToast.show("Product updated successfully");
+                    },
+                    error: function (oError) {
+                        MessageToast.show("Error while updating the product: " + oError.message);
+                    }
+                });
+
+                // Close the dialog after saving
+                this._oUpdateDialog.close();
+            },
+            _formatDate: function (sDate) {// Helper function to format date in YYYY-MM-DD
+                if (!sDate) {
+                    return null;  // Handle null or empty date cases
+                }
+                // Convert string to Date object
+                var oDate = new Date(sDate);
+
+                // Ensure it is in YYYY-MM-DD format
+                var iYear = oDate.getFullYear();
+                var iMonth = (oDate.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+                var iDay = oDate.getDate().toString().padStart(2, '0');
+
+                return iYear + '-' + iMonth + '-' + iDay;
+            },
+            onCloseUpdateProductDialog: function () {  // Function to close the update dialog without saving
+                this._oUpdateDialog.close();
+            },
 
 
 
+            
 
-
-
-
-
-
-
-
-
-
-
-
-
+            
+            onDeleteProductListView: function (oEvent) { //---------delete fucntionality-----------------
+                // Get the context from the button that was pressed
+                var oButton = oEvent.getSource(); // Get the button that triggered the event
+                var oContext = oButton.getBindingContext(); // Get the binding context of the button
+            
+                // Check if context is available
+                if (oContext) {
+                    var sUniqueID = oContext.getProperty("uniqueID"); // Get the unique ID from the context
+                    this._deleteProductByUniqueID(sUniqueID);
+                } else {
+                    MessageToast.show("No product selected for deletion.");
+                }
+            },
+            
+            _deleteProductByUniqueID: function (sUniqueID) {
+                var oModel = this.getView().getModel();
+            
+                // Show a confirmation dialog before deletion with the unique ID
+                MessageBox.confirm("Are you sure you want to delete the product with Unique ID: " + sUniqueID + "?", {
+                    title: "Confirm Deletion",
+                    onClose: function (oAction) {
+                        if (oAction === MessageBox.Action.OK) {
+                            // Perform the delete operation
+                            oModel.remove("/product(" + sUniqueID + ")", {
+                                success: function () {
+                                    MessageToast.show("Product deleted successfully");
+                                    // Optionally refresh the product list or model
+                                    oModel.refresh();
+                                },
+                                error: function (oError) {
+                                    MessageToast.show("Error while deleting the product: " + oError.message);
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+            
 
 
 

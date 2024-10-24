@@ -9,7 +9,7 @@ sap.ui.define([
     "sap/m/StandardListItem",
     "sap/m/MessageBox"
 ],
-    function (Controller, Fragment, Filter, FilterOperator, Panel, List, MessageToast, StandardListItem,MessageBox) {
+    function (Controller, Fragment, Filter, FilterOperator, Panel, List, MessageToast, StandardListItem, MessageBox) {
         "use strict";
         var that;
         let oLastSelectedRadioButton = null; // Initialize a variable to keep track of the currently selected radio button
@@ -56,45 +56,88 @@ sap.ui.define([
             //         }
             //     });
             // },
-            
-            onInit: function () { // -------------in oninit functioanlity by defult i had set one product to the table(---with active and inactive status functioanlity----)-------------------
-                // Define 'that' for referencing the controller context
+
+            // onInit: function () { // -------------in oninit functioanlity by defult i had set one product to the table(---with active and inactive status functioanlity----)-------------------
+            //     // Define 'that' for referencing the controller context
+            //     var that = this;
+
+            //     // Get the OData model
+            //     var oModel = this.getOwnerComponent().getModel("cat3model");
+            //     this.getView().setModel(oModel);
+            //     this.bus = this.getOwnerComponent().getEventBus();
+            //     this._isDataLoaded = false; // Flag to track data loading status
+            //     this.selectedProductID = null;
+
+            //     // Fetch the product data from the OData service
+            //     oModel.read("/product", {
+            //         success: function (oData) {
+            //             // Check if there are any products returned
+            //             if (oData.results && oData.results.length > 0) {
+            //                 // Set the first product as the default product
+            //                 var defaultProduct = {
+            //                     productName: oData.results[0].productName,  // First product name
+            //                     productID: oData.results[0].productID       // First product ID
+            //                 };
+
+            //                 // Set the default product to the model
+            //                 oModel.setProperty("/selectedProduct", defaultProduct);
+
+            //                 // Set the value of the Input field to the product name
+            //                 that.getView().byId("productNameField").setValue(defaultProduct.productName);
+
+            //                 // Optionally, filter the table by this product ID
+            //                 that._filterTableByProduct(defaultProduct.productID);
+
+            //                 // Log the product statuses for debugging
+            //                 console.log("Product Statuses:", oData.results.map(product => product.status));
+
+            //                 // Here, you can also ensure the table is populated with the product data
+            //                 oModel.setProperty("/product", oData.results); // Assuming you have the correct binding for the product entity
+            //             } else {
+            //                 // Handle the case where no products are returned
+            //                 console.warn("No products found.");
+            //             }
+            //         },
+            //         error: function (oError) {
+            //             console.error("Error fetching product data: ", oError);
+            //         }
+            //     });
+            // },
+
+            onInit: function () {
                 var that = this;
-                
-                // Get the OData model
                 var oModel = this.getOwnerComponent().getModel("cat3model");
                 this.getView().setModel(oModel);
                 this.bus = this.getOwnerComponent().getEventBus();
-                this._isDataLoaded = false; // Flag to track data loading status
+                this._isDataLoaded = false;
                 this.selectedProductID = null;
-                
+
                 // Fetch the product data from the OData service
                 oModel.read("/product", {
                     success: function (oData) {
-                        // Check if there are any products returned
+                        console.log("Fetched products:", oData.results); // Debugging line
                         if (oData.results && oData.results.length > 0) {
+                            // Format the dates
+                            oData.results.forEach(function (product) {
+                                product.validFrom = that._formatDate(product.validFrom);
+                                product.validTo = that._formatDate(product.validTo);
+                            });
+
                             // Set the first product as the default product
                             var defaultProduct = {
-                                productName: oData.results[0].productName,  // First product name
-                                productID: oData.results[0].productID       // First product ID
+                                productName: oData.results[0].productName,
+                                productID: oData.results[0].productID
                             };
-            
-                            // Set the default product to the model
+
                             oModel.setProperty("/selectedProduct", defaultProduct);
-            
-                            // Set the value of the Input field to the product name
                             that.getView().byId("productNameField").setValue(defaultProduct.productName);
-            
-                            // Optionally, filter the table by this product ID
                             that._filterTableByProduct(defaultProduct.productID);
-            
-                            // Log the product statuses for debugging
+
                             console.log("Product Statuses:", oData.results.map(product => product.status));
-            
-                            // Here, you can also ensure the table is populated with the product data
-                            oModel.setProperty("/product", oData.results); // Assuming you have the correct binding for the product entity
+
+                            // Set the formatted product data in the model
+                            oModel.setProperty("/product", oData.results);
                         } else {
-                            // Handle the case where no products are returned
                             console.warn("No products found.");
                         }
                     },
@@ -103,9 +146,29 @@ sap.ui.define([
                     }
                 });
             },
-            
 
-            
+            // Date formatter function
+            _formatDate: function (dateString) {
+                console.log("Formatting date:", dateString); // Debugging line
+                if (!dateString) {
+                    return "";
+                }
+                var date = new Date(dateString);
+                var year = date.getFullYear();
+                var month = (date.getMonth() + 1).toString().padStart(2, '0');
+                var day = date.getDate().toString().padStart(2, '0');
+                const formattedDate = year + '-' + month + '-' + day;
+                console.log("Formatted date:", formattedDate); // Log the formatted date
+                return formattedDate;
+            },
+
+
+
+
+
+
+
+
             _filterTableByProduct: function (productID) { // ----Filter the Table Based on the Selected Product----
                 var oTable = this.getView().byId("productTable");
                 var oBinding = oTable.getBinding("items");
@@ -346,32 +409,32 @@ sap.ui.define([
                 // Get the selected item from the event
                 var oSelectedItem = oEvent.getSource();
                 var oContext = oSelectedItem.getBindingContext();
-                
+
                 // Ensure the binding context is valid
                 if (!oContext) {
                     MessageBox.error("No product context found.");
                     return;
                 }
-            
+
                 // Get the unique ID and status of the selected product
                 var suniqueID = oContext.getProperty("uniqueID"); // Assuming the binding path has "uniqueID"
                 var status = oContext.getProperty("status"); // Adjust according to your model property
-            
+
                 // Check if the product is inactive
                 if (status === "inactive") {
                     MessageBox.warning("Cannot view details for inactive product: " + suniqueID + ".");
                     // Prevent navigation if the product is inactive
                     return;
                 }
-            
+
                 // Publish the Product ID via EventBus if the product is active
                 var oEventBus = this.getOwnerComponent().getEventBus();
                 console.log("Publishing event with uniqueID: ", suniqueID);
                 var oGModel = this.getOwnerComponent().getModel("globalModel");
                 oGModel.setProperty("/uniqueID", suniqueID);
                 oEventBus.publish("flexible", "setDetailPage", { uniqueID: suniqueID });
-            },  
-         // onRowSelected: function (oEvent) {//-----------listview table onrowselect fucntiolaity(using og model and without active and inactive status functionality)--------------
+            },
+            // onRowSelected: function (oEvent) {//-----------listview table onrowselect fucntiolaity(using og model and without active and inactive status functionality)--------------
             //     var oSelectedItem = oEvent.getSource();
             //     var oContext = oSelectedItem.getBindingContext();
             //     var suniqueID = oContext.getProperty("uniqueID");  // Assuming the binding path has "productID"
@@ -989,7 +1052,8 @@ sap.ui.define([
 
 
 
-            
+
+
             onEditProductListView: function (oEvent) { //------------update fucntionality-----------------
                 // Get the selected product data from the table row
                 var oSelectedItem = oEvent.getSource().getParent().getBindingContext().getObject();
@@ -1041,20 +1105,20 @@ sap.ui.define([
                 // Close the dialog after saving
                 this._oUpdateDialog.close();
             },
-            _formatDate: function (sDate) {// Helper function to format date in YYYY-MM-DD
-                if (!sDate) {
-                    return null;  // Handle null or empty date cases
-                }
-                // Convert string to Date object
-                var oDate = new Date(sDate);
+            // _formatDate: function (sDate) {// Helper function to format date in YYYY-MM-DD
+            //     if (!sDate) {
+            //         return null;  // Handle null or empty date cases
+            //     }
+            //     // Convert string to Date object
+            //     var oDate = new Date(sDate);
 
-                // Ensure it is in YYYY-MM-DD format
-                var iYear = oDate.getFullYear();
-                var iMonth = (oDate.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
-                var iDay = oDate.getDate().toString().padStart(2, '0');
+            //     // Ensure it is in YYYY-MM-DD format
+            //     var iYear = oDate.getFullYear();
+            //     var iMonth = (oDate.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
+            //     var iDay = oDate.getDate().toString().padStart(2, '0');
 
-                return iYear + '-' + iMonth + '-' + iDay;
-            },
+            //     return iYear + '-' + iMonth + '-' + iDay;
+            // },
             onCloseUpdateProductDialog: function () {  // Function to close the update dialog without saving
                 this._oUpdateDialog.close();
             },
@@ -1063,78 +1127,137 @@ sap.ui.define([
 
 
 
-            
+
             onDeleteProductListView: function (oEvent) { //---------delete fucntionality-----------------
                 // Get the context from the button that was pressed
                 var oButton = oEvent.getSource(); // Get the button that triggered the event
                 var oContext = oButton.getBindingContext(); // Get the binding context of the button
-            
+
                 // Check if context is available
                 if (oContext) {
                     var sUniqueID = oContext.getProperty("uniqueID"); // Get the unique ID from the context
-                    this._deleteProductByUniqueID(sUniqueID);
+                    this._deleteProductAndClassByUniqueID(sUniqueID);
                 } else {
                     MessageToast.show("No product selected for deletion.");
                 }
             },
+            // Function to delete product and product class entries using uniqueID
+            // Function to delete product and product class entries using uniqueID
+            _deleteProductAndClassByUniqueID: function (sUniqueID) {
+                var oModel = this.getView().getModel("cat3model");
             
-            _deleteProductByUniqueID: function (sUniqueID) {
-                var oModel = this.getView().getModel();
-            
-                // Show a confirmation dialog before deletion with the unique ID
-                MessageBox.confirm("Are you sure you want to delete the product with Unique ID: " + sUniqueID + "?", {
+                // Confirm deletion action
+                MessageBox.confirm("Are you sure you want to delete the product and product class entry with Unique ID: " + sUniqueID + "?", {
                     title: "Confirm Deletion",
                     onClose: function (oAction) {
                         if (oAction === MessageBox.Action.OK) {
-                            // Perform the delete operation
-                            oModel.remove("/product(" + sUniqueID + ")", {
+                            // Delete from product entity using uniqueID
+                            oModel.remove("/product(uniqueID=" + sUniqueID + ")", {
                                 success: function () {
-                                    MessageToast.show("Product deleted successfully");
-                                    // Optionally refresh the product list or model
-                                    oModel.refresh();
+                                    // After successfully deleting the product, read the productclass entity without any filters
+                                    oModel.read("/productclass", {
+                                        success: function (oData) {
+                                            if (oData.results && oData.results.length > 0) {
+                                                // Apply custom filtering logic to find matching records
+                                                var oFilteredRecord = oData.results.find(function (record) {
+                                                    return record.uniqueID_uniqueID === sUniqueID;
+                                                });
+            
+                                                if (oFilteredRecord) {
+                                                    var sClassID = oFilteredRecord.classID_classID;  // Extract classID from filtered record
+            
+                                                    // Now delete the productclass using both uniqueID and classID
+                                                    oModel.remove("/productclass(uniqueID_uniqueID=" + sUniqueID + ",classID_classID='" + sClassID + "')", {
+                                                        success: function () {
+                                                            MessageToast.show("Product and product class entries deleted successfully");
+                                                            oModel.refresh();
+                                                        },
+                                                        error: function (oError) {
+                                                            MessageToast.show("Error while deleting the product class entry: " + oError.message);
+                                                        }
+                                                    });
+                                                } else {
+                                                    MessageToast.show("No matching product class found to delete");
+                                                }
+                                            } else {
+                                                MessageToast.show("No product class records found");
+                                            }
+                                        },
+                                        error: function (oError) {
+                                            MessageToast.show("Error fetching the product class data: " + oError.message);
+                                        }
+                                    });
                                 },
                                 error: function (oError) {
-                                    MessageToast.show("Error while deleting the product: " + oError.message);
+                                    MessageToast.show("Error while deleting the product entry: " + oError.message);
                                 }
                             });
                         }
                     }
                 });
             },
+            // _deleteProductByUniqueID: function (sUniqueID) {
+            //     var oModel = this.getView().getModel();
 
+            //     // Show a confirmation dialog before deletion with the unique ID
+            //     MessageBox.confirm("Are you sure you want to delete the product with Unique ID: " + sUniqueID + "?", {
+            //         title: "Confirm Deletion",
+            //         onClose: function (oAction) {
+            //             if (oAction === MessageBox.Action.OK) {
+            //                 // Perform the delete operation
+            //                 oModel.remove("/product(" + sUniqueID + ")", {
+            //                     success: function () {
+            //                         MessageToast.show("Product deleted successfully");
+            //                         // Optionally refresh the product list or model
+            //                         oModel.refresh();
+            //                     },
+            //                     error: function (oError) {
+            //                         MessageToast.show("Error while deleting the product: " + oError.message);
+            //                     }
+            //                 });
+            //             }
+            //         }
+            //     });
+            // },
+            
+
+         
+            
+            
+            
 
 
 
             onSwitchChange: function (oEvent) { //-----------status functionality----------------
                 var oSwitch = oEvent.getSource(); // Get the Switch control that triggered the event
-            
+
                 // Get the binding context of the switch to access the uniqueID
                 var oBindingContext = oSwitch.getBindingContext(); // Uses default model
-            
+
                 // Ensure the binding context is valid
                 if (!oBindingContext) {
                     MessageBox.error("No product context found.");
                     return;
                 }
-            
+
                 // Retrieve the uniqueID from the binding context
                 var uniqueID = oBindingContext.getProperty("uniqueID"); // Ensure this matches the actual property name in your model
-            
+
                 // Get the OData model
                 var oModel = this.getOwnerComponent().getModel("cat3model");
-            
+
                 // Fetch the current status and toggle it
                 var currentStatus = oBindingContext.getProperty("status");
                 var newStatus = (currentStatus === "active") ? "inactive" : "active"; // Toggle status
-            
+
                 // Create the payload for the update
                 var payload = {
                     status: newStatus
                 };
-            
+
                 // Construct the path to the specific product entity using uniqueID
                 var sPath = "/product(" + uniqueID + ")"; // Adjust this path according to your OData service structure
-            
+
                 // Update the status in the OData model
                 oModel.update(sPath, payload, {
                     success: function () {
@@ -1150,12 +1273,12 @@ sap.ui.define([
                     }
                 });
             }
-            
-            
-            
-            
-            
-            
+
+
+
+
+
+
 
 
 

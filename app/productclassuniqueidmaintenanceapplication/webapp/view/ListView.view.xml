@@ -62,7 +62,7 @@
                         <Text text="Status" />
                     </Column>
                     <Column>
-                        <Text text="Valid From" />
+                       <Text text="Valid From" />
                     </Column>
                     <Column>
                         <Text text="Valid To" />
@@ -80,8 +80,8 @@
                                 state="{= ${status}.toLowerCase() === 'active' }" 
                                 change="onSwitchChange" />
                                  
-                                 <Text text="{validFrom}" />
-                            <Text text="{validTo}" />
+                                <Text text="{validFrom}" />  <!-- Ensure this matches your model property -->
+                                <Text text="{validTo}" />    <!-- Ensure this matches your model property -->
                             <HBox>
                                 <Button icon="sap-icon://edit" press="onEditProductListView" type="Success" class="sapUiSmallMarginEnd" />
                                 <Button icon="sap-icon://delete" press="onDeleteProductListView" type="Reject" class="sapUiSmallMarginEnd" />

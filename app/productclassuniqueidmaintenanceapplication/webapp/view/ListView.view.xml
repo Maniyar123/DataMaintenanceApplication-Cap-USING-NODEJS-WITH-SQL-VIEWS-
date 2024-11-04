@@ -80,8 +80,8 @@
                                 state="{= ${status}.toLowerCase() === 'active' }" 
                                 change="onSwitchChange" />
                                  
-                                <Text text="{validFrom}" />  <!-- Ensure this matches your model property -->
-                                <Text text="{validTo}" />    <!-- Ensure this matches your model property -->
+                                  <Text text="{path: 'validFrom', formatter: '.formatter.formatDate'}" /> <!-- Formatted date -->
+                            <Text text="{path: 'validTo', formatter: '.formatter.formatDate'}" /> <!-- Formatted date -->
                             <HBox>
                                 <Button icon="sap-icon://edit" press="onEditProductListView" type="Success" class="sapUiSmallMarginEnd" />
                                 <Button icon="sap-icon://delete" press="onDeleteProductListView" type="Reject" class="sapUiSmallMarginEnd" />

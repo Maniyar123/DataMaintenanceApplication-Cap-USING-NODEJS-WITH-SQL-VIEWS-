@@ -7,15 +7,58 @@ sap.ui.define([
     "sap/m/List",
     "sap/m/MessageToast",
     "sap/m/StandardListItem",
-    "sap/m/MessageBox"
+    "sap/m/MessageBox",
+    "com/productclassuniqueidmaintenanceapplication/util/formatter" // Adjust path if necessary
+
+    
 ],
-    function (Controller, Fragment, Filter, FilterOperator, Panel, List, MessageToast, StandardListItem, MessageBox) {
+    function (Controller, Fragment, Filter, FilterOperator, Panel, List, MessageToast, StandardListItem, MessageBox,formatter) {
         "use strict";
         var that;
         let oLastSelectedRadioButton = null; // Initialize a variable to keep track of the currently selected radio button
 
         return Controller.extend("com.productclassuniqueidmaintenanceapplication.controller.ListView", {
+            formatter: formatter,
 
+            onInit: function () {
+                var that = this;
+                var oModel = this.getOwnerComponent().getModel("cat3model");
+                this.getView().setModel(oModel);
+                this.bus = this.getOwnerComponent().getEventBus();
+                this._isDataLoaded = false; // Flag to track data loading status
+                this.selectedProductID = null;
+    
+                // Fetch the product data from the OData service
+                oModel.read("/product", {
+                    success: function (oData) {
+                        // Check if there are any products returned
+                        if (oData.results && oData.results.length > 0) {
+                            // Set the first product as the default product
+                            var defaultProduct = {
+                                productName: oData.results[0].productName,  // First product name
+                                productID: oData.results[0].productID,      // First product ID
+                                productDate: formatter.formatDate(oData.results[0].productDate) // Format date
+                            };
+    
+                            // Set the default product to the model
+                            oModel.setProperty("/selectedProduct", defaultProduct);
+    
+                            // Set the value of the Input field to the product name
+                            that.getView().byId("productNameField").setValue(defaultProduct.productName);
+    
+                            // Optionally, filter the table by this product ID
+                            that._filterTableByProduct(defaultProduct.productID);
+                            console.log("Product Statuses:", oData.results.map(product => product.status));
+                        } else {
+                            // Handle the case where no products are returned
+                            console.warn("No products found.");
+                        }
+                    },
+                    error: function (oError) {
+                        console.error("Error fetching product data: ", oError);
+                    }
+                });
+            },
             // onInit: function () {// -------------in oninit functioanlity by defult i had set one product to the table(without active and inactive status functioanlity)-------------------
             //     that = this;
             //     var oModel = this.getOwnerComponent().getModel("cat3model");
@@ -104,63 +147,7 @@ sap.ui.define([
             //     });
             // },
 
-            onInit: function () {
-                var that = this;
-                var oModel = this.getOwnerComponent().getModel("cat3model");
-                this.getView().setModel(oModel);
-                this.bus = this.getOwnerComponent().getEventBus();
-                this._isDataLoaded = false;
-                this.selectedProductID = null;
-
-                // Fetch the product data from the OData service
-                oModel.read("/product", {
-                    success: function (oData) {
-                        console.log("Fetched products:", oData.results); // Debugging line
-                        if (oData.results && oData.results.length > 0) {
-                            // Format the dates
-                            oData.results.forEach(function (product) {
-                                product.validFrom = that._formatDate(product.validFrom);
-                                product.validTo = that._formatDate(product.validTo);
-                            });
-
-                            // Set the first product as the default product
-                            var defaultProduct = {
-                                productName: oData.results[0].productName,
-                                productID: oData.results[0].productID
-                            };
-
-                            oModel.setProperty("/selectedProduct", defaultProduct);
-                            that.getView().byId("productNameField").setValue(defaultProduct.productName);
-                            that._filterTableByProduct(defaultProduct.productID);
-
-                            console.log("Product Statuses:", oData.results.map(product => product.status));
-
-                            // Set the formatted product data in the model
-                            oModel.setProperty("/product", oData.results);
-                        } else {
-                            console.warn("No products found.");
-                        }
-                    },
-                    error: function (oError) {
-                        console.error("Error fetching product data: ", oError);
-                    }
-                });
-            },
-
-            // Date formatter function
-            _formatDate: function (dateString) {
-                console.log("Formatting date:", dateString); // Debugging line
-                if (!dateString) {
-                    return "";
-                }
-                var date = new Date(dateString);
-                var year = date.getFullYear();
-                var month = (date.getMonth() + 1).toString().padStart(2, '0');
-                var day = date.getDate().toString().padStart(2, '0');
-                const formattedDate = year + '-' + month + '-' + day;
-                console.log("Formatted date:", formattedDate); // Log the formatted date
-                return formattedDate;
-            },
+          
 
 
 

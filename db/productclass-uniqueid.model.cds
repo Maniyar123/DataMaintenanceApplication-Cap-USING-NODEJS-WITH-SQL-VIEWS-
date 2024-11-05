@@ -43,6 +43,7 @@ entity PRODUTCLASSUNICALVIEW {
     DESCRIPTION:String;
     CHARACTERISTICNAME:String;
     VALUE:String;
+    CHARACTERISTICID:String;
 
 }
 @cds.persistence.exists

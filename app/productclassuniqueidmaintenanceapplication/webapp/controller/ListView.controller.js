@@ -1057,8 +1057,9 @@ sap.ui.define([
                 sap.ui.getCore().byId("inputProductNameUpdate").setValue(oSelectedItem.productName);
                 sap.ui.getCore().byId("descriptionInputUpdate").setValue(oSelectedItem.description);
                 sap.ui.getCore().byId("statusSelectUpdate").setSelectedKey(oSelectedItem.status);
-                sap.ui.getCore().byId("validFromInputUpdate").setValue(oSelectedItem.validFrom);
-                sap.ui.getCore().byId("validToInputUpdate").setValue(oSelectedItem.validTo);
+                 // Use the formatter to format dates
+            sap.ui.getCore().byId("validFromInputUpdate").setValue(formatter.formatDate(oSelectedItem.validFrom));
+            sap.ui.getCore().byId("validToInputUpdate").setValue(formatter.formatDate(oSelectedItem.validTo));
 
                 // Open the update dialog
                 this._oUpdateDialog.open();
@@ -1073,18 +1074,18 @@ sap.ui.define([
                     description: sap.ui.getCore().byId("descriptionInputUpdate").getValue(),
                     status: sap.ui.getCore().byId("statusSelectUpdate").getSelectedKey(),
 
-                    // Parse and format the dates correctly (YYYY-MM-DD)
-                    validFrom: this._formatDate(sap.ui.getCore().byId("validFromInputUpdate").getValue()),
-                    validTo: this._formatDate(sap.ui.getCore().byId("validToInputUpdate").getValue())
-                };
+                      // Call formatter for date conversion
+                        validFrom: formatter.formatDate(sap.ui.getCore().byId("validFromInputUpdate").getValue()),
+                        validTo: formatter.formatDate(sap.ui.getCore().byId("validToInputUpdate").getValue())
+                    };
 
-                // Perform the update operation via OData or any service here
-                var oModel = this.getView().getModel();
-                oModel.update("/product(" + oUpdatedProduct.uniqueID + ")", oUpdatedProduct, {
-                    success: function () {
+                        // Perform the update operation via OData or any service here
+                        var oModel = this.getView().getModel();
+                        oModel.update("/product(" + oUpdatedProduct.uniqueID + ")", oUpdatedProduct, {
+                         success: function () {
                         MessageToast.show("Product updated successfully");
                     },
-                    error: function (oError) {
+                        error: function (oError) {
                         MessageToast.show("Error while updating the product: " + oError.message);
                     }
                 });
@@ -1092,20 +1093,7 @@ sap.ui.define([
                 // Close the dialog after saving
                 this._oUpdateDialog.close();
             },
-            // _formatDate: function (sDate) {// Helper function to format date in YYYY-MM-DD
-            //     if (!sDate) {
-            //         return null;  // Handle null or empty date cases
-            //     }
-            //     // Convert string to Date object
-            //     var oDate = new Date(sDate);
-
-            //     // Ensure it is in YYYY-MM-DD format
-            //     var iYear = oDate.getFullYear();
-            //     var iMonth = (oDate.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-based
-            //     var iDay = oDate.getDate().toString().padStart(2, '0');
-
-            //     return iYear + '-' + iMonth + '-' + iDay;
-            // },
+          
             onCloseUpdateProductDialog: function () {  // Function to close the update dialog without saving
                 this._oUpdateDialog.close();
             },

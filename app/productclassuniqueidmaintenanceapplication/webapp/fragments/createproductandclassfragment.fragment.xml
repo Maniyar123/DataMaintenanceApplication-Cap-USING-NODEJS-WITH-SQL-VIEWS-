@@ -2,13 +2,9 @@
     <Dialog
         id="createProductDialog"
         title="Create Product"
-       
         draggable="true"
         contentHeight="600px" 
         contentWidth="500px"> 
-        
-        
-        
         <content>
             <VBox id="productVBox" class="sapUiSmallMargin">
 
@@ -26,11 +22,11 @@
                     </items>
                 </Select>
 
-                <Label text="Valid From (YYYY-MM-DD)" design="Bold"/>
-                <Input id="inputValidFrom" tooltip="Valid From (YYYY-MM-DD)"/>
+                <Label text="Valid From" design="Bold"/>
+                <DatePicker id="inputValidFrom" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" tooltip="Select a start date"/>
 
-                <Label text="Valid To (YYYY-MM-DD)" design="Bold"/>
-                <Input id="inputValidTo" tooltip="Valid To (YYYY-MM-DD)"/>
+                <Label text="Valid To" design="Bold"/>
+                <DatePicker id="inputValidTo" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" tooltip="Select an end date"/>
 
                 <!-- Placeholder for the additional fragment -->
                 <VBox id="characteristicFormVBox" visible="false"></VBox> <!-- Initially hidden -->

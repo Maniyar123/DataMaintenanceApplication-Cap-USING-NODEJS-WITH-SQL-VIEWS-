@@ -10,13 +10,13 @@ sap.ui.define([
     "sap/m/MessageBox",
     "com/productclassuniqueidmaintenanceapplication/util/formatter" // Adjust path if necessary
 
-    
+
 ],
-    function (Controller, Fragment, Filter, FilterOperator, Panel, List, MessageToast, StandardListItem, MessageBox,formatter) {
+    function (Controller, Fragment, Filter, FilterOperator, Panel, List, MessageToast, StandardListItem, MessageBox, formatter) {
         "use strict";
         var that;
         let oLastSelectedRadioButton = null; // Initialize a variable to keep track of the currently selected radio button
-
+        this.lastSelectedRadioButtons = {};
         return Controller.extend("com.productclassuniqueidmaintenanceapplication.controller.ListView", {
             formatter: formatter,
 
@@ -27,7 +27,7 @@ sap.ui.define([
                 this.bus = this.getOwnerComponent().getEventBus();
                 this._isDataLoaded = false; // Flag to track data loading status
                 this.selectedProductID = null;
-    
+
                 // Fetch the product data from the OData service
                 oModel.read("/product", {
                     success: function (oData) {
@@ -39,13 +39,13 @@ sap.ui.define([
                                 productID: oData.results[0].productID,      // First product ID
                                 productDate: formatter.formatDate(oData.results[0].productDate) // Format date
                             };
-    
+
                             // Set the default product to the model
                             oModel.setProperty("/selectedProduct", defaultProduct);
-    
+
                             // Set the value of the Input field to the product name
                             that.getView().byId("productNameField").setValue(defaultProduct.productName);
-    
+
                             // Optionally, filter the table by this product ID
                             that._filterTableByProduct(defaultProduct.productID);
                             console.log("Product Statuses:", oData.results.map(product => product.status));
@@ -147,7 +147,7 @@ sap.ui.define([
             //     });
             // },
 
-          
+
 
 
 
@@ -392,35 +392,114 @@ sap.ui.define([
 
 
 
-            onRowSelected: function (oEvent) { //---------onRowSelected with active and inactive functionality-----------
+            // onRowSelected: function (oEvent) { //---------onRowSelected with active and inactive functionality-----------
+            //     // Get the selected item from the event
+            //     var oSelectedItem = oEvent.getSource();
+            //     var oContext = oSelectedItem.getBindingContext();
+
+            //     // Ensure the binding context is valid
+            //     if (!oContext) {
+            //         MessageBox.error("No product context found.");
+            //         return;
+            //     }
+
+            //     // Get the unique ID and status of the selected product
+            //     var suniqueID = oContext.getProperty("uniqueID"); // Assuming the binding path has "uniqueID"
+            //     var status = oContext.getProperty("status"); // Adjust according to your model property
+
+            //     // Check if the product is inactive
+            //     if (status === "inactive") {
+            //         MessageBox.warning("Cannot view details for inactive product: " + suniqueID + ".");
+            //         // Prevent navigation if the product is inactive
+            //         return;
+            //     }
+
+            //     // Publish the Product ID via EventBus if the product is active
+            //     var oEventBus = this.getOwnerComponent().getEventBus();
+            //     console.log("Publishing event with uniqueID: ", suniqueID);
+            //     var oGModel = this.getOwnerComponent().getModel("globalModel");
+            //     oGModel.setProperty("/uniqueID", suniqueID);
+
+            //     oEventBus.publish("flexible", "setDetailPage", { uniqueID: suniqueID });
+            // },
+            onRowSelected: function (oEvent) {
                 // Get the selected item from the event
                 var oSelectedItem = oEvent.getSource();
                 var oContext = oSelectedItem.getBindingContext();
-
+            
                 // Ensure the binding context is valid
                 if (!oContext) {
                     MessageBox.error("No product context found.");
                     return;
                 }
-
+            
                 // Get the unique ID and status of the selected product
                 var suniqueID = oContext.getProperty("uniqueID"); // Assuming the binding path has "uniqueID"
                 var status = oContext.getProperty("status"); // Adjust according to your model property
-
+            
                 // Check if the product is inactive
                 if (status === "inactive") {
                     MessageBox.warning("Cannot view details for inactive product: " + suniqueID + ".");
                     // Prevent navigation if the product is inactive
                     return;
                 }
-
-                // Publish the Product ID via EventBus if the product is active
-                var oEventBus = this.getOwnerComponent().getEventBus();
-                console.log("Publishing event with uniqueID: ", suniqueID);
-                var oGModel = this.getOwnerComponent().getModel("globalModel");
-                oGModel.setProperty("/uniqueID", suniqueID);
-                oEventBus.publish("flexible", "setDetailPage", { uniqueID: suniqueID });
+            
+                // Now fetch and filter the characteristics data based on the selected uniqueID
+                this._fetchCharacteristicsData(suniqueID);
             },
+            
+            _fetchCharacteristicsData: function(suniqueID) {
+                var oModel = this.getOwnerComponent().getModel("cat3model");
+                var oGModel = this.getOwnerComponent().getModel("globalModel");
+                
+                // Read data from the OData service
+                oModel.read("/productclass", {
+                    success: function (oData) {
+                        // Ensure the 'results' field exists and contains the data
+                        if (!oData || !oData.results) {
+                            MessageBox.error("No characteristics data found for the selected product.");
+                            return;
+                        }
+            
+                        // Filter results based on uniqueID
+                        var filteredData = oData.results.filter(function (item) {
+                            return item.uniqueID_uniqueID === suniqueID;  // Adjust if needed
+                        });
+            
+                        if (filteredData.length === 0) {
+                            MessageBox.warning("No characteristics data found for the selected uniqueID.");
+                            return;
+                        }
+            
+                        // Extract characteristic IDs from filtered data
+                        var characteristicIDs = filteredData.map(function (item) {
+                            return item.characteristicID_characteristicID;
+                        });
+            
+                        console.log("Fetched characteristic IDs: ", characteristicIDs);
+            
+                        // Set uniqueID and characteristicIDs in globalModel
+                        oGModel.setProperty("/uniqueID", suniqueID);  // Set uniqueID
+                        oGModel.setProperty("/characteristicIDs", characteristicIDs);  // Set characteristicIDs
+            
+                        // Publish the event with uniqueID and characteristic IDs
+                        var oEventBus = this.getOwnerComponent().getEventBus();
+                        oEventBus.publish("flexible", "setDetailPage", {
+                            uniqueID: suniqueID,
+                            characteristicIDs: characteristicIDs
+                        });
+                    }.bind(this),
+                    error: function (oError) {
+                        MessageBox.error("Error fetching characteristics data: " + oError.message);
+                    }
+                });
+            },
+            
+            
+
+
+
+
             // onRowSelected: function (oEvent) {//-----------listview table onrowselect fucntiolaity(using og model and without active and inactive status functionality)--------------
             //     var oSelectedItem = oEvent.getSource();
             //     var oContext = oSelectedItem.getBindingContext();
@@ -721,7 +800,8 @@ sap.ui.define([
                     // Create an entry for productclass entity
                     var newProductClassEntry = {
                         uniqueID_uniqueID: createdProductID, // Bind with the created product's uniqueID
-                        classID_classID: classID, // Bind the classID from the characteristic
+                        classID_classID: classID,
+                        characteristicID_characteristicID: charID// Bind the classID from the characteristic
                         // characteristicID: charID // Bind the characteristic ID if needed
                     };
 
@@ -740,6 +820,86 @@ sap.ui.define([
                     });
                 }, this); // Bind 'this' to the forEach loop
             },
+            
+            // _saveCharacteristics: function (createdProductID) {
+            //     var oCharacteristicTable = sap.ui.getCore().byId("characteristicTable");
+            //     var aItems = oCharacteristicTable.getItems(); // Get all items (rows) from the table
+            //     var oModel = this.getView().getModel("cat3model");
+
+            //     // Create an empty array to store characteristics to save
+            //     var aCharacteristicsToSave = [];
+
+            //     // Read the data from the OData service
+            //     oModel.read("/productclass", {
+            //         success: function (oData) {
+            //             console.log("Fetched oData:", oData);  // Log the fetched data for inspection
+
+            //             if (Array.isArray(oData.results)) {
+            //                 // Loop over the items in the table
+            //                 aItems.forEach(function (oItem) {
+            //                     var oCharacteristicData = oItem.getBindingContext().getObject(); // Get the data for each item
+            //                     console.log("Processing characteristic data:", oCharacteristicData);  // Log characteristic data for inspection
+
+            //                     // Filter characteristics based on uniqueID, classID, and characteristicID
+            //                     var filteredData = oData.results.filter(function (item) {
+            //                         return   item.classID_classID === oCharacteristicData.CLASS_ID &&
+            //                                item.characteristicID_characteristicID === oCharacteristicData.ID;
+            //                     });
+
+            //                     console.log("Filtered data:", filteredData);  // Log filtered data for inspection
+
+            //                     if (filteredData.length > 0) {
+            //                         // Create the object to be saved in productclass
+            //                         var newProductClassEntry = {
+            //                             uniqueID_uniqueID: createdProductID, // Bind the created product's unique ID
+            //                             classID_classID: oCharacteristicData.classID_classID, // Class ID from the characteristic
+            //                             characteristicID_characteristicID: oCharacteristicData.characteristicID_characteristicID // Characteristic ID from the item
+            //                         };
+
+            //                         // Add this entry to the array of characteristics to save
+            //                         aCharacteristicsToSave.push(newProductClassEntry);
+            //                     }
+            //                 });
+
+            //                 // Proceed to save the characteristics if any were found
+            //                 if (aCharacteristicsToSave.length > 0) {
+            //                     aCharacteristicsToSave.forEach(function (newProductClassEntry) {
+            //                         oModel.create("/productclass", newProductClassEntry, {
+            //                             success: function () {
+            //                                 sap.m.MessageToast.show("Class ID added to product successfully.");
+            //                                 // Close the dialog after processing all characteristics
+            //                                 this.onCloseCreateProductDialog();
+            //                             }.bind(this),
+            //                             error: function (error) {
+            //                                 console.error("Error while saving class ID:", error);
+            //                                 sap.m.MessageToast.show("Error saving class ID.");
+            //                             }.bind(this)
+            //                         });
+            //                     });
+            //                 } else {
+            //                     sap.m.MessageToast.show("No characteristics found to add.");
+            //                 }
+            //             } else {
+            //                 console.error("OData response does not contain a valid 'results' property or it's not an array.");
+            //                 sap.m.MessageToast.show("Error fetching product class data.");
+            //             }
+            //         }.bind(this),
+            //         error: function (error) {
+            //             console.error("Error while reading productclass data:", error);
+            //             sap.m.MessageToast.show("Error fetching product class data.");
+            //         }
+            //     });
+            // },
+
+
+
+
+
+
+
+
+
+
             onAddCharacteristic: function () {//--------------------when i click the add icon insid ethe create button frgamnet panels frgamnet will open there creating the ppanels  dynamically----------
                 // Check if the fragment is already loaded
                 if (!this.oFragment) {
@@ -855,62 +1015,137 @@ sap.ui.define([
                 this.oFragment.rerender();
             },
 
+            // _transformData: function (aData) {
+            //     const oGroupedData = {};
+
+            //     aData.forEach((oItem) => {
+            //         // Group by class
+            //         if (!oGroupedData[oItem.CLASSID]) {
+            //             oGroupedData[oItem.CLASSID] = {
+            //                 CLASSID: oItem.CLASSID,
+            //                 CLASSNAME: oItem.CLASSNAME,
+            //                 nodes: []
+            //             };
+            //         }
+
+            //         // Group by characteristic within the class
+            //         const aCharacteristics = oGroupedData[oItem.CLASSID].nodes;
+            //         let oCharacteristic = aCharacteristics.find(char => char.CHARACTERISTICID === oItem.CHARACTERISTICID);
+
+            //         if (!oCharacteristic) {
+            //             oCharacteristic = {
+            //                 CHARACTERISTICID: oItem.CHARACTERISTICID,
+            //                 CHARACTERISTICNAME: oItem.CHARACTERISTICNAME,
+            //                 nodes: []
+            //             };
+            //             aCharacteristics.push(oCharacteristic);
+            //         }
+
+            //         // Add value to the characteristic
+            //         oCharacteristic.nodes.push({
+            //             VALUE: oItem.VALUE
+            //         });
+            //     });
+
+            //     // Convert grouped data object into an array
+            //     return Object.values(oGroupedData);
+            // },
+
             _transformData: function (aData) {
                 const oGroupedData = {};
 
                 aData.forEach((oItem) => {
-                    // Group by class
+                    // Initialize the class group if it doesn't exist
                     if (!oGroupedData[oItem.CLASSID]) {
                         oGroupedData[oItem.CLASSID] = {
                             CLASSID: oItem.CLASSID,
-                            CLASSNAME: oItem.CLASSNAME,
+                            CLASSNAME: oItem.CLASSNAME, // Use CLASSID as the name, modify if you have a separate class name property
                             nodes: []
                         };
                     }
 
-                    // Group by characteristic within the class
+                    // Reference to the characteristics array within the current class
                     const aCharacteristics = oGroupedData[oItem.CLASSID].nodes;
-                    let oCharacteristic = aCharacteristics.find(char => char.CHARACTERISTICID === oItem.CHARACTERISTICID);
 
+                    // Check if a panel already exists for this characteristic name within the current CLASSID
+                    let oCharacteristic = aCharacteristics.find(char =>
+                        char.CHARACTERISTICNAME === oItem.CHARACTERISTICNAME && char.CLASSID === oItem.CLASSID
+                    );
+
+                    // If no panel exists for this characteristic within this CLASSID, create one
                     if (!oCharacteristic) {
                         oCharacteristic = {
+                            CLASSID: oItem.CLASSID, // Add CLASSID to the characteristic panel for verification
                             CHARACTERISTICID: oItem.CHARACTERISTICID,
                             CHARACTERISTICNAME: oItem.CHARACTERISTICNAME,
-                            nodes: []
+                            nodes: [] // Initialize as an array to store all values
                         };
                         aCharacteristics.push(oCharacteristic);
                     }
 
-                    // Add value to the characteristic
-                    oCharacteristic.nodes.push({
-                        VALUE: oItem.VALUE
-                    });
+                    // Add the value to the characteristic's nodes (avoid duplicates if necessary)
+                    if (!oCharacteristic.nodes.some(valueObj => valueObj.VALUE === oItem.value)) {
+                        oCharacteristic.nodes.push({
+                            VALUE: oItem.VALUE
+                        });
+                    }
                 });
 
-                // Convert grouped data object into an array
+                // Convert the grouped data object into an array
                 return Object.values(oGroupedData);
             },
 
+
+
+            // onSelect: function (oEvent) {
+            //     const oSelectedButton = oEvent.getSource();
+
+            //     // Check if the clicked radio button is the last selected one
+            //     if (oLastSelectedRadioButton === oSelectedButton) {
+            //         // Deselect the radio button
+            //         oSelectedButton.setSelected(false);
+            //         oLastSelectedRadioButton = null; // Reset the last selected radio button
+            //         MessageToast.show("Deselected: " + oSelectedButton.getText());
+            //     } else {
+            //         // Deselect the last selected radio button, if it exists
+            //         if (oLastSelectedRadioButton) {
+            //             oLastSelectedRadioButton.setSelected(false);
+            //         }
+            //         // Select the clicked radio button
+            //         oSelectedButton.setSelected(true);
+            //         oLastSelectedRadioButton = oSelectedButton; // Update the last selected radio button
+            //         MessageToast.show("Selected: " + oSelectedButton.getText());
+            //     }
+            // },
+            // Map to keep track of the last selected radio button per characteristic
+
+
             onSelect: function (oEvent) {
                 const oSelectedButton = oEvent.getSource();
+                const characteristicId = oSelectedButton.getGroupName(); // Unique ID for each characteristic group
 
-                // Check if the clicked radio button is the last selected one
-                if (oLastSelectedRadioButton === oSelectedButton) {
+                // Check if the clicked radio button is the last selected one for this characteristic
+                if (this.lastSelectedRadioButtons[characteristicId] === oSelectedButton) {
                     // Deselect the radio button
                     oSelectedButton.setSelected(false);
-                    oLastSelectedRadioButton = null; // Reset the last selected radio button
+                    this.lastSelectedRadioButtons[characteristicId] = null; // Reset last selected for this characteristic
                     MessageToast.show("Deselected: " + oSelectedButton.getText());
                 } else {
-                    // Deselect the last selected radio button, if it exists
-                    if (oLastSelectedRadioButton) {
-                        oLastSelectedRadioButton.setSelected(false);
+                    // Deselect the last selected radio button for this characteristic, if it exists
+                    if (this.lastSelectedRadioButtons[characteristicId]) {
+                        this.lastSelectedRadioButtons[characteristicId].setSelected(false);
                     }
                     // Select the clicked radio button
                     oSelectedButton.setSelected(true);
-                    oLastSelectedRadioButton = oSelectedButton; // Update the last selected radio button
+                    this.lastSelectedRadioButtons[characteristicId] = oSelectedButton; // Update the last selected for this characteristic
                     MessageToast.show("Selected: " + oSelectedButton.getText());
                 }
             },
+
+
+
+
+
 
             onCloseClassCharValDialog: function () { // ------classcharvalue frgament close functionality-------------
                 this.oFragment.close();
@@ -1057,9 +1292,9 @@ sap.ui.define([
                 sap.ui.getCore().byId("inputProductNameUpdate").setValue(oSelectedItem.productName);
                 sap.ui.getCore().byId("descriptionInputUpdate").setValue(oSelectedItem.description);
                 sap.ui.getCore().byId("statusSelectUpdate").setSelectedKey(oSelectedItem.status);
-                 // Use the formatter to format dates
-            sap.ui.getCore().byId("validFromInputUpdate").setValue(formatter.formatDate(oSelectedItem.validFrom));
-            sap.ui.getCore().byId("validToInputUpdate").setValue(formatter.formatDate(oSelectedItem.validTo));
+                // Use the formatter to format dates
+                sap.ui.getCore().byId("validFromInputUpdate").setValue(formatter.formatDate(oSelectedItem.validFrom));
+                sap.ui.getCore().byId("validToInputUpdate").setValue(formatter.formatDate(oSelectedItem.validTo));
 
                 // Open the update dialog
                 this._oUpdateDialog.open();
@@ -1074,18 +1309,18 @@ sap.ui.define([
                     description: sap.ui.getCore().byId("descriptionInputUpdate").getValue(),
                     status: sap.ui.getCore().byId("statusSelectUpdate").getSelectedKey(),
 
-                      // Call formatter for date conversion
-                        validFrom: formatter.formatDate(sap.ui.getCore().byId("validFromInputUpdate").getValue()),
-                        validTo: formatter.formatDate(sap.ui.getCore().byId("validToInputUpdate").getValue())
-                    };
+                    // Call formatter for date conversion
+                    validFrom: formatter.formatDate(sap.ui.getCore().byId("validFromInputUpdate").getValue()),
+                    validTo: formatter.formatDate(sap.ui.getCore().byId("validToInputUpdate").getValue())
+                };
 
-                        // Perform the update operation via OData or any service here
-                        var oModel = this.getView().getModel();
-                        oModel.update("/product(" + oUpdatedProduct.uniqueID + ")", oUpdatedProduct, {
-                         success: function () {
+                // Perform the update operation via OData or any service here
+                var oModel = this.getView().getModel();
+                oModel.update("/product(" + oUpdatedProduct.uniqueID + ")", oUpdatedProduct, {
+                    success: function () {
                         MessageToast.show("Product updated successfully");
                     },
-                        error: function (oError) {
+                    error: function (oError) {
                         MessageToast.show("Error while updating the product: " + oError.message);
                     }
                 });
@@ -1093,7 +1328,7 @@ sap.ui.define([
                 // Close the dialog after saving
                 this._oUpdateDialog.close();
             },
-          
+
             onCloseUpdateProductDialog: function () {  // Function to close the update dialog without saving
                 this._oUpdateDialog.close();
             },
@@ -1111,6 +1346,7 @@ sap.ui.define([
                 // Check if context is available
                 if (oContext) {
                     var sUniqueID = oContext.getProperty("uniqueID"); // Get the unique ID from the context
+
                     this._deleteProductAndClassByUniqueID(sUniqueID);
                 } else {
                     MessageToast.show("No product selected for deletion.");
@@ -1118,9 +1354,63 @@ sap.ui.define([
             },
             // Function to delete product and product class entries using uniqueID
             // Function to delete product and product class entries using uniqueID
+            // _deleteProductAndClassByUniqueID: function (sUniqueID) {
+            //     var oModel = this.getView().getModel("cat3model");
+
+            //     // Confirm deletion action
+            //     MessageBox.confirm("Are you sure you want to delete the product and product class entry with Unique ID: " + sUniqueID + "?", {
+            //         title: "Confirm Deletion",
+            //         onClose: function (oAction) {
+            //             if (oAction === MessageBox.Action.OK) {
+            //                 // Delete from product entity using uniqueID
+            //                 oModel.remove("/product(uniqueID=" + sUniqueID + ")", {
+            //                     success: function () {
+            //                         // After successfully deleting the product, read the productclass entity without any filters
+            //                         oModel.read("/productclass", {
+            //                             success: function (oData) {
+            //                                 if (oData.results && oData.results.length > 0) {
+            //                                     // Apply custom filtering logic to find matching records
+            //                                     var oFilteredRecord = oData.results.find(function (record) {
+            //                                         return record.uniqueID_uniqueID === sUniqueID;
+            //                                     });
+
+            //                                     if (oFilteredRecord) {
+            //                                         var sClassID = oFilteredRecord.classID_classID;  // Extract classID from filtered record
+
+            //                                         // Now delete the productclass using both uniqueID and classID
+            //                                         oModel.remove("/productclass(uniqueID_uniqueID=" + sUniqueID + ",classID_classID='" + sClassID + "')", {
+            //                                             success: function () {
+            //                                                 MessageToast.show("Product and product class entries deleted successfully");
+            //                                                 oModel.refresh();
+            //                                             },
+            //                                             error: function (oError) {
+            //                                                 MessageToast.show("Error while deleting the product class entry: " + oError.message);
+            //                                             }
+            //                                         });
+            //                                     } else {
+            //                                         MessageToast.show("No matching product class found to delete");
+            //                                     }
+            //                                 } else {
+            //                                     MessageToast.show("No product class records found");
+            //                                 }
+            //                             },
+            //                             error: function (oError) {
+            //                                 MessageToast.show("Error fetching the product class data: " + oError.message);
+            //                             }
+            //                         });
+            //                     },
+            //                     error: function (oError) {
+            //                         MessageToast.show("Error while deleting the product entry: " + oError.message);
+            //                     }
+            //                 });
+            //             }
+            //         }
+            //     });
+            // },
+
             _deleteProductAndClassByUniqueID: function (sUniqueID) {
                 var oModel = this.getView().getModel("cat3model");
-            
+
                 // Confirm deletion action
                 MessageBox.confirm("Are you sure you want to delete the product and product class entry with Unique ID: " + sUniqueID + "?", {
                     title: "Confirm Deletion",
@@ -1129,20 +1419,25 @@ sap.ui.define([
                             // Delete from product entity using uniqueID
                             oModel.remove("/product(uniqueID=" + sUniqueID + ")", {
                                 success: function () {
-                                    // After successfully deleting the product, read the productclass entity without any filters
+                                    // After deleting the product, read the productclass entity to get all keys
                                     oModel.read("/productclass", {
                                         success: function (oData) {
                                             if (oData.results && oData.results.length > 0) {
-                                                // Apply custom filtering logic to find matching records
+                                                // Find the matching product class record by uniqueID
                                                 var oFilteredRecord = oData.results.find(function (record) {
                                                     return record.uniqueID_uniqueID === sUniqueID;
                                                 });
-            
+
                                                 if (oFilteredRecord) {
-                                                    var sClassID = oFilteredRecord.classID_classID;  // Extract classID from filtered record
-            
-                                                    // Now delete the productclass using both uniqueID and classID
-                                                    oModel.remove("/productclass(uniqueID_uniqueID=" + sUniqueID + ",classID_classID='" + sClassID + "')", {
+                                                    var sClassID = oFilteredRecord.classID_classID;
+                                                    var sCharacteristicID = oFilteredRecord.characteristicID_characteristicID; // Retrieve characteristicID
+
+                                                    // Delete the productclass entry using all keys
+                                                    var sPath = "/productclass(uniqueID_uniqueID=" + sUniqueID +
+                                                        ",classID_classID='" + sClassID + "'" +
+                                                        ",characteristicID_characteristicID='" + sCharacteristicID + "')";
+
+                                                    oModel.remove(sPath, {
                                                         success: function () {
                                                             MessageToast.show("Product and product class entries deleted successfully");
                                                             oModel.refresh();
@@ -1171,6 +1466,7 @@ sap.ui.define([
                     }
                 });
             },
+
             // _deleteProductByUniqueID: function (sUniqueID) {
             //     var oModel = this.getView().getModel();
 
@@ -1194,12 +1490,12 @@ sap.ui.define([
             //         }
             //     });
             // },
-            
 
-         
-            
-            
-            
+
+
+
+
+
 
 
 

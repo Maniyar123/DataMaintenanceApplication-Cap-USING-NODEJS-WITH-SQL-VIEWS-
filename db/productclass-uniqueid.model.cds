@@ -27,7 +27,7 @@ entity Characteristic {
 entity ProductClass {
    key uniqueID  : Association to Product;  // Foreign key to Product
    key classID   : Association to Class;    // Foreign key to Class
-    
+   key characteristicID:Association to Characteristic;
     
 }
 entity DemoProduct {

@@ -167,7 +167,9 @@
   
     <attribute id="CHARACTERISTICID" order="10" displayAttribute="false" attributeHierarchyActive="false">
       <descriptions defaultDescription="CHARACTERISTICID"/>
+  
       <keyMapping columnObjectName="Join_1_3" columnName="CHARACTERISTICID"/>
+  
     </attribute>
   </attributes>
   <calculatedAttributes/>

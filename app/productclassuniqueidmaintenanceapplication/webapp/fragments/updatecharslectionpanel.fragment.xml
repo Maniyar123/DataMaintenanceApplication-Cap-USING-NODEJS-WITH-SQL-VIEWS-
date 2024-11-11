@@ -1,0 +1,18 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+ <Dialog
+        id="classDialogUpdate"
+        title="Class and Characteristic Selection"
+        afterOpen="onBeforeOpen"
+        draggable="true">
+        <VBox id="myVBoxUpdate" class="sapUiSmallMargin">
+            <!-- Panels will be dynamically added here -->
+        </VBox>
+        <buttons>
+        <Button  text="Update" press="onSubmitClassCharValUpdate"></Button>
+            <Button
+                text="Close"
+                press="onCloseClassCharValDialogUpdate"/>
+
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

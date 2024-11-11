@@ -3,7 +3,7 @@
         id="editProductDialog"
         title="Update Product"
         draggable="true"
-        contentHeight="420px"
+       contentHeight="600px" 
         contentWidth="500px"> 
 
         <content>
@@ -36,6 +36,39 @@
                 <DatePicker id="validToInputUpdate" displayFormat="yyyy-MM-dd" valueFormat="yyyy-MM-dd" tooltip="Select an end date"/>
 
             </VBox>
+
+            <!-- Placeholder for the additional fragment with the table -->
+            <VBox id="editCharacteristicFormVBox" class="sapUiSmallMargin">
+                
+                <!-- Use HBox for placing button to the right -->
+                <HBox justifyContent="End" class="sapUiSmallMarginBottom">
+                    <Button 
+                        icon="sap-icon://add" 
+                        press="onEditAddCharacteristic" />
+                </HBox>
+
+                <!-- Table for displaying characteristics data -->
+                <Table id="characteristicsEditTable" items="{/FILTERED_DATA}">
+                    <columns>
+                        <Column>
+                            <Text text="Characteristic Name"/>
+                        </Column>
+                        <Column>
+                            <Text text="Value"/>
+                        </Column>
+                    </columns>
+
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Text text="{CHARACTERISTICNAME}"/>
+                                <Text text="{VALUE}"/>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </VBox>
+
         </content>
 
         <beginButton>

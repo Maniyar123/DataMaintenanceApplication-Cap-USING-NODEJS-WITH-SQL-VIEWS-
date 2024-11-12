@@ -1365,13 +1365,13 @@ sap.ui.define([
                 // Get the selected product data from the table row
                 const oSelectedItem = oEvent.getSource().getParent().getBindingContext().getObject();
                 const uniqueID = oSelectedItem.uniqueID;
-
+            
                 // Create the dialog if not already created
                 if (!this._oUpdateDialog) {
                     this._oUpdateDialog = sap.ui.xmlfragment("com.productclassuniqueidmaintenanceapplication.fragments.editProductFragment", this);
                     this.getView().addDependent(this._oUpdateDialog);
                 }
-
+            
                 // Populate the dialog inputs with the selected product data
                 sap.ui.getCore().byId("uniqueIDInputUpdate").setValue(oSelectedItem.uniqueID);
                 sap.ui.getCore().byId("productIDInputUpdate").setValue(oSelectedItem.productID);
@@ -1380,24 +1380,32 @@ sap.ui.define([
                 sap.ui.getCore().byId("statusSelectUpdate").setSelectedKey(oSelectedItem.status);
                 sap.ui.getCore().byId("validFromInputUpdate").setValue(formatter.formatDate(oSelectedItem.validFrom));
                 sap.ui.getCore().byId("validToInputUpdate").setValue(formatter.formatDate(oSelectedItem.validTo));
-
-                // Step 1: Fetch data from `productclass` to retrieve characteristic IDs
+            
+                // Step 1: Fetch data from `productclass` to retrieve classID and characteristicID for the selected uniqueID
                 const oModel = this.getView().getModel("cat3model");
                 oModel.read("/productclass", {
                     success: (oData) => {
-                        // Extract characteristicIDs for the selected uniqueID
-                        const characteristicIDs = oData.results
-                            .filter(item => item.uniqueID_uniqueID === uniqueID)
-                            .map(item => item.characteristicID_characteristicID);
-
+                        // Extract characteristic IDs and corresponding class IDs for the selected uniqueID
+                        const characteristicDataMap = {};
+                        oData.results.forEach(item => {
+                            if (item.uniqueID_uniqueID === uniqueID) {
+                                characteristicDataMap[item.characteristicID_characteristicID] = item.classID_classID;
+                            }
+                        });
+            
+                        const characteristicIDs = Object.keys(characteristicDataMap);
+            
                         // Step 2: Fetch all data from `productclassunicalview`
                         oModel.read("/productclassunicalview", {
                             success: (oData) => {
-                                // Step 3: Programmatically filter data based on uniqueID and characteristicID using strict equality (===)
-                                const filteredData = oData.results.filter(item =>
-                                    item.UNIQUEID === uniqueID && characteristicIDs.includes(item.CHARACTERISTICID)
-                                );
-
+                                // Step 3: Filter data based on uniqueID and characteristicID only
+                                const filteredData = oData.results
+                                    .filter(item => item.UNIQUEID === uniqueID && characteristicIDs.includes(item.CHARACTERISTICID))
+                                    .map(item => ({
+                                        ...item,
+                                        CLASSID: characteristicDataMap[item.CHARACTERISTICID] // Add classID from characteristicDataMap
+                                    }));
+            
                                 // Step 4: Bind the filtered data to the table in the dialog
                                 const oTable = sap.ui.getCore().byId("characteristicsEditTable");
                                 const oJSONModel = new sap.ui.model.json.JSONModel({ FILTERED_DATA: filteredData });
@@ -1407,15 +1415,16 @@ sap.ui.define([
                                 MessageToast.show("Error while fetching product class unical view data: " + oError.message);
                             }
                         });
-
+            
                         // Open the update dialog
                         this._oUpdateDialog.open();
                     },
                     error: (oError) => {
-                        MessageToast.show("Error while fetching characteristic IDs: " + oError.message);
+                        MessageToast.show("Error while fetching characteristic data: " + oError.message);
                     }
                 });
             },
+            
 
             // onSaveUpdatedProduct: function () {
             //     const oUpdatedProduct = {
@@ -1477,28 +1486,28 @@ sap.ui.define([
             
 
             _saveCharacteristicsUpdate: function (updatedProductID) {
-                // Get the table of characteristics
-                var oCharacteristicTable = sap.ui.getCore().byId("characteristicsEditTable");
-                var aItems = oCharacteristicTable.getItems(); // Get all items (rows) from the table
+                // Access the model bound to the characteristics table
+                var oTable = sap.ui.getCore().byId("characteristicsEditTable");
+                var oModel = oTable.getModel();
+                var aCharacteristicData = oModel.getProperty("/FILTERED_DATA"); // Retrieve FILTERED_DATA directly
             
-                // Use the model for productclass (or the same model as before)
-                var oModel = this.getView().getModel("cat3model");
+                // Use the model for productclass (assuming it's already set in the main view)
+                var oProductClassModel = this.getView().getModel("cat3model");
             
                 // Read all records from the productclass entity
-                oModel.read("/productclass", {
+                oProductClassModel.read("/productclass", {
                     success: function (oData) {
-                        // Loop through all items in the table
-                        aItems.forEach(function (oItem) {
-                            // Get characteristic data from the table row
-                            var oCharacteristicData = oItem.getBindingContext().getObject();
-                            var classID = oCharacteristicData.CLASS_ID; // Assuming CLASS_ID exists
-                            var charID = oCharacteristicData.ID; // Assuming ID exists
-            
-                            // Custom Filtering Logic: Check if the record already exists based on custom criteria
+                        // Loop through all items in the aCharacteristicData array
+                        aCharacteristicData.forEach(function (oCharacteristic) {
+                            var classID = oCharacteristic.CLASSID; // Assuming CLASSID is part of FILTERED_DATA
+                            var charID = oCharacteristic.CHARACTERISTICID; // Assuming CHARACTERISTICID is part of FILTERED_DATA
+                           
+                            // Check if a record with matching uniqueID, classID, and charID exists
                             var bRecordExists = oData.results.some(function (existingRecord) {
                                 return existingRecord.uniqueID_uniqueID === updatedProductID &&
                                        existingRecord.classID_classID === classID &&
                                        existingRecord.characteristicID_characteristicID === charID;
+                                       
                             });
             
                             // If the record does not exist, create it
@@ -1506,12 +1515,12 @@ sap.ui.define([
                                 // Create a new productclass entry
                                 var newProductClassEntry = {
                                     uniqueID_uniqueID: updatedProductID, // Bind with the updated product's uniqueID
-                                    classID_classID: classID, // Bind with the characteristic class ID
+                                    classID_classID: classID, // Bind with the class ID
                                     characteristicID_characteristicID: charID // Bind with the characteristic ID
                                 };
             
-                                // Now create the entry in the productclass entity set
-                                oModel.create("/productclass", newProductClassEntry, {
+                                // Create the entry in the productclass entity set
+                                oProductClassModel.create("/productclass", newProductClassEntry, {
                                     success: function () {
                                         sap.m.MessageToast.show("Characteristic added to product successfully.");
                                     },
@@ -1521,7 +1530,7 @@ sap.ui.define([
                                     }
                                 });
                             } else {
-                                // If the record already exists, log or show a message
+                                // Log or show a message if the record already exists
                                 console.log("Record with the same uniqueID, classID, and characteristicID already exists.");
                                 sap.m.MessageToast.show("Record already exists, skipping.");
                             }
@@ -1534,12 +1543,13 @@ sap.ui.define([
                 });
             },
             
-
             onCloseUpdateProductDialog: function () {
                 this._oUpdateDialog.close();
             },
+            
+            
 
-
+          
 
 
 
@@ -1754,17 +1764,17 @@ sap.ui.define([
 
             onEditAddCharacteristic: function () {//--------------------when i click the add icon insid ethe create button frgamnet panels frgamnet will open there creating the ppanels  dynamically----------
                 // Check if the fragment is already loaded
-                if (!this.oFragment) {
+                if (!this.oFragmentUpdate) {
                     // Load the fragment and bind the controller to maintain context
-                    this.oFragment = sap.ui.xmlfragment("com.productclassuniqueidmaintenanceapplication.fragments.updatecharslectionpanel", this);
-                    this.getView().addDependent(this.oFragment);
+                    this.oFragmentUpdate = sap.ui.xmlfragment("com.productclassuniqueidmaintenanceapplication.fragments.updatecharslectionpanel", this);
+                    this.getView().addDependent(this.oFragmentUpdate);
 
                     // Attach afterOpen event to load data after the dialog is opened
-                    this.oFragment.attachAfterOpen(this.loadDataUpdate.bind(this));
+                    this.oFragmentUpdate.attachAfterOpen(this.loadDataUpdate.bind(this));
                 }
 
                 // Open the dialog
-                this.oFragment.open();
+                this.oFragmentUpdate.open();
             },
             loadDataUpdate: function () {
                 // Create OData model with your service URL
@@ -1783,7 +1793,7 @@ sap.ui.define([
             onDataLoadedUpdate: function (oData) {
                 var oModel = this.getOwnerComponent().getModel("cat3model");
 
-                if (!this.oFragment) {
+                if (!this.oFragmentUpdate) {
                     console.error("Fragment is not initialized!");
                     return;
                 }
@@ -1864,7 +1874,7 @@ sap.ui.define([
                     oVBox.addItem(oPanel);
                 });
 
-                this.oFragment.rerender();
+                this.oFragmentUpdate.rerender();
             },
             _transformDataUpdate: function (aData) {
                 const oGroupedData = {};
@@ -1916,10 +1926,10 @@ sap.ui.define([
                     console.error("VBox not found!");
                     return;
                 }
-
+            
                 const aPanelData = []; // Array to store all selected data
                 let hasSelection = false; // Flag to check if any selection is made
-
+            
                 // Iterate through each panel representing a class
                 oVBox.getItems().forEach((oPanel) => {
                     const selectedClassName = oPanel.getHeaderText(); // Get class name
@@ -1929,20 +1939,20 @@ sap.ui.define([
                         CLASSID: classId,
                         CHARACTERISTICS_DATA: []
                     };
-
+            
                     const oInnerVBox = oPanel.getContent()[0]; // Inner VBox for characteristics
-
+            
                     if (!oInnerVBox || !oInnerVBox.getItems || oInnerVBox.getItems().length === 0) {
                         return; // Skip if no characteristics
                     }
-
+            
                     // Iterate through each characteristic panel
                     oInnerVBox.getItems().forEach((oCharacteristicPanel) => {
                         const characteristicName = oCharacteristicPanel.getHeaderText();
                         const characteristicId = oCharacteristicPanel.data("characteristicId");
-
+            
                         const selectedValues = [];
-
+            
                         // Get selected radio button values
                         oCharacteristicPanel.getContent().forEach((oControl) => {
                             if (oControl instanceof sap.m.VBox) {
@@ -1954,79 +1964,80 @@ sap.ui.define([
                                 });
                             }
                         });
-
+            
                         // If values are selected, add to panel data
                         if (selectedValues.length > 0) {
                             panelData.CHARACTERISTICS_DATA.push({
-                                ID: characteristicId,
+                                CHARACTERISTICID: characteristicId,
                                 NAME: characteristicName,
                                 SELECTED_VALUES: selectedValues,
-                                CLASS_ID: classId
+                                CLASS_ID: classId // Store CLASS_ID
                             });
                         }
                     });
-
+            
                     // Only push panel data if there is selected data
                     if (panelData.CHARACTERISTICS_DATA.length > 0) {
                         aPanelData.push(panelData);
                     }
                 });
-
+            
                 // Show message if no selection is made
                 if (!hasSelection) {
                     sap.m.MessageToast.show("Please select at least one class and its values.");
                     return;
                 }
-
+            
                 // Retrieve the characteristics table and its rows
                 var characteristicsEditTable = sap.ui.getCore().byId("characteristicsEditTable");
                 if (characteristicsEditTable) {
                     const tableRows = characteristicsEditTable.getItems();
-
+            
                     const newCharacteristics = [];
                     const duplicateEntriesBefore = []; // Duplicates before adding the new record
                     const duplicateEntriesAfter = [];  // Duplicates after adding the new record
-
+            
                     // Get the existing data from the table model
                     const existingData = characteristicsEditTable.getModel().getData().FILTERED_DATA || [];
-
+            
                     // Loop through each characteristic in aPanelData and check for duplicates in the existing table data
                     aPanelData.forEach(panel => {
                         panel.CHARACTERISTICS_DATA.forEach(characteristic => {
                             // Check if the same characteristic ID and selected value already exists in the table rows (before adding)
                             const duplicate = existingData.some(row => {
-                                return row.CHARACTERISTICID === characteristic.ID &&
+                                return row.CHARACTERISTICID === characteristic.CHARACTERISTICID &&
                                     row.VALUE === characteristic.SELECTED_VALUES.join(', '); // Compare both ID and value
                             });
-
+            
                             if (duplicate) {
                                 duplicateEntriesBefore.push(characteristic.NAME); // Add name to duplicates if found
                             } else {
                                 newCharacteristics.push({
                                     CHARACTERISTICNAME: characteristic.NAME,
-                                    ID: characteristic.ID,
-                                    VALUE: characteristic.SELECTED_VALUES.join(', ') // Store the selected values as a comma-separated string
+                                    CHARACTERISTICID: characteristic.CHARACTERISTICID,
+                                    VALUE: characteristic.SELECTED_VALUES.join(', '), // Store the selected values as a comma-separated string
+                                    CLASSID: characteristic.CLASS_ID // Store CLASS_ID here
                                 });
                             }
                         });
                     });
-
+            
                     // If duplicates are found before adding, show a message to the user
                     if (duplicateEntriesBefore.length > 0) {
                         const messageBefore = `"${duplicateEntriesBefore.join(', ')}" with the selected values already exist.`;
                         sap.m.MessageToast.show(messageBefore);
                     }
-
+            
                     // Add only new characteristics to the model if there are any
                     if (newCharacteristics.length > 0) {
                         const updatedData = existingData.concat(newCharacteristics); // Merge new data with existing data
                         characteristicsEditTable.getModel().setData({
                             FILTERED_DATA: updatedData
                         });
-
+            
                         // After adding, check again for duplicates to ensure nothing gets added twice
                         const newTableData = characteristicsEditTable.getModel().getData().FILTERED_DATA;
-
+            
                         const allUniqueData = [];
                         newTableData.forEach(item => {
                             // Check if this item already exists in the allUniqueData array based on ID and value
@@ -2034,17 +2045,17 @@ sap.ui.define([
                                 existingItem.CHARACTERISTICID === item.CHARACTERISTICID &&
                                 existingItem.VALUE === item.VALUE
                             );
-
+            
                             if (!duplicateCheck) {
                                 allUniqueData.push(item); // Add if not a duplicate
                             }
                         });
-
+            
                         // Finally, update the model to only include unique records
                         characteristicsEditTable.getModel().setData({
                             FILTERED_DATA: allUniqueData
                         });
-
+            
                         // If duplicates are found after adding, show a message to the user
                         if (allUniqueData.length !== newTableData.length) {
                             const messageAfter = "Duplicate records found after addition. They were removed.";
@@ -2052,11 +2063,12 @@ sap.ui.define([
                         }
                     }
                 }
-
+            
                 // Close the dialog and log the selected data
-                this.oFragment.close();
+                this.oFragmentUpdate.close();
                 console.log("Selected Class Data:", aPanelData);
             }
+            
 
 
 

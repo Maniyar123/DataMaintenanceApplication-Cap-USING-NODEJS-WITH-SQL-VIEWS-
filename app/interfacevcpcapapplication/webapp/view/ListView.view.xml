@@ -1,0 +1,14 @@
+<mvc:View controllerName="com.interfacevcpcapapplication.controller.ListView"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <Page id="page" title="{i18n>title}">
+           
+             <List id="listItems"  itemPress="onListItemPress" items="{vcpmodel>/INTERFACE}" >
+   
+   	  <StandardListItem type="Navigation"
+	  title="{vcpmodel>interface_Name}"
+      icon="sap-icon://begin" 
+      />
+       </List>
+    </Page>
+</mvc:View>

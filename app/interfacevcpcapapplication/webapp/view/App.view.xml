@@ -1,0 +1,13 @@
+<mvc:View controllerName="com.interfacevcpcapapplication.controller.App"
+   xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+     xmlns="sap.f" height="100%">
+    <FlexibleColumnLayout 
+        id="fcl"
+        
+        >
+        <beginColumnPages>
+            <mvc:XMLView id="beginView" async="true" viewName="com.interfacevcpcapapplication.view.ListView" />
+        </beginColumnPages>
+
+        </FlexibleColumnLayout>
+</mvc:View>

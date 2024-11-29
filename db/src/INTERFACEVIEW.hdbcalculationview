@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="INTERFACEVIEW" applyPrivilegeType="NONE" dataCategory="DIMENSION" dimensionType="STANDARD" schemaVersion="3.0" hierarchyGeneration="SQL" outputViewType="Projection" cacheInvalidationPeriod="NONE" enforceSqlExecution="true" application="BAS">
+<descriptions defaultDescription="INTERFACEVIEW"/>
+<localVariables/>
+<variableMappings/>
+<dataSources>
+  <DataSource id="CATALOGSERVICE4_INTERFACE_SERVICE_CONFIGURATION">
+    <resourceUri>CATALOGSERVICE4_INTERFACE_SERVICE_CONFIGURATION</resourceUri>
+  </DataSource>
+  <DataSource id="CATALOGSERVICE4_CONFIGURATION_INTERFACE_TABLE">
+    <resourceUri>CATALOGSERVICE4_CONFIGURATION_INTERFACE_TABLE</resourceUri>
+  </DataSource>
+  <DataSource id="CATALOGSERVICE4_SERVICETYPE">
+    <resourceUri>CATALOGSERVICE4_SERVICETYPE</resourceUri>
+  </DataSource>
+</dataSources>
+<snapshotProcedures/>
+<calculationViews>
+  <calculationView xsi:type="Calculation:JoinView" id="Join_1_1" cardinality="C1_N" joinType="inner" multiJoinNode="Join_1" multiJoinCentralTable="CATALOGSERVICE4_SERVICETYPE" multiJoinOrder="Outside In">
+    <viewAttributes>
+      <viewAttribute id="SERVICE_ID"/>
+      <viewAttribute id="PARAMETER_ID"/>
+      <viewAttribute id="VALUE_ID"/>
+      <viewAttribute id="INTERFACE_TYPE"/>
+      <viewAttribute hidden="true" id="JOIN$SERVICE_ID$SERVICE_ID"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="CATALOGSERVICE4_INTERFACE_SERVICE_CONFIGURATION">
+      <mapping xsi:type="Calculation:AttributeMapping" target="SERVICE_ID" source="SERVICE_ID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="PARAMETER_ID" source="PARAMETER_ID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="VALUE_ID" source="VALUE_ID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="INTERFACE_TYPE" source="INTERFACE_TYPE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$SERVICE_ID$SERVICE_ID" source="SERVICE_ID"/>
+    </input>
+    <input node="CATALOGSERVICE4_CONFIGURATION_INTERFACE_TABLE">
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$SERVICE_ID$SERVICE_ID" source="SERVICE_ID"/>
+    </input>
+    <joinAttribute name="JOIN$SERVICE_ID$SERVICE_ID"/>
+  </calculationView>
+  <calculationView xsi:type="Calculation:JoinView" id="Join_1_2" cardinality="C1_N" joinType="inner" multiJoinNode="Join_1" multiJoinCentralTable="CATALOGSERVICE4_SERVICETYPE" multiJoinOrder="Outside In">
+    <viewAttributes>
+      <viewAttribute id="INTERFACE_TYPE"/>
+      <viewAttribute id="SERVICE_TYPENAME"/>
+      <viewAttribute id="SERVICE_ID"/>
+      <viewAttribute id="PARAMETER_ID"/>
+      <viewAttribute id="VALUE_ID"/>
+      <viewAttribute hidden="true" id="JOIN$INTERFACE_TYPE$INTERFACE_TYPE"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="CATALOGSERVICE4_SERVICETYPE">
+      <mapping xsi:type="Calculation:AttributeMapping" target="INTERFACE_TYPE" source="INTERFACE_TYPE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="SERVICE_TYPENAME" source="SERVICE_TYPENAME"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$INTERFACE_TYPE$INTERFACE_TYPE" source="INTERFACE_TYPE"/>
+    </input>
+    <input node="Join_1_1">
+      <mapping xsi:type="Calculation:AttributeMapping" target="SERVICE_ID" source="SERVICE_ID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="PARAMETER_ID" source="PARAMETER_ID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="VALUE_ID" source="VALUE_ID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$INTERFACE_TYPE$INTERFACE_TYPE" source="INTERFACE_TYPE"/>
+    </input>
+    <joinAttribute name="JOIN$INTERFACE_TYPE$INTERFACE_TYPE"/>
+  </calculationView>
+</calculationViews>
+
+<logicalModel id="Join_1_2">
+  <attributes>
+    <attribute id="INTERFACE_TYPE" order="1" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="INTERFACE_TYPE"/>
+      <keyMapping columnObjectName="Join_1_2" columnName="INTERFACE_TYPE"/>
+    </attribute>
+    <attribute id="SERVICE_TYPENAME" order="2" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="SERVICE_TYPENAME"/>
+      <keyMapping columnObjectName="Join_1_2" columnName="SERVICE_TYPENAME"/>
+    </attribute>
+    <attribute id="SERVICE_ID" order="3" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="SERVICE_ID"/>
+      <keyMapping columnObjectName="Join_1_2" columnName="SERVICE_ID"/>
+    </attribute>
+    <attribute id="PARAMETER_ID" order="4" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="PARAMETER_ID"/>
+      <keyMapping columnObjectName="Join_1_2" columnName="PARAMETER_ID"/>
+    </attribute>
+    <attribute id="VALUE_ID" order="5" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="VALUE_ID"/>
+      <keyMapping columnObjectName="Join_1_2" columnName="VALUE_ID"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures/>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+    
+  
+    <shape expanded="true" modelObjectName="Join_1" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="89" y="208"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape modelObjectName="CATALOGSERVICE4_SERVICETYPE" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput" multiJoinViewNodeName="Join_1">
+      <upperLeftCorner x="30" y="40"/>
+      <rectangleSize width="271.1640625"/>
+    </shape>
+    <shape modelObjectName="CATALOGSERVICE4_INTERFACE_SERVICE_CONFIGURATION" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput" multiJoinViewNodeName="Join_1">
+      <upperLeftCorner x="320" y="30"/>
+      <rectangleSize width="421.609375"/>
+    </shape>
+    <shape modelObjectName="CATALOGSERVICE4_CONFIGURATION_INTERFACE_TABLE" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput" multiJoinViewNodeName="Join_1">
+      <upperLeftCorner x="798" y="62"/>
+      <rectangleSize width="408.25"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>

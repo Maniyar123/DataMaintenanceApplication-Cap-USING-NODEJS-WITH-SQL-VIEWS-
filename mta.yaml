@@ -85,6 +85,10 @@ modules:
       - comdemoexceldownload.zip
       name: comdemoexceldownload
       target-path: resources/
+    - artifacts:
+      - cominterfacevcpcapapplication.zip
+      name: cominterfacevcpcapapplication
+      target-path: resources/
 - name: comcarproductapplicationproductsapplication
   type: html5
   path: app/productsapplication
@@ -148,6 +152,16 @@ modules:
 - name: comdemoexceldownload
   type: html5
   path: app/demoexceldownload
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: cominterfacevcpcapapplication
+  type: html5
+  path: app/interfacevcpcapapplication
   build-parameters:
     build-result: dist
     builder: custom

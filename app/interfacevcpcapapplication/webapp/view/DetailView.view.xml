@@ -1,0 +1,10 @@
+<mvc:View controllerName="com.interfacevcpcapapplication.controller.DetailView"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+
+    <Page id="detailPage" title="{i18n>title2}" >
+        <content>
+            <VBox id="vboxContainer" /> <!-- We will dynamically add panels here -->
+        </content>
+    </Page>
+</mvc:View>

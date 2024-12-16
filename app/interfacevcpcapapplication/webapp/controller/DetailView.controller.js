@@ -111,16 +111,16 @@ sap.ui.define([
                     // Assign the operation based on PARAMETER_ID
                     switch (parameterId) {
                         case 1:
-                            operation = "Create: ";
+                            operation = "Create:";
                             break;
                         case 2:
-                            operation = "Read: ";
+                            operation = "Read:";
                             break;
                         case 3:
-                            operation = "Update: ";
+                            operation = "Update:";
                             break;
                         case 4:
-                            operation = "Delete: ";
+                            operation = "Delete:";
                             break;
                         default:
                             console.log("Unknown PARAMETER_ID:", parameterId);

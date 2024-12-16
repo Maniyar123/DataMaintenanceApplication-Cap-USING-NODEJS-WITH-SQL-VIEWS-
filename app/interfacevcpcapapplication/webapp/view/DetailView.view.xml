@@ -18,19 +18,22 @@
             <!-- ComboBox for selecting CRUD applicability -->
             <ComboBox visible="{= !${treeModel>nodes} || ${treeModel>nodes}.length === 1 }" >
             
-              <items>
-                <!-- Dynamically set text based on mode using expression binding -->
-                <core:Item text="{= ${treeModel>name} === 'Create: ' || ${treeModel>name} === 'Update: ' || ${treeModel>name} === 'Delete: ' ? 'automatedpplicable' : '' }"  />
-                <core:Item text="{= ${treeModel>name} === 'Create: ' || ${treeModel>name} === 'Read: '  || ${treeModel>name} === 'Update: ' || ${treeModel>name} === 'Delete: ' ? 'applicable' : '' }" />
-                <core:Item text="{= ${treeModel>name} === 'Create: ' || ${treeModel>name} === 'Read: '  || ${treeModel>name} === 'Update: ' || ${treeModel>name} === 'Delete: '  ? 'not applicable' : '' }" />
-                <core:Item text="{= ${treeModel>name} === 'Create: ' || ${treeModel>name} === 'Update: ' || ${treeModel>name} === 'Delete: ' ? 'manual' : '' }" />
-               
-         </items>
+             <items>
+                  <core:Item 
+                    text="automated applicable" 
+                    enabled="{= ${treeModel>name} === 'Create:' || ${treeModel>name} === 'Update:' || ${treeModel>name} === 'Delete:' }" />
+                  <core:Item 
+                    text="applicable" 
+                    enabled="{= ${treeModel>name} === 'Create:' || ${treeModel>name} === 'Read:' || ${treeModel>name} === 'Update:' || ${treeModel>name} === 'Delete:' }" />
+                  <core:Item 
+                    text="not applicable" 
+                    enabled="{= ${treeModel>name} === 'Create:' || ${treeModel>name} === 'Read:' || ${treeModel>name} === 'Update:' || ${treeModel>name} === 'Delete:' }" />
+                  <core:Item 
+                    text="manual" 
+                    enabled="{= ${treeModel>name} === 'Create:' || ${treeModel>name} === 'Update:' || ${treeModel>name} === 'Delete:' }" />
+              </items>
             </ComboBox>
           </VBox>
-        
-          
-
         </CustomTreeItem>
       </items>
     </Tree>

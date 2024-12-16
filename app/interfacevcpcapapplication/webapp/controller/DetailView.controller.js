@@ -1,90 +1,142 @@
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
-    "sap/m/Panel",
-    "sap/m/VBox",
-    "sap/m/Input",
-    "sap/ui/layout/form/SimpleForm"
-], function (Controller, Panel, VBox, Input, SimpleForm) {
+    "sap/ui/model/odata/v2/ODataModel",
+    "sap/m/Tree",
+    "sap/m/StandardTreeItem",
+    "sap/ui/model/json/JSONModel",
+    "sap/m/BusyDialog"
+], function (Controller, ODataModel, Tree, StandardTreeItem, JSONModel, BusyDialog) {
     "use strict";
 
     return Controller.extend("com.interfacevcpcapapplication.controller.DetailView", {
+
         onInit: function () {
             this.bus = this.getOwnerComponent().getEventBus();
-            this.bus.subscribe("flexible", "setDetailPage", this.onListItemPress, this);
+            this.bus.subscribe("flexible", "setDetailPage", this.setDetailPage, this);
+            this._busyDialog = new BusyDialog(); // Initialize the BusyDialog
         },
 
-        // Triggered when an item is clicked on the list page
-        onListItemPress: function () {
-            const oModel = this.getOwnerComponent().getModel("vcpmodel"); // Default OData model
+        getData: function (sInterfaceID) {
+            var oModel = this.getOwnerComponent().getModel("vcpmodel");
 
-            // Fetch data from the 'SERVICETYPE' entity
-            oModel.read("/SERVICETYPE", {
-                success: (oData) => {
-                    console.log("Fetched SERVICETYPE data:", oData); // Debugging the response
+            // Open the BusyDialog before starting data load
+            this._busyDialog.open();
 
-                    // Use "results" instead of "value"
-                    if (oData.results && oData.results.length > 0) {
-                        // Dynamically create panels based on service_TypeName
-                        this._createPanels(oData.results);
-                    } else {
-                        console.warn("No data found in SERVICETYPE results");
+            oModel.read("/interface_View", {
+                success: function (oData) {
+                    if (!oData || !oData.results) {
+                        console.error("No data found for the interface.");
+                        this._busyDialog.close(); // Close the BusyDialog on failure
+                        return;
                     }
-                },
-                error: (oError) => {
-                    console.error("Failed to fetch SERVICETYPE data", oError);
+
+                    // Filter data based on SERVICE_ID
+                    var filteredData = oData.results.filter(function (item) {
+                        return item.SERVICE_ID === sInterfaceID;
+                    });
+
+                    if (filteredData.length > 0) {
+                        // Group data by SERVICE_TYPENAME and assign the correct CRUD operations
+                        var groupedData = this._groupDataWithCRUD(filteredData);
+
+                        // Set the grouped data to the model to bind to Tree
+                        var oTreeModel = new JSONModel({ SERVICE_TYPES: groupedData });
+                        this.getView().setModel(oTreeModel, "treeModel");
+                    } else {
+                        console.error("No matching data found for the interface ID.");
+                    }
+
+                    // Close the BusyDialog after data load is complete
+                    this._busyDialog.close();
+                }.bind(this),
+
+                error: function (oError) {
+                    console.error("Error fetching interface data: ", oError);
+
+                    // Close the BusyDialog in case of an error
+                    this._busyDialog.close();
                 }
             });
         },
 
-        // Dynamically create panels for each service_TypeName
-        _createPanels: function (aServiceTypes) {
-            const oVBox = this.byId("vboxContainer"); // Parent container
-            oVBox.destroyItems(); // Clear previous panels
-
-            // Loop through the service types and create a panel for each
-            aServiceTypes.forEach((oServiceType) => {
-                const sServiceTypeName = oServiceType.service_TypeName;
-
-                // Create a panel
-                const oPanel = new Panel({
-                    headerText: sServiceTypeName,
-                    expandable: true,
-                    expanded: false, // Initially collapsed
-                    content: [
-                        // Placeholder VBox for CRUD inputs, initially empty
-                        new VBox({
-                            items: []
-                        })
-                    ],
-                    expand: this._onPanelExpand.bind(this, sServiceTypeName)
-                });
-
-                // Add the panel to the parent VBox
-                oVBox.addItem(oPanel);
-            });
+        onAfterRendering: function () {
+            var oGModel = this.getOwnerComponent().getModel("globalModelvcp");
+            var sInterfaceID = oGModel.getProperty("/id");
+            this.getData(sInterfaceID); // Call getData with interface ID
         },
 
-        // Triggered when a panel is expanded
-        _onPanelExpand: function (sServiceTypeName, oEvent) {
-            const oPanel = oEvent.getSource();
-            const oVBox = oPanel.getContent()[0]; // Access the VBox inside the panel
+        setDetailPage: function (sChannel, sEvent, oData) {
+            var sInterfaceID = oData.id;
+            this.getData(sInterfaceID);
+        },
 
-            // Check if inputs are already added
-            if (oVBox.getItems().length === 0) {
-                console.log(`Adding CRUD inputs for ${sServiceTypeName}`); // Debugging
-
-                // Add CRUD inputs (Create, Read, Update, Delete)
-                ["Create", "Read", "Update", "Delete"].forEach((sAction) => {
-                    const oInput = new Input({
-                        placeholder: `${sAction} ${sServiceTypeName}`
+        _groupDataWithCRUD: function (data) {
+            var grouped = [];
+            var uniqueTypes = new Set(); // Track unique SERVICE_TYPENAME values
+        
+            // Set to track already added combinations of SERVICE_TYPENAME and PARAMETER_ID
+            var addedOperations = new Map();
+        
+            data.forEach(function (item) {
+                var serviceType = item.SERVICE_TYPENAME; // Get SERVICE_TYPENAME
+                var parameterId = item.PARAMETER_ID; // Get PARAMETER_ID
+        
+                // Ensure the item has a valid SERVICE_TYPENAME before processing
+                if (!serviceType) {
+                    console.error("Missing SERVICE_TYPENAME for item:", item);
+                    return; // Skip this item if SERVICE_TYPENAME is missing
+                }
+        
+                // Initialize the group for the serviceType if not already done
+                if (!uniqueTypes.has(serviceType)) {
+                    uniqueTypes.add(serviceType);
+                    grouped.push({
+                        name: serviceType,
+                        nodes: [] // Initialize an empty array for nodes
                     });
-                    oVBox.addItem(oInput);
+                }
+        
+                // Find the group for the serviceType
+                var serviceGroup = grouped.find(function (group) {
+                    return group.name === serviceType;
                 });
-            }
-        },
-
-        onExit: function () {
-            this.bus.unsubscribe("flexible", "setDetailPage", this.onListItemPress, this);
+        
+                // Create a unique key based on SERVICE_TYPENAME and PARAMETER_ID
+                var uniqueKey = serviceType + "_" + parameterId;
+        
+                // Now, add nodes based on PARAMETER_ID if it's not 0 and if not already added
+                if (parameterId !== 0 && !addedOperations.has(uniqueKey)) {
+                    var operation = "";
+        
+                    // Assign the operation based on PARAMETER_ID
+                    switch (parameterId) {
+                        case 1:
+                            operation = "Create: ";
+                            break;
+                        case 2:
+                            operation = "Read: ";
+                            break;
+                        case 3:
+                            operation = "Update: ";
+                            break;
+                        case 4:
+                            operation = "Delete: ";
+                            break;
+                        default:
+                            console.log("Unknown PARAMETER_ID:", parameterId);
+                            return; // Skip unknown operations
+                    }
+        
+                    // Add operation to the group if it's not already added for this SERVICE_TYPENAME and PARAMETER_ID
+                    if (serviceGroup && operation) {
+                        serviceGroup.nodes.push({ name: operation });
+                        addedOperations.set(uniqueKey, true); // Mark this combination as added
+                    }
+                }
+            });
+        
+            return grouped;
         }
+
     });
 });

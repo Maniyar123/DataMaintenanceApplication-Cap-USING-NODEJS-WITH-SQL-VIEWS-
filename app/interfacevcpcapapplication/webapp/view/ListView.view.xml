@@ -1,14 +1,25 @@
 <mvc:View controllerName="com.interfacevcpcapapplication.controller.ListView"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m">
-    <Page id="page" title="{i18n>title}">
-           
-             <List id="listItems"  itemPress="onListItemPress" items="{vcpmodel>/INTERFACE}" >
-   
-   	  <StandardListItem type="Navigation"
-	  title="{vcpmodel>interface_Name}"
-      icon="sap-icon://begin" 
-      />
-       </List>
+    <Page id="page" title="{i18n>title}" titleAlignment="Center">
+        
+        <!-- Add Search Bar to List -->
+        <List id="listItems" itemPress="onListItemPress" items="{vcpmodel>/INTERFACE}">
+            <headerToolbar>
+                <Toolbar>
+                    
+                    <ToolbarSpacer />
+                    <SearchField id="searchField" placeholder="Search here ..."  liveChange="onLiveChange" />
+                </Toolbar>
+            </headerToolbar>
+            
+            <!-- Custom List Items -->
+            <CustomListItem type="Navigation">
+                <HBox height="60px" alignItems="Center">
+                    <Text text="{vcpmodel>interface_Name}" />
+                </HBox>
+            </CustomListItem>
+        </List>
+        
     </Page>
 </mvc:View>

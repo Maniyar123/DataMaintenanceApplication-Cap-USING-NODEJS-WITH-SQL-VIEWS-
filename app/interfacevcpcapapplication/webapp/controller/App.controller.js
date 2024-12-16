@@ -26,7 +26,7 @@ sap.ui.define([
         viewName: "com.interfacevcpcapapplication.view.DetailView"
       }).then(function (detailView) {
         this.oFlexibleColumnLayout.addMidColumnPage(detailView);
-        this.oFlexibleColumnLayout.setLayout(LayoutType.TwoColumnsBeginExpanded);
+        this.oFlexibleColumnLayout.setLayout(LayoutType.TwoColumnsMidExpanded);
       }.bind(this));
     },
 

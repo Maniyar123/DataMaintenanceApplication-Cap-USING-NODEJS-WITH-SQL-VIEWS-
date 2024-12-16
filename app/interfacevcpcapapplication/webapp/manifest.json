@@ -70,6 +70,13 @@
           "autoExpandSelect": true,
           "earlyRequests": true
         }
+      },
+
+      "globalModelvcp": {
+        "type": "sap.ui.model.json.JSONModel",
+        "settings": {
+         
+        }
       }
     },
     "resources": {

@@ -1,10 +1,39 @@
-<mvc:View controllerName="com.interfacevcpcapapplication.controller.DetailView"
-    xmlns:mvc="sap.ui.core.mvc"
-    xmlns="sap.m">
+<mvc:View
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m"
+  xmlns:core="sap.ui.core"
+  controllerName="com.interfacevcpcapapplication.controller.DetailView">
 
-    <Page id="detailPage" title="{i18n>title2}" >
-        <content>
-            <VBox id="vboxContainer" /> <!-- We will dynamically add panels here -->
-        </content>
-    </Page>
+  <Page title="Detail" titleAlignment="Center">
+    <!-- Tree for displaying service types and CRUD operations -->
+    <Tree id="serviceTree" items="{
+      path: 'treeModel>/SERVICE_TYPES'
+    }">
+      <items>
+        <CustomTreeItem>
+          <VBox>
+            <!-- Display Service Type Name -->
+            <Text text="{treeModel>name}"/>
+
+            <!-- ComboBox for selecting CRUD applicability -->
+            <ComboBox visible="{= !${treeModel>nodes} || ${treeModel>nodes}.length === 1 }" >
+            
+              <items>
+                <!-- Dynamically set text based on mode using expression binding -->
+                <core:Item text="{= ${treeModel>name} === 'Create: ' || ${treeModel>name} === 'Update: ' || ${treeModel>name} === 'Delete: ' ? 'automatedpplicable' : '' }"  />
+                <core:Item text="{= ${treeModel>name} === 'Create: ' || ${treeModel>name} === 'Read: '  || ${treeModel>name} === 'Update: ' || ${treeModel>name} === 'Delete: ' ? 'applicable' : '' }" />
+                <core:Item text="{= ${treeModel>name} === 'Create: ' || ${treeModel>name} === 'Read: '  || ${treeModel>name} === 'Update: ' || ${treeModel>name} === 'Delete: '  ? 'not applicable' : '' }" />
+                <core:Item text="{= ${treeModel>name} === 'Create: ' || ${treeModel>name} === 'Update: ' || ${treeModel>name} === 'Delete: ' ? 'manual' : '' }" />
+               
+         </items>
+            </ComboBox>
+          </VBox>
+        
+          
+
+        </CustomTreeItem>
+      </items>
+    </Tree>
+  </Page>
+
 </mvc:View>

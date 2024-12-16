@@ -33,13 +33,59 @@ sap.ui.define([
         //     // Publish the event with the selected item ID
         //     this.bus.publish("flexible", "setDetailPage", { selectedItemId });
         // }
-        onListItemPress: function () {
-            // Publish the event to load the detail page
-            this.bus.publish("flexible", "setDetailPage");
+        
+        onListItemPress: function(oEvent) {
+            // Get the selected item from the event
+            var oSelectedItem = oEvent.getParameter("listItem");
+        
+            // Get the binding context of the selected item
+            var oBindingContext = oSelectedItem.getBindingContext("vcpmodel");
+            var oGModel = this.getOwnerComponent().getModel("globalModelvcp");
+        
+            if (oBindingContext) {
+                // Access properties via the binding context
+                var sID = oBindingContext.getProperty("interface_ID");
+                var sName = oBindingContext.getProperty("interface_Name");
+        
+                // Log the properties (optional)
+                // console.log("Selected ID: ", sID);
+                // console.log("Selected Name: ", sName);
+        
+                // Set the selected values to the global model
+                oGModel.setProperty("/id", sID);
+                oGModel.setProperty("/name", sName);
+        
+                // Publish event to navigate to the detail page
+                this.bus.publish("flexible", "setDetailPage", {
+                    id: sID,
+                    name: sName
+                });
+            } else {
+                console.error("Binding context is undefined.");
+            }
+        },
+        
+        
+        onLiveChange: function (oEvent) {
+            // Get the value entered in the SearchField
+            var sQuery = oEvent.getParameter("newValue");
+            var oList = this.byId("listItems");
+            var oBinding = oList.getBinding("items");
+        
+            // Apply the filter only if there is a query
+            if (sQuery) {
+                var oFilter = new sap.ui.model.Filter({
+                    path: "interface_Name", // Property to filter
+                    operator: sap.ui.model.FilterOperator.Contains,
+                    value1: sQuery,
+                    caseSensitive: false // Ensure case-insensitive filtering
+                });
+                oBinding.filter([oFilter]);
+            } else {
+                // Clear the filter if the query is empty
+                oBinding.filter([]);
+            }
         }
-        
-        
-        
-        
+
     });
-});
+}); 

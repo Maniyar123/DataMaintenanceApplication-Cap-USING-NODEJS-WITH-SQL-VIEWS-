@@ -25,6 +25,7 @@ entity Configuration_Interface_Table {
     key Interface_Type          : Integer; // Foreign key to ServiceType.Interface_Type
    
 }
+
  }
 @cds.persistence.exists
 @cds.persistence.table

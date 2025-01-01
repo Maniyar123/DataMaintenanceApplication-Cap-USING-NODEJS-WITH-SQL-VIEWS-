@@ -1,0 +1,196 @@
+{
+  "_version": "1.65.0",
+  "sap.app": {
+    "id": "com.vcplocapp",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": {
+      "version": "0.0.1"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "resources": "resources.json",
+    "sourceTemplate": {
+      "id": "@sap/generator-fiori:lrop",
+      "version": "1.15.7",
+      "toolsId": "b5332e91-5050-4fb0-a0ce-e10e8eb999fd"
+    },
+    "dataSources": {
+      "mainService": {
+        "uri": "/odata/v4/catalog-service5/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "odataVersion": "4.0"
+        }
+      },
+      "mainService1": {
+        "uri": "/v2/odata/v4/catalog-service5/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "odataVersion": "2.0"
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": "",
+      "phone": "",
+      "phone@2": "",
+      "tablet": "",
+      "tablet@2": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": true,
+    "dependencies": {
+      "minUI5Version": "1.131.1",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {},
+        "sap.fe.templates": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "com.vcplocapp.i18n.i18n"
+        }
+      },
+      "": {
+        "dataSource": "mainService",
+        "preload": true,
+        "settings": {
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
+      },
+      "vmodel": {
+        "dataSource": "mainService1",
+        "preload": true,
+        "settings": {
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
+      },
+      "@i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "uri": "i18n/i18n.properties"
+      }
+    },
+    "resources": {
+      "css": []
+    },
+    "routing": {
+      "config": {},
+      "routes": [
+        {
+          "pattern": ":?query:",
+          "name": "LOCATION_STBList",
+          "target": "LOCATION_STBList"
+        },
+        {
+          "pattern": "LOCATION_STB({key}):?query:",
+          "name": "LOCATION_STBObjectPage",
+          "target": "LOCATION_STBObjectPage"
+        }
+      ],
+      "targets": {
+        "LOCATION_STBList": {
+          "type": "Component",
+          "id": "LOCATION_STBList",
+          "name": "sap.fe.templates.ListReport",
+          "options": {
+            "settings": {
+              "contextPath": "/LOCATION_STB",
+              "variantManagement": "Page",
+              "navigation": {
+                "LOCATION_STB": {
+                  "detail": {
+                    "route": "LOCATION_STBObjectPage"
+                  }
+                }
+              },
+              "controlConfiguration": {
+                "@com.sap.vocabularies.UI.v1.LineItem": {
+                  "tableSettings": {
+                    "type": "ResponsiveTable"
+                  },
+                  "actions": {
+                    "uploadButtonActionId": {
+                      "press": "com.vcplocapp.ext.controller.UploadButton.onPressUploadButton",
+                      "visible": true,
+                      "enabled": true,
+                      "requiresSelection": false,
+                      "text": "Upload"
+                    },
+                    "pushButtonActionId": {
+                      "press": "com.vcplocapp.ext.controller.PushButton.onPressPushButton",
+                      "visible": true,
+                      "enabled": true,
+                      "requiresSelection": false,
+                      "text": "Push"
+                    },
+                    "downloadTempActionButton": {
+                      "press": "com.vcplocapp.ext.controller.DownloadTemp.onPressDownloadTempButton",
+                      "visible": true,
+                      "enabled": true,
+                      "requiresSelection": false,
+                      "text": "Download Template"
+                    },
+                  
+                    "createButton": {
+                      "press": "com.vcplocapp.ext.controller.Listcontroller.onPressCreateButton",
+                      "visible": true,
+                      "enabled": true,
+                      "requiresSelection": false,
+                      "text": "Create"
+                    },
+                    "updateButtonActionId": {
+                      "press": "com.vcplocapp.ext.controller.UpdateButton.OnPressUpdateButton",
+                      "visible": true,
+                      "enabled": true,
+                      "requiresSelection": false,
+                      "text": "Update"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "LOCATION_STBObjectPage": {
+          "type": "Component",
+          "id": "LOCATION_STBObjectPage",
+          "name": "sap.fe.templates.ObjectPage",
+          "options": {
+            "settings": {
+              "editableHeaderContent": false,
+              "contextPath": "/LOCATION_STB"
+            }
+          }
+        }
+      }
+    }
+  },
+  "sap.fiori": {
+    "registrationIds": [],
+    "archeType": "transactional"
+  }
+}

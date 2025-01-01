@@ -1,0 +1,99 @@
+<core:FragmentDefinition xmlns="sap.m"
+                         xmlns:core="sap.ui.core"
+                         xmlns:form="sap.ui.layout.form">
+    <Dialog id="locationUpdateDialog" 
+            title="Update Location"
+            >
+        <content>
+            <form:SimpleForm id="updateLocationForm" 
+                             layout="ColumnLayout" 
+                             editable="true">
+                <!-- Location ID -->
+                <Label text="Location ID"/>
+                <Input id="updateLocationIdInput" 
+                       maxLength="4" 
+                       required="true" 
+                       editable="false" 
+                       value="{/LocationId}"/>
+                
+                <!-- Location Description -->
+                <Label text="Location Description"/>
+                <Input id="updateLocationDescInput" 
+                       maxLength="30" 
+                       value="{/LocationDesc}"/>
+                
+                <!-- Location Type -->
+                <Label text="Location Type"/>
+                <Input id="updateLocationTypeInput" 
+                       maxLength="1" 
+                       value="{/LocationType}"/>
+                
+                <!-- Latitude -->
+                <Label text="Latitude"/>
+                <Input id="updateLatitudeInput" 
+                       maxLength="20" 
+                       value="{/Latitude}"/>
+                
+                <!-- Longitude -->
+                <Label text="Longitude"/>
+                <Input id="updateLongitudeInput" 
+                       maxLength="20" 
+                       value="{/Longitude}"/>
+                
+                <!-- Reserve Fields -->
+                <Label text="Reserve Field 1"/>
+                <Input id="updateReserveField1Input" 
+                       maxLength="20" 
+                       value="{/ReserveField1}"/>
+
+                <Label text="Reserve Field 2"/>
+                <Input id="updateReserveField2Input" 
+                       maxLength="20" 
+                       value="{/ReserveField2}"/>
+
+                <Label text="Reserve Field 3"/>
+                <Input id="updateReserveField3Input" 
+                       maxLength="20" 
+                       value="{/ReserveField3}"/>
+
+                <Label text="Reserve Field 4"/>
+                <Input id="updateReserveField4Input" 
+                       maxLength="20" 
+                       value="{/ReserveField4}"/>
+
+                <Label text="Reserve Field 5"/>
+                <Input id="updateReserveField5Input" 
+                       maxLength="20" 
+                       value="{/ReserveField5}"/>
+
+                <!-- Authorization Group -->
+                <Label text="Authorization Group"/>
+                <Input id="updateAuthGroupInput" 
+                       value="{/AuthGroup}"/>
+
+                <!-- Created/Changed Info -->
+                <Label text="Created Date"/>
+                <DatePicker id="updateCreatedDateInput" 
+                            value="{/CreatedDate}"/>
+
+                <Label text="Created Time"/>
+                <TimePicker id="updateCreatedTimeInput" 
+                            valueFormat="HH:mm:ss" 
+                            displayFormat="HH:mm:ss" 
+                            value="{/CreatedTime}"/>
+
+                <Label text="Created By"/>
+                <Input id="updateCreatedByInput" 
+                       maxLength="12" 
+                       value="{/CreatedBy}"/>
+            </form:SimpleForm>
+        </content>
+        <buttons>
+            <Button text="Update" 
+                    type="Emphasized" 
+                    press="OnPressUpdateButton"/>
+            <Button text="Cancel" 
+                    press="onCancelUpdate"/>
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

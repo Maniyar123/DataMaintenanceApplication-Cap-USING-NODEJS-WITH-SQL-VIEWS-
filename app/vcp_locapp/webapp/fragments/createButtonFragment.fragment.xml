@@ -1,0 +1,68 @@
+<core:FragmentDefinition xmlns="sap.m"
+                         xmlns:core="sap.ui.core"
+                         xmlns:form="sap.ui.layout.form" core:require="{handler:'com/vcplocapp/ext/controller/Listcontroller'}">
+    <Dialog id="locationCreateDialog"
+            title="Create Location" 
+            draggable="true"
+           >
+        <content>
+            <form:SimpleForm id="locationForm"
+                             layout="ColumnLayout"
+                             editable="true">
+                <!-- Location ID -->
+                <Label text="Location ID"/>
+                <Input id="locationIdInput" maxLength="4" required="true"/>
+                
+                <!-- Location Description -->
+                <Label text="Location Description"/>
+                <Input id="locationDescInput" maxLength="30"/>
+                
+                <!-- Location Type -->
+                <Label text="Location Type"/>
+                <Input id="locationTypeInput" maxLength="1"/>
+                
+                <!-- Latitude -->
+                <Label text="Latitude"/>
+                <Input id="latitudeInput" maxLength="20"/>
+                
+                <!-- Longitude -->
+                <Label text="Longitude"/>
+                <Input id="longitudeInput" maxLength="20"/>
+                
+                <!-- Reserve Fields -->
+                <Label text="Reserve Field 1"/>
+                <Input id="reserveField1Input" maxLength="20"/>
+
+                <Label text="Reserve Field 2"/>
+                <Input id="reserveField2Input" maxLength="20"/>
+
+                <Label text="Reserve Field 3"/>
+                <Input id="reserveField3Input" maxLength="20"/>
+
+                <Label text="Reserve Field 4"/>
+                <Input id="reserveField4Input" maxLength="20"/>
+
+                <Label text="Reserve Field 5"/>
+                <Input id="reserveField5Input" maxLength="20"/>
+
+                <!-- Authorization Group -->
+                <Label text="Authorization Group"/>
+                <Input id="authGroupInput"/>
+
+                <!-- Created/Changed Info (Optional for Creation) -->
+                <Label text="Created Date" required="true"/>
+                <DatePicker id="createdDateInput"/>
+              
+                <Label text="Created Time" required="true"/>
+                <TimePicker id="createdTimeInput" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss"/>
+
+                <Label text="Created By"/>
+                <Input id="createdByInput" maxLength="12"/>
+            </form:SimpleForm>
+        </content>
+        <buttons>
+            <Button text="Save" type="Emphasized" press="handler.onSaveLocation"/>
+            <Button text="Cancel" press="handler.onCancelLocation"/>
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>

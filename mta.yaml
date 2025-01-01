@@ -89,6 +89,30 @@ modules:
       - cominterfacevcpcapapplication.zip
       name: cominterfacevcpcapapplication
       target-path: resources/
+    - artifacts:
+      - comlocationapp.zip
+      name: comlocationapp
+      target-path: resources/
+    - artifacts:
+      - demo.zip
+      name: demo
+      target-path: resources/
+    - artifacts:
+      - comvcplocapp.zip
+      name: comvcplocapp
+      target-path: resources/
+    - artifacts:
+      - iftest.zip
+      name: iftest
+      target-path: resources/
+    - artifacts:
+      - comtest.zip
+      name: comtest
+      target-path: resources/
+    - artifacts:
+      - comproject1.zip
+      name: comproject1
+      target-path: resources/
 - name: comcarproductapplicationproductsapplication
   type: html5
   path: app/productsapplication
@@ -169,6 +193,66 @@ modules:
     - npm install
     - npm run build:cf
     supported-platforms: []
+- name: comlocationapp
+  type: html5
+  path: app/locationapp
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: demo
+  type: html5
+  path: app/demo
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: comvcplocapp
+  type: html5
+  path: app/vcp_locapp
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: iftest
+  type: html5
+  path: app/test
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: comtest
+  type: html5
+  path: app/test
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
+- name: comproject1
+  type: html5
+  path: app/project1
+  build-parameters:
+    build-result: dist
+    builder: custom
+    commands:
+    - npm install
+    - npm run build:cf
+    supported-platforms: []
 resources:
 - name: productdetails-auth
   type: org.cloudfoundry.managed-service
@@ -203,11 +287,20 @@ resources:
             ProxyType: Internet
             Type: HTTP
             URL: https://ui5.sap.com
+          - Authentication: NoAuthentication
+            HTML5.DynamicDestination: true
+            HTML5.ForwardAuthToken: true
+            Name: productdetails-srv-api
+            ProxyType: Internet
+            Type: HTTP
+            URL: ~{srv-api/srv-url}
           existing_destinations_policy: update
       version: 1.0.0
     service: destination
     service-name: productdetails-destination-service
     service-plan: lite
+  requires:
+  - name: srv-api
 parameters:
   deploy_mode: html5-repo
   enable-parallel-deployments: true

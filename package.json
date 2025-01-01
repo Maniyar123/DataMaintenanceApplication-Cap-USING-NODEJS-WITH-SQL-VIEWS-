@@ -20,9 +20,10 @@
     "@sap/cds-dk": "^7",
     "@sap/eslint-plugin-cds": "^3",
     "@sap/hdi-deploy": "^4.9.5",
-    "@sap/ux-specification": "^1.120.17",
+    "@sap/ux-specification": "UI5-1.131",
     "eslint": "^9",
-    "rimraf": "^5.0.5"
+    "rimraf": "^5.0.5",
+    "mbt": "^1.2.29"
   },
   "scripts": {
     "start": "cds-serve",
@@ -35,7 +36,12 @@
     "watch-productclassdatamaintenanceapplication": "cds watch --open productclassdatamaintenanceapplication/webapp/index.html?sap-ui-xx-viewCache=false",
     "watch-productclassuniqueidmaintenanceapplication": "cds watch --open productclassuniqueidmaintenanceapplication/webapp/index.html?sap-ui-xx-viewCache=false",
     "watch-demoexceldownload": "cds watch --open demoexceldownload/webapp/index.html?sap-ui-xx-viewCache=false",
-    "watch-interfacevcpcapapplication": "cds watch --open interfacevcpcapapplication/webapp/index.html?sap-ui-xx-viewCache=false"
+    "watch-interfacevcpcapapplication": "cds watch --open interfacevcpcapapplication/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-locationapp": "cds watch --open locationapp/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-demo": "cds watch --open demo/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-vcp_locapp": "cds watch --open vcp_locapp/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-test": "cds watch --open test/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-project1": "cds watch --open project1/webapp/index.html?sap-ui-xx-viewCache=false"
   },
   "cds": {
     "requires": {
@@ -47,6 +53,15 @@
   },
   "sapux": [
     "app/productdetailsapplication",
-    "app/maintenanceapplication"
+    "app/maintenanceapplication",
+    "app/locationapp",
+    "app/locationapp",
+    "app/locationapp",
+    "app/demo",
+    "app/vcp_locapp",
+    "app/vcp_locapp",
+    "app/test",
+    "app/test",
+    "app/project1"
   ]
 }

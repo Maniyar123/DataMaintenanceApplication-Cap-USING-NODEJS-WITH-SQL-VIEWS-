@@ -1,0 +1,31 @@
+<core:FragmentDefinition xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:core="sap.ui.core" core:require="{handler:'com/vcplocapp/ext/controller/UploadButton'}">
+
+    <Dialog
+        id="fileUploadDialog"
+        title="Upload File"
+        class="sapUiSizeCompact"
+        xmlns:u="sap.ui.unified"
+        draggable="true"
+       >
+        
+        <VBox>
+            <u:FileUploader
+                id="fileUploader"
+                name="file"
+                uploadUrl="https://port4004-workspaces-ws-tfmqm.us10.trial.applicationstudio.cloud.sap/odata/v4/catalog-service5/UploadFile"
+                buttonText="Browse"
+                uploadComplete="onUploadComplete" 
+                class="sapUiMediumMarginBegin"
+                />
+        </VBox>
+
+        <beginButton>
+          <Button text="Upload" press="handler.onUploadFile" type="Neutral"></Button>
+        
+        </beginButton>
+        
+        <endButton>
+            <Button text="Close" press="handler.onCloseUploadDialog" />
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

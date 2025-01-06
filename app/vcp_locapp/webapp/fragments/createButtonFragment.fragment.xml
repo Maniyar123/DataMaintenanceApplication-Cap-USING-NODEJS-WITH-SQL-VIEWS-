@@ -4,11 +4,16 @@
     <Dialog id="locationCreateDialog"
             title="Create Location" 
             draggable="true"
+            contentWidth="500px"
+            contentHeight="1050px"
+            verticalScrolling="false"
            >
         <content>
             <form:SimpleForm id="locationForm"
                              layout="ColumnLayout"
-                             editable="true">
+                             editable="true"
+                            
+                            >
                 <!-- Location ID -->
                 <Label text="Location ID"/>
                 <Input id="locationIdInput" maxLength="4" required="true"/>
@@ -49,15 +54,6 @@
                 <Label text="Authorization Group"/>
                 <Input id="authGroupInput"/>
 
-                <!-- Created/Changed Info (Optional for Creation) -->
-                <Label text="Created Date" required="true"/>
-                <DatePicker id="createdDateInput"/>
-              
-                <Label text="Created Time" required="true"/>
-                <TimePicker id="createdTimeInput" valueFormat="HH:mm:ss" displayFormat="HH:mm:ss"/>
-
-                <Label text="Created By"/>
-                <Input id="createdByInput" maxLength="12"/>
             </form:SimpleForm>
         </content>
         <buttons>

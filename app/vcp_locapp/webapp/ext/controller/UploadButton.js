@@ -66,24 +66,27 @@ sap.ui.define([
 
                     // Process each row and prepare the payload for the OData service
                     dataRows.forEach(function (row) {
+                        var currentDate = new Date(); // Get the current date and time
+                        var currentISODate = currentDate.toISOString().split("T")[0]; // Format as YYYY-MM-DD
+                        var currentISOTime = currentDate.toISOString().split("T")[1].split(".")[0]; // Format as HH:MM:SS
+
                         var oFileData = {
                             LOCATION_ID: String(row[0] || "No ID"),  // Convert to string to prevent the deserialization error
-                            LOCATION_DESC: row[1] || "No Description", // Default if empty
-                            LOCATION_TYPE: row[2] || "F", // Default if empty
-                            LATITUDE: row[3] || "0.0", // Default if empty
-                            LONGITUTE: row[4] || "0.0", // Default if empty
+                            LOCATION_DESC: row[1] || "", // Default if empty
+                            LOCATION_TYPE: row[2] || "", // Default if empty
+                            LATITUDE: row[3] || "", // Default if empty
+                            LONGITUTE: row[4] || "", // Default if empty
                             RESERVE_FIELD1: row[5] || "", // Empty if not provided
                             RESERVE_FIELD2: row[6] || "", // Empty if not provided
-                            RESERVE_FIELD3: (row[7] ? (row[7] / 1024).toFixed(2) + " KB" : "0 KB"), // Handle empty size
+                            RESERVE_FIELD3: row[7] || "", // Handle empty size
                             RESERVE_FIELD4: "",
                             RESERVE_FIELD5: "",
                             AUTH_GROUP: "",
-                            CHANGED_DATE: new Date().toISOString().split("T")[0],
-                            CHANGED_TIME: new Date().toTimeString().split(" ")[0],
-                            CHANGED_BY: "",
-                            CREATED_DATE: new Date().toISOString().split("T")[0],
-                            CREATED_TIME: new Date().toTimeString().split(" ")[0],
-                            CREATED_BY: ""
+                            CHANGED_DATE: currentISODate, // Auto-generated date
+                            CHANGED_TIME: currentISOTime, // Auto-generated time
+                            CREATED_DATE: currentISODate, // Auto-generated date
+                            CREATED_TIME: currentISOTime  // Auto-generated time
+                           
                         };
 
                         // Log the data being sent to OData service for debugging

@@ -24,16 +24,29 @@ sap.ui.define([
                         return;
                     }
 
+                    // Define the properties to exclude
+                    var aExcludedFields = [
+                        "CHANGED_DATE",
+                        "CHANGED_TIME",
+                        "CHANGED_BY",
+                        "CREATED_DATE",
+                        "CREATED_TIME",
+                        "CREATED_BY"
+                    ];
+
                     // Extract the column headings (properties of the entity type)
                     var oProperties = oEntityType.querySelectorAll("Property");
                     var aColumns = [];
 
                     oProperties.forEach(function (oProperty) {
-                        aColumns.push(oProperty.getAttribute("Name"));
+                        var sPropertyName = oProperty.getAttribute("Name");
+                        if (!aExcludedFields.includes(sPropertyName)) {
+                            aColumns.push(sPropertyName);
+                        }
                     });
 
                     if (aColumns.length === 0) {
-                        MessageToast.show("No properties found for the entity.");
+                        MessageToast.show("No properties found for the entity after filtering.");
                         return;
                     }
 

@@ -146,6 +146,7 @@
                       "enabled": true,
                       "requiresSelection": false,
                       "text": "Push"
+                      
                     },
                     "downloadTempActionButton": {
                       "press": "com.vcplocapp.ext.controller.DownloadTemp.onPressDownloadTempButton",

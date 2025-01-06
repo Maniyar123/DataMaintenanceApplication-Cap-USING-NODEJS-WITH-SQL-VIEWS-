@@ -18,11 +18,7 @@ sap.ui.define([
                 MessageToast.show("Please select at least one record to push.");
                 return; // Exit if no records are selected
             }
-              // Check if multiple records are selected
-            if (aSelectedIndices.length > 1) {
-                MessageToast.show("Please select only one record to push.");
-                return; // Exit if multiple records are selected
-            }
+          
             // Show confirmation dialog after records are selected
             MessageBox.confirm("Are you sure you want to push the selected records to STAGE_LOC?", {
                 title: "Confirmation",
